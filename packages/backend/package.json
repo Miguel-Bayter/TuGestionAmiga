@@ -1,5 +1,5 @@
 {
-  "name": "tu-gestion-amiga",
+  "name": "@tu-gestion-amiga/backend",
   "version": "1.0.0",
   "private": true,
   "type": "module",
