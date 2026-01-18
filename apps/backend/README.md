@@ -132,6 +132,7 @@ datasource db {
 ```
 
 Todos los scripts bash y SQL desaparecen. Prisma maneja todo:
+
 - ✅ Creación de tablas
 - ✅ Migraciones
 - ✅ Seeding de datos
@@ -148,49 +149,56 @@ Después de ejecutar `pnpm run db:seed`:
 ## 🔗 Endpoints API
 
 ### Health Check
+
 - `GET /api/health` - Verificar que el servidor está corriendo
 
 ### Autenticación
+
 - `POST /api/auth/register` - Registro de usuario con validación de contraseña
 - `POST /api/auth/login` - Login con bcrypt
 
 ### Libros
+
 - `GET /api/books` - Listar todos los libros
 - `GET /api/books/:id` - Detalle de un libro
 - `GET /api/books?available=true` - Listar solo libros disponibles
 
 ## 🛠️ Tecnologías
 
-| Tecnología | Versión | Propósito |
-|-----------|---------|----------|
-| **Node.js** | 20.9.0+ | Runtime |
-| **TypeScript** | 5.3+ | Type-safety |
-| **Express** | 4.19+ | Web framework |
-| **Prisma** | 6.19+ | ORM agnóstico |
-| **MySQL** | 8.x | Base de datos |
-| **bcryptjs** | 2.4+ | Hashing de passwords |
-| **dotenv** | 17.2+ | Variables de entorno |
-| **nodemon** | 3.1+ | Hot reload en desarrollo |
-| **ts-node** | 10.9+ | Ejecutar TypeScript directo |
+| Tecnología     | Versión | Propósito                   |
+| -------------- | ------- | --------------------------- |
+| **Node.js**    | 20.9.0+ | Runtime                     |
+| **TypeScript** | 5.3+    | Type-safety                 |
+| **Express**    | 4.19+   | Web framework               |
+| **Prisma**     | 6.19+   | ORM agnóstico               |
+| **MySQL**      | 8.x     | Base de datos               |
+| **bcryptjs**   | 2.4+    | Hashing de passwords        |
+| **dotenv**     | 17.2+   | Variables de entorno        |
+| **nodemon**    | 3.1+    | Hot reload en desarrollo    |
+| **ts-node**    | 10.9+   | Ejecutar TypeScript directo |
 
 ## 🔑 Decisiones de Diseño
 
 ### ✅ Prisma 6 (No Prisma 7)
+
 - Prisma 6 es LTS (Long Term Support)
 - Mantiene la sintaxis familiar `schema.prisma`
 - Prisma 7 tiene breaking changes
 
 ### ✅ Agnóstico de Base de Datos
+
 - **Antes**: Scripts bash y SQL específicos para MySQL
 - **Ahora**: Prisma maneja todo automáticamente
 - **Resultado**: Cambiar a PostgreSQL toma 5 segundos
 
 ### ✅ TypeScript Seeder
+
 - **Antes**: Scripts bash (requieren MySQL CLI)
 - **Ahora**: `prisma/seed.ts` con Prisma Client
 - **Resultado**: Funciona en cualquier SO, con cualquier BD
 
 ### ✅ Password Utility
+
 - Centralizado en `src/utils/password.ts`
 - Validación de fortaleza incluida
 - Reutilizable en toda la app
@@ -198,21 +206,26 @@ Después de ejecutar `pnpm run db:seed`:
 ## 📝 Notas Importantes
 
 ### Variables de Entorno
+
 El proyecto usa dos archivos `.env`:
+
 - **`.env`** - Usado por Prisma CLI para comandos como `prisma push`
 - **`.env.local`** - Usado por la aplicación en runtime (prioridad mayor)
 
 Ambos deben tener el mismo contenido para consistencia.
 
 ### CommonJS vs ES Modules
+
 El proyecto usa **CommonJS** para mejor compatibilidad con `ts-node`. No es necesario agregar `.js` a los imports.
 
 ### CORS
+
 Configurado por defecto para `http://localhost:5173` (Vite). Cambiar en `.env.local` si es necesario.
 
 ## 🐛 Troubleshooting
 
 ### Error: Missing DATABASE_URL
+
 ```bash
 # Verificar que ambos archivos existen
 ls .env .env.local
@@ -222,6 +235,7 @@ cat .env | grep DATABASE_URL
 ```
 
 ### Error: Cannot connect to MySQL
+
 ```bash
 # Verificar que MySQL está corriendo
 mysql -u root -p -e "SELECT 1;"
@@ -231,6 +245,7 @@ mysql -u root -p -e "SELECT 1;"
 ```
 
 ### Error: Port already in use
+
 ```bash
 # Cambiar puerto en .env.local
 PORT=3001  # o el puerto que prefieras

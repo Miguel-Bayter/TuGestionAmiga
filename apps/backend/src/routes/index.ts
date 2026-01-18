@@ -1,11 +1,11 @@
-import { Router } from 'express';
+import { Router, type Request, type Response } from 'express';
 import authRoutes from './auth.routes';
 import booksRoutes from './books.routes';
 
 const router = Router();
 
 // Health check
-router.get('/health', (req, res) => {
+router.get('/health', (_req: Request, res: Response) => {
   res.json({ ok: true, message: 'Server is running' });
 });
 
@@ -14,7 +14,7 @@ router.use('/auth', authRoutes);
 router.use('/books', booksRoutes);
 
 // 404 handler for API routes
-router.use('*', (req, res) => {
+router.use('*', (_req: Request, res: Response) => {
   res.status(404).json({ ok: false, error: 'Endpoint not found' });
 });
 

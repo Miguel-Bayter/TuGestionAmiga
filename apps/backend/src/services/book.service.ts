@@ -1,3 +1,4 @@
+import { BookPayload } from '@/types';
 import prisma from '../config/database';
 import { ApiError } from '../middleware/error';
 
@@ -6,14 +7,14 @@ export class BookService {
     return prisma.book.findMany({
       where: available ? { available: true } : undefined,
       include: { category: true },
-      orderBy: { id: 'desc' }
+      orderBy: { id: 'desc' },
     });
   }
 
   async getById(id: number) {
     const book = await prisma.book.findUnique({
       where: { id },
-      include: { category: true }
+      include: { category: true },
     });
 
     if (!book) {
@@ -23,7 +24,7 @@ export class BookService {
     return book;
   }
 
-  async create(data: any) {
+  async create(data: BookPayload) {
     return prisma.book.create({
       data: {
         title: data.title,
@@ -33,13 +34,13 @@ export class BookService {
         price: data.price,
         purchaseStock: data.purchaseStock || 0,
         rentalStock: data.rentalStock || 0,
-        available: data.available || false
+        available: data.available || false,
       },
-      include: { category: true }
+      include: { category: true },
     });
   }
 
-  async update(id: number, data: any) {
+  async update(id: number, data: BookPayload) {
     const book = await prisma.book.findUnique({ where: { id } });
     if (!book) {
       throw new ApiError(404, 'Book not found');
@@ -48,7 +49,7 @@ export class BookService {
     return prisma.book.update({
       where: { id },
       data,
-      include: { category: true }
+      include: { category: true },
     });
   }
 

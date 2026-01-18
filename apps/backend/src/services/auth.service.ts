@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import prisma from '../config/database';
 import { ApiError } from '../middleware/error';
 import { hashPassword, comparePassword, validatePasswordStrength } from '../utils/password';
@@ -23,16 +24,35 @@ export class AuthService {
         email,
         name,
         password: hash,
-        roleId: 2 // USER role
+        roleId: 2, // USER role
       },
-      include: { role: true }
+      include: { role: true },
+    });
+
+    // Generate JWT tokens for new user
+    const payload = {
+      userId: user.id,
+      roleId: user.roleId,
+      roleName: user.role.name,
+    };
+
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, {
+      expiresIn: '15m',
+    });
+
+    const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, {
+      expiresIn: '7d',
     });
 
     return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      roleId: user.roleId
+      user: {
+        id_usuario: user.id,
+        email: user.email,
+        name: user.name,
+        roleId: user.roleId,
+      },
+      accessToken,
+      refreshToken,
     };
   }
 
@@ -40,7 +60,7 @@ export class AuthService {
     // Find user by email
     const user = await prisma.user.findUnique({
       where: { email },
-      include: { role: true }
+      include: { role: true },
     });
 
     if (!user) {
@@ -53,11 +73,30 @@ export class AuthService {
       throw new ApiError(401, 'Invalid credentials');
     }
 
+    // Generate JWT tokens
+    const payload = {
+      userId: user.id,
+      roleId: user.roleId,
+      roleName: user.role.name,
+    };
+
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, {
+      expiresIn: '15m',
+    });
+
+    const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, {
+      expiresIn: '7d',
+    });
+
     return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      roleId: user.roleId
+      user: {
+        id_usuario: user.id,
+        email: user.email,
+        name: user.name,
+        roleId: user.roleId,
+      },
+      accessToken,
+      refreshToken,
     };
   }
 }

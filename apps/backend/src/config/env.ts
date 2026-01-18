@@ -18,17 +18,17 @@ for (const envVar of requiredEnvVars) {
 
 export const config = {
   database: {
-    url: process.env.DATABASE_URL!
+    url: process.env.DATABASE_URL!,
   },
   server: {
     port: parseInt(process.env.PORT || '3000', 10),
     nodeEnv: process.env.NODE_ENV || 'development',
-    isDev: process.env.NODE_ENV === 'development'
+    isDev: process.env.NODE_ENV === 'development',
   },
   cors: {
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-    credentials: true
-  }
+    credentials: true,
+  },
 };
 
 export default config;

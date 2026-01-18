@@ -11,6 +11,17 @@
     "build": "pnpm -r build",
     "build:frontend": "pnpm --filter @tu-gestion-amiga/frontend build",
     "build:backend": "pnpm --filter @tu-gestion-amiga/backend build",
-    "preview:frontend": "pnpm --filter @tu-gestion-amiga/frontend preview"
+    "preview:frontend": "pnpm --filter @tu-gestion-amiga/frontend preview",
+    "lint": "pnpm -r lint",
+    "format": "pnpm -r format",
+    "format:check": "pnpm -r format:check",
+    "lint:fix": "pnpm -r lint:fix",
+    "check": "pnpm lint & pnpm format:check",
+    "type-check": "pnpm -r type-check",
+    "check-all": "pnpm --filter @tu-gestion-amiga/frontend check-all & pnpm --filter @tu-gestion-amiga/backend check-all",
+    "clean": "pnpm -r clean && rimraf node_modules || true"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.0"
   }
 }

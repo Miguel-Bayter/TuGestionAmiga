@@ -6,7 +6,7 @@ export const corsMiddleware = cors({
   credentials: config.cors.credentials,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-ID'],
-  maxAge: 3600
+  maxAge: 3600,
 });
 
 export default corsMiddleware;

@@ -15,12 +15,12 @@ async function main() {
   const roleAdmin = await prisma.role.upsert({
     where: { id: 1 },
     update: {},
-    create: { id: 1, name: 'ADMIN' }
+    create: { id: 1, name: 'ADMIN' },
   });
   const roleUser = await prisma.role.upsert({
     where: { id: 2 },
     update: {},
-    create: { id: 2, name: 'USER' }
+    create: { id: 2, name: 'USER' },
   });
   console.log('✓ Roles seeded');
 
@@ -36,14 +36,14 @@ async function main() {
     'Drama',
     'Comedia',
     'Romance',
-    'Aventura'
+    'Aventura',
   ];
 
   for (const categoryName of categories) {
     await prisma.category.upsert({
       where: { name: categoryName },
       update: {},
-      create: { name: categoryName }
+      create: { name: categoryName },
     });
   }
   console.log('✓ Categories seeded');
@@ -51,7 +51,7 @@ async function main() {
   // Seed Demo Books
   console.log('📖 Seeding demo books...');
   const fictionCategory = await prisma.category.findFirst({
-    where: { name: 'Ficción' }
+    where: { name: 'Ficción' },
   });
 
   if (fictionCategory) {
@@ -64,7 +64,7 @@ async function main() {
         price: 29.99,
         purchaseStock: 10,
         rentalStock: 5,
-        available: true
+        available: true,
       },
       {
         title: 'Cien años de soledad',
@@ -74,7 +74,7 @@ async function main() {
         price: 24.99,
         purchaseStock: 15,
         rentalStock: 8,
-        available: true
+        available: true,
       },
       {
         title: '1984',
@@ -84,7 +84,7 @@ async function main() {
         price: 19.99,
         purchaseStock: 20,
         rentalStock: 10,
-        available: true
+        available: true,
       },
       {
         title: 'Don Quijote de la Mancha',
@@ -94,7 +94,7 @@ async function main() {
         price: 34.99,
         purchaseStock: 12,
         rentalStock: 6,
-        available: true
+        available: true,
       },
       {
         title: 'Harry Potter y la Piedra Filosofal',
@@ -104,13 +104,13 @@ async function main() {
         price: 22.99,
         purchaseStock: 25,
         rentalStock: 12,
-        available: true
-      }
+        available: true,
+      },
     ];
 
     for (const book of demoBooks) {
       const existing = await prisma.book.findFirst({
-        where: { title: book.title }
+        where: { title: book.title },
       });
       if (!existing) {
         await prisma.book.create({ data: book });
@@ -131,8 +131,8 @@ async function main() {
       email: 'admin@tugestionamiga.com',
       name: 'Admin User',
       password: hashedPassword,
-      roleId: roleAdmin.id
-    }
+      roleId: roleAdmin.id,
+    },
   });
   console.log('✓ Admin user seeded');
   console.log('   Email: admin@tugestionamiga.com');

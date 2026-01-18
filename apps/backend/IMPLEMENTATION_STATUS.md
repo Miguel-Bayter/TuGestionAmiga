@@ -203,15 +203,15 @@ apps/backend/
 
 ### Tables Created
 
-| Table | Columns | Purpose |
-|-------|---------|---------|
-| `role` | id, name | User roles (ADMIN, USER) |
-| `user` | id, email, name, password, role_id | User accounts |
-| `category` | id, name | Book categories |
-| `book` | id, title, author, description, category_id, price, purchase_stock, rental_stock, available | Book catalog |
-| `loan` | id, user_id, book_id, loan_date, due_date, returned_date, status, extensions | Book rentals |
-| `purchase` | id, user_id, book_id, price, date | Book purchases |
-| `cart_item` | id, user_id, book_id, quantity | Shopping cart |
+| Table       | Columns                                                                                     | Purpose                  |
+| ----------- | ------------------------------------------------------------------------------------------- | ------------------------ |
+| `role`      | id, name                                                                                    | User roles (ADMIN, USER) |
+| `user`      | id, email, name, password, role_id                                                          | User accounts            |
+| `category`  | id, name                                                                                    | Book categories          |
+| `book`      | id, title, author, description, category_id, price, purchase_stock, rental_stock, available | Book catalog             |
+| `loan`      | id, user_id, book_id, loan_date, due_date, returned_date, status, extensions                | Book rentals             |
+| `purchase`  | id, user_id, book_id, price, date                                                           | Book purchases           |
+| `cart_item` | id, user_id, book_id, quantity                                                              | Shopping cart            |
 
 ### Sample Data Loaded
 
@@ -314,25 +314,25 @@ ADMIN_PASSWORD=admin123
 ### Short Term
 
 4. **Add input validation** (Zod recommended)
-2. **Implement JWT authentication** (replace header-based auth)
-3. **Add proper error handling** for all edge cases
-4. **Add request logging** (Morgan or Winston)
+5. **Implement JWT authentication** (replace header-based auth)
+6. **Add proper error handling** for all edge cases
+7. **Add request logging** (Morgan or Winston)
 
 ### Medium Term
 
 8. **Update frontend** to use new API endpoints
-2. **Add tests** (unit + integration)
-3. **Add API documentation** (Swagger/OpenAPI)
-4. **Improve security** (rate limiting, helmet.js)
+9. **Add tests** (unit + integration)
+10. **Add API documentation** (Swagger/OpenAPI)
+11. **Improve security** (rate limiting, helmet.js)
 
 ### Long Term
 
 12. **Add email notifications**
-2. **Add file upload** for book covers
-3. **Add search and filters**
-4. **Add pagination**
-5. **Docker setup**
-6. **CI/CD pipeline**
+13. **Add file upload** for book covers
+14. **Add search and filters**
+15. **Add pagination**
+16. **Docker setup**
+17. **CI/CD pipeline**
 
 ---
 

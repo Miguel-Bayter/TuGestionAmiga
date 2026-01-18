@@ -13,9 +13,9 @@ export class ApiError extends Error {
 
 export const errorHandler = (
   err: Error | ApiError,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void => {
   const status = err instanceof ApiError ? err.status : 500;
   const message = err.message || 'Internal Server Error';
@@ -26,12 +26,12 @@ export const errorHandler = (
 
   res.status(status).json({
     ok: false,
-    error: message
+    error: message,
   });
 };
 
-export const asyncHandler = (
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>
-) => (req: Request, res: Response, next: NextFunction) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
-};
+export const asyncHandler =
+  (fn: (req: Request, res: Response, next: NextFunction) => Promise<void>) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
