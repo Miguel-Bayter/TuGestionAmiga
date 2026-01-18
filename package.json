@@ -5,14 +5,12 @@
   "private": true,
   "packageManager": "pnpm@9.0.0",
   "scripts": {
-    "dev": "pnpm -r dev",
+    "dev": "pnpm -r --filter @tu-gestion-amiga/frontend --filter @tu-gestion-amiga/backend dev",
     "dev:frontend": "pnpm --filter @tu-gestion-amiga/frontend dev",
     "dev:backend": "pnpm --filter @tu-gestion-amiga/backend dev",
     "build": "pnpm -r build",
     "build:frontend": "pnpm --filter @tu-gestion-amiga/frontend build",
     "build:backend": "pnpm --filter @tu-gestion-amiga/backend build",
-    "preview:frontend": "pnpm --filter @tu-gestion-amiga/frontend preview",
-    "cy:open": "pnpm -r cy:open",
-    "cy:run": "pnpm -r cy:run"
+    "preview:frontend": "pnpm --filter @tu-gestion-amiga/frontend preview"
   }
 }

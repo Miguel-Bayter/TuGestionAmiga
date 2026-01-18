@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Models
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique @db.VarChar(50)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  users User[]
+
+  @@map("role")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique @db.VarChar(100)
+  name      String   @db.VarChar(100)
+  password  String   @db.VarChar(255)
+  roleId    Int      @map("role_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  role      Role          @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  loans     Loan[]
+  purchases Purchase[]
+  cartItems CartItem[]
+
+  @@map("user")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique @db.VarChar(100)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  books Book[]
+
+  @@map("category")
+}
+
+model Book {
+  id            Int      @id @default(autoincrement())
+  title         String   @db.VarChar(150)
+  author        String   @db.VarChar(100)
+  description   String?  @db.Text
+  categoryId    Int?     @map("category_id")
+  price         Decimal  @default(0) @db.Decimal(10, 2)
+  purchaseStock Int      @default(0) @map("purchase_stock")
+  rentalStock   Int      @default(0) @map("rental_stock")
+  available     Boolean  @default(false)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  category  Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  loans     Loan[]
+  purchases Purchase[]
+  cartItems CartItem[]
+
+  @@map("book")
+}
+
+model Loan {
+  id           Int       @id @default(autoincrement())
+  userId       Int       @map("user_id")
+  bookId       Int       @map("book_id")
+  loanDate     DateTime  @default(now()) @map("loan_date")
+  dueDate      DateTime  @map("due_date")
+  returnedDate DateTime? @map("returned_date")
+  status       String    @db.VarChar(50)
+  extensions   Int       @default(0)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@map("loan")
+}
+
+model Purchase {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  bookId    Int      @map("book_id")
+  price     Decimal  @db.Decimal(10, 2)
+  date      DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@map("purchase")
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  bookId    Int      @map("book_id")
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+  @@map("cart_item")
+}
