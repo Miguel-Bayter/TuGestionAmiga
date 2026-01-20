@@ -3,8 +3,8 @@
  * Fetches the current user's shopping cart
  */
 
-import type { ICartRepository } from '../../Repository'
-import type { Cart } from '../../Entity'
+import type { ICartRepository } from '@/domain/Repository/cart.repository'
+import type { Cart } from '@/domain/Entity/cart.entity'
 
 export class GetCartUseCase {
   constructor(private cartRepository: ICartRepository) {}

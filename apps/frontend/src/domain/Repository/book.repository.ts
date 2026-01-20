@@ -3,7 +3,7 @@
  * Contract for book operations
  */
 
-import type { Book } from '../Entity'
+import type { Book } from '@/domain/Entity/book.entity'
 import type { PaginatedResponse } from '@/shared/types'
 
 export interface IBookRepository {

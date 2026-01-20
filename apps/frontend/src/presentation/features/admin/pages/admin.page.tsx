@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { api } from '@/data/Repository'
 import { useAuthStore } from '@/shared/stores'
-import { useToast } from '@/hooks/useToast'
+import { useToast } from '@/shared/hooks/use-toast.hook'
 import { formatDate } from '@/shared/helpers'
 import { User } from '@/shared/types'
 

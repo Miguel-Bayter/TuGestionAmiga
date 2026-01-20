@@ -3,9 +3,9 @@
  * Re-export all Zustand stores
  */
 
-export { useAuthStore } from './useAuthStore'
-export { useBookStore } from './useBookStore'
-export { useCartStore } from './useCartStore'
-export { useLoanStore } from './useLoanStore'
-export { useToastStore } from './useToastStore'
-export { useUIStore } from './useUIStore'
+export { useAuthStore } from './use-auth.store'
+export { useBookStore } from './use-book.store'
+export { useCartStore } from './use-cart.store'
+export { useLoanStore } from './use-loan.store'
+export { useToastStore } from './use-toast.store'
+export { useUIStore } from './use-ui.store'

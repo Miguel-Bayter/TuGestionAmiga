@@ -3,7 +3,7 @@
  * Returns a loaned book
  */
 
-import type { ILoanRepository } from '../../Repository'
+import type { ILoanRepository } from '@/domain/Repository/loan.repository'
 
 export class ReturnLoanUseCase {
   constructor(private loanRepository: ILoanRepository) {}

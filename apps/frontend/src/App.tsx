@@ -1,10 +1,10 @@
 import { Suspense } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { RequireAuth } from '@/features/auth/components/RequireAuth'
-import { RequireAdmin } from '@/features/auth/components/RequireAdmin'
-import { Layout } from '@/components/Layout'
-import { Toast } from '@/components/Toast'
-import { routes } from './data/routes'
+import { RequireAuth } from '@/presentation/features/auth/components/require-auth'
+import { RequireAdmin } from '@/presentation/features/auth/components/require-admin'
+import { Layout } from '@/presentation/components/Layout'
+import { Toast } from '@/presentation/components/Toast'
+import { routes } from '@/data/routes'
 
 function App() {
   return (

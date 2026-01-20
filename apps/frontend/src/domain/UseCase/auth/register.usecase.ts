@@ -3,7 +3,7 @@
  * Registers a new user
  */
 
-import type { IAuthRepository } from '../../Repository'
+import type { IAuthRepository } from '@/domain/Repository/auth.repository'
 import type { RegisterRequest, RegisterResponse } from '@/shared/types'
 
 export class RegisterUseCase {

@@ -4,8 +4,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Book } from '@/shared/types'
 import { api } from '@/data/Repository'
 import { useAuthStore } from '@/shared/stores'
-import BookCard from '@/features/books/components/BookCard'
-import BookDetailsModal from '@/features/books/components/BookDetailsModal'
+import BookCard from '@/presentation/features/books/components/book-card'
+import BookDetailsModal from '@/presentation/features/books/components/book-details-modal'
 
 // Temporary placeholder functions until covers lib is migrated
 const createCoverDataUri = (title?: string): string => {

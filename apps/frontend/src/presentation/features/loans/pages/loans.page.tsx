@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/data/Repository'
 import { useAuthStore } from '@/shared/stores'
-import { useToast } from '@/hooks/useToast'
+import { useToast } from '@/shared/hooks/use-toast.hook'
 import { formatDate } from '@/shared/helpers'
 
 // Temporary placeholder functions until covers lib is migrated

@@ -3,7 +3,7 @@
  * Deletes a book (admin only)
  */
 
-import type { IBookRepository } from '../../Repository'
+import type { IBookRepository } from '@/domain/Repository/book.repository'
 
 export class DeleteBookUseCase {
   constructor(private bookRepository: IBookRepository) {}

@@ -3,8 +3,8 @@
  * Fetches user's overdue loans
  */
 
-import type { ILoanRepository } from '../../Repository'
-import type { Loan } from '../../Entity'
+import type { ILoanRepository } from '@/domain/Repository/loan.repository'
+import type { Loan } from '@/domain/Entity/loan.entity'
 
 export class GetOverdueLoansUseCase {
   constructor(private loanRepository: ILoanRepository) {}

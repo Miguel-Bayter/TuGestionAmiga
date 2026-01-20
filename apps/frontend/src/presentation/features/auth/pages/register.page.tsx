@@ -6,7 +6,7 @@
 import { useState, FormEvent, ChangeEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/shared/stores'
-import { useToast } from '@/hooks/useToast'
+import { useToast } from '@/shared/hooks/use-toast.hook'
 import { ROUTES } from '@/shared/config'
 
 export function RegisterPage() {

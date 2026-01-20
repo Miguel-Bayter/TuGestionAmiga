@@ -4,9 +4,9 @@
  */
 
 import { create } from 'zustand'
-import { GetBooksUseCase, GetBookUseCase, GetAvailableBooksUseCase } from '@/domain/UseCase/Book'
-import { bookRepository } from '@/data/Repository'
-import type { Book } from '@/domain/entity'
+import { GetBooksUseCase, GetBookUseCase, GetAvailableBooksUseCase } from '@/domain/UseCase/book'
+import { bookRepository } from '@/data/Repository/book.repository-impl'
+import type { Book } from '@/domain/Entity/book.entity'
 import type { PaginatedResponse } from '@/shared/types'
 
 interface BookState {

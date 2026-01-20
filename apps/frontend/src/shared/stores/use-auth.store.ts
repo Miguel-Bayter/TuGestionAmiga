@@ -9,8 +9,8 @@ import {
   RegisterUseCase,
   LogoutUseCase,
   GetProfileUseCase,
-} from '@/domain/UseCase/Auth'
-import { authRepository } from '@/data/Repository'
+} from '@/domain/UseCase/auth'
+import { authRepository } from '@/data/Repository/auth.repository-impl'
 import { TokenManager } from '@/data/Provider'
 import { STORAGE_KEYS } from '@/shared/config'
 import type { User, LoginRequest, RegisterRequest } from '@/shared/types'

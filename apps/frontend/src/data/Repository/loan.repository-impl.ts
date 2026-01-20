@@ -3,11 +3,11 @@
  * Concrete implementation of loan operations
  */
 
-import { AxPrivate } from '../Provider'
+import { axPrivate } from '@/data/Provider'
 import { API_ENDPOINTS } from '@/shared/config'
-import { loanSchema, loansArraySchema } from '../Schema'
-import type { ILoanRepository } from '@/domain/Repository'
-import type { Loan } from '@/domain/entity'
+import { loanSchema, loansArraySchema } from '@/data/Schema'
+import type { ILoanRepository } from '@/domain/Repository/loan.repository'
+import type { Loan } from '@/domain/Entity/loan.entity'
 import type { PaginatedResponse } from '@/shared/types'
 import { isOverdue } from '@/shared/helpers'
 
@@ -20,7 +20,7 @@ export class LoanRepository implements ILoanRepository {
     if (page !== undefined) params.append('page', page.toString())
     if (pageSize !== undefined) params.append('pageSize', pageSize.toString())
 
-    const response = await AxPrivate.get(API_ENDPOINTS.LOANS, {
+    const response = await axPrivate.get(API_ENDPOINTS.LOANS, {
       params: Object.fromEntries(params),
     })
 
@@ -37,7 +37,7 @@ export class LoanRepository implements ILoanRepository {
    * Get a single loan by ID
    */
   async getLoan(id: number): Promise<Loan> {
-    const response = await AxPrivate.get(API_ENDPOINTS.LOAN_BY_ID(id))
+    const response = await axPrivate.get(API_ENDPOINTS.LOAN_BY_ID(id))
     return loanSchema.parse(response.data)
   }
 
@@ -45,7 +45,7 @@ export class LoanRepository implements ILoanRepository {
    * Create a new loan
    */
   async createLoan(bookId: number): Promise<Loan> {
-    const response = await AxPrivate.post(API_ENDPOINTS.LOANS, {
+    const response = await axPrivate.post(API_ENDPOINTS.LOANS, {
       id_libro: bookId,
     })
     return loanSchema.parse(response.data)
@@ -55,14 +55,14 @@ export class LoanRepository implements ILoanRepository {
    * Return a loaned book
    */
   async returnLoan(id: number): Promise<void> {
-    await AxPrivate.post(API_ENDPOINTS.LOAN_RETURN(id), {})
+    await axPrivate.post(API_ENDPOINTS.LOAN_RETURN(id), {})
   }
 
   /**
    * Get active loans (not returned)
    */
   async getActiveLoans(): Promise<Loan[]> {
-    const response = await AxPrivate.get(API_ENDPOINTS.LOANS, {
+    const response = await axPrivate.get(API_ENDPOINTS.LOANS, {
       params: { devuelto: false },
     })
     return loansArraySchema.parse(response.data)

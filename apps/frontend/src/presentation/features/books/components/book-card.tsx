@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Book } from '@/shared/types'
 import { api } from '@/data/Repository'
 import { useAuthStore } from '@/shared/stores'
-import { useToast } from '@/hooks/useToast'
+import { useToast } from '@/shared/hooks/use-toast.hook'
 
 interface BookCardProps {
   book: Book

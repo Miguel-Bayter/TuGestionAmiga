@@ -5,7 +5,7 @@
 
 import axios, { type AxiosError } from 'axios'
 import { API_BASE_URL, HTTP_STATUS } from '@/shared/config'
-import { TokenManager } from './tokenManager'
+import { TokenManager } from './token-manager.provider'
 
 /**
  * Private Axios instance

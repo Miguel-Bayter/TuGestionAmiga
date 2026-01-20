@@ -3,8 +3,8 @@
  * Fetches a single book by ID
  */
 
-import type { IBookRepository } from '../../Repository'
-import type { Book } from '../../Entity'
+import type { IBookRepository } from '@/domain/Repository/book.repository'
+import type { Book } from '@/domain/Entity/book.entity'
 
 export class GetBookUseCase {
   constructor(private bookRepository: IBookRepository) {}

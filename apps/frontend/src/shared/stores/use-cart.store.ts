@@ -9,9 +9,9 @@ import {
   AddToCartUseCase,
   RemoveFromCartUseCase,
   CheckoutUseCase,
-} from '@/domain/UseCase/Cart'
-import { cartRepository } from '@/data/Repository'
-import type { Cart } from '@/domain/entity'
+} from '@/domain/UseCase/cart'
+import { cartRepository } from '@/data/Repository/cart.repository-impl'
+import type { Cart } from '@/domain/Entity/cart.entity'
 
 interface CartState {
   // State

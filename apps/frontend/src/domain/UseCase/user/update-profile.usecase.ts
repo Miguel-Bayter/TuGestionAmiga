@@ -3,8 +3,8 @@
  * Updates the current user's profile
  */
 
-import type { IAuthRepository } from '../../Repository'
-import type { User } from '../../Entity'
+import type { IAuthRepository } from '@/domain/Repository/auth.repository'
+import type { User } from '@/domain/Entity/user.entity'
 
 export class UpdateProfileUseCase {
   constructor(private authRepository: IAuthRepository) {}
