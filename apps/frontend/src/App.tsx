@@ -4,7 +4,7 @@ import { RequireAuth } from '@/features/auth/components/RequireAuth'
 import { RequireAdmin } from '@/features/auth/components/RequireAdmin'
 import { Layout } from '@/components/Layout'
 import { Toast } from '@/components/Toast'
-import { routes } from './routes'
+import { routes } from './data/routes'
 
 function App() {
   return (
