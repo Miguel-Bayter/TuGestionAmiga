@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
 import type { AwilixContainer } from 'awilix';
-import { AuthRequest } from '../types/index';
+import { AuthRequest } from '@/shared/types/index';
 
 /**
  * Create authentication middleware factory
