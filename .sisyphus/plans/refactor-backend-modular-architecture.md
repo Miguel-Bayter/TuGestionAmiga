@@ -301,26 +301,11 @@ Final verification & testing
 
 ---
 
-- [ ] 4. Move config/cors.ts to shared/config/
-
-  **What to do**:
-  - Move `apps/backend/src/config/cors.ts` → `apps/backend/src/shared/config/cors.ts`
-  - Find all files importing from `@/config/cors`
-  - Update imports to `@/shared/config/cors`
-
-  **Acceptance Criteria**:
-  - [ ] File moved to `/shared/config/cors.ts`
-  - [ ] All imports updated: `ast_grep_replace(pattern="@/config/cors", rewrite="@/shared/config/cors", lang="typescript")`
-  - [ ] `pnpm type-check` → exit code 0
-
-  **Commit**: YES
-  - Message: `refactor(backend): move cors to shared/config`
-  - Files: `src/shared/config/cors.ts`, `src/app.ts`
-  - Pre-commit: `pnpm type-check`
+- [x] 4. Move config/cors.ts to shared/config/
 
 ---
 
-- [ ] 5. Move config/database.ts to shared/config/
+- [x] 5. Move config/database.ts to shared/config/
 
   **What to do**:
   - Move `apps/backend/src/config/database.ts` → `apps/backend/src/shared/config/database.ts`

@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { ApiError } from '@/middleware/error';
+import { ApiError } from '@/shared/middleware/error';
 import type { BookPayload } from '@/modules/book/domain/entity/book.entity';
 import type { IBookRepository } from '@/modules/book/domain/interface/book.repository';
 

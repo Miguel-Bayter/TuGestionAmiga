@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import type { AwilixContainer } from 'awilix';
-import { asyncHandler } from '../middleware/error';
+import { asyncHandler } from '../shared/middleware/error';
 
 export function createBooksRoutes(container: AwilixContainer) {
   const router = Router();

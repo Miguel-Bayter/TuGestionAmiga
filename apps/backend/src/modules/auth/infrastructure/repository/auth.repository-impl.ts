@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
-import { ApiError } from '@/middleware/error';
+import { ApiError } from '@/shared/middleware/error';
 import { hashPassword, comparePassword, validatePasswordStrength } from '@/utils/password';
 import type { IAuthRepository } from '@/modules/auth/domain/interface/auth.repository';
 import type { AuthUser } from '@/modules/auth/domain/entity/auth.entity';
