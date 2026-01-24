@@ -375,60 +375,19 @@ Final verification & testing
 
 ---
 
-- [ ] 8. Move middleware/auth.ts to shared/middleware/
-
-  **What to do**:
-  - Move `apps/backend/src/middleware/auth.ts` → `apps/backend/src/shared/middleware/auth.ts`
-  - Find all imports from `@/middleware/auth`
-  - Update to `@/shared/middleware/auth`
-
-  **Acceptance Criteria**:
-  - [ ] File moved to `/shared/middleware/auth.ts`
-  - [ ] All imports updated
-  - [ ] `pnpm type-check` → exit code 0
-
-  **Commit**: YES
-  - Message: `refactor(backend): move auth middleware to shared/middleware`
-  - Pre-commit: `pnpm type-check`
+- [x] 8. Move middleware/auth.ts to shared/middleware/
 
 ---
 
 #### Step C: Migrate /utils → /shared/libs
 
-- [ ] 9. Move utils/password.ts to shared/libs/ (Rename to libs)
-
-  **What to do**:
-  - Move `apps/backend/src/utils/password.ts` → `apps/backend/src/shared/libs/password.ts`
-  - Find all imports from `@/utils/password`
-  - Update to `@/shared/libs/password`
-  - NOTE: Path changes from `/utils` to `/libs` AND `/utils/` to `/libs/`
-
-  **Must NOT do**:
-  - Don't change password hashing logic
-  - Don't modify function signatures
-  - Don't change password validation rules
-
-  **Parallelizable**: NO (middleware must finish first)
-
-  **References**:
-  - Usage Reference: `apps/backend/src/modules/auth/infrastructure/repository/auth.repository-impl.ts:4` imports password functions
-  - Find all: `ast_grep_search(pattern="from.*['\"]@/utils", lang="typescript")`
-
-  **Acceptance Criteria**:
-  - [ ] File moved to `/shared/libs/password.ts`
-  - [ ] All imports updated: `ast_grep_replace(pattern="@/utils/password", rewrite="@/shared/libs/password", lang="typescript")`
-  - [ ] `pnpm type-check` → exit code 0
-  - [ ] `pnpm lint` → exit code 0
-
-  **Commit**: YES
-  - Message: `refactor(backend): move password utils to shared/libs`
-  - Pre-commit: `pnpm type-check && pnpm lint`
+- [x] 9. Move utils/password.ts to shared/libs/ (Rename to libs)
 
 ---
 
 #### Step D: Migrate /types → /shared/types
 
-- [ ] 10. Move types/index.ts to shared/types/
+- [x] 10. Move types/index.ts to shared/types/
 
   **What to do**:
   - Move `apps/backend/src/types/index.ts` → `apps/backend/src/shared/types/index.ts`
