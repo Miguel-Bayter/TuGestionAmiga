@@ -39,11 +39,7 @@ export interface IAuthRepository {
    * @returns New access token
    * @throws ApiError if token is invalid, expired, or user not found
    */
-  refreshToken(
-    refreshToken: string
-  ): Promise<{
-    accessToken: string;
-  }>;
+  refreshToken(refreshToken: string): Promise<{ accessToken: string }>;
 
   /**
    * Validate and decode JWT access token

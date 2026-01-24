@@ -8,6 +8,8 @@ import { BookRepository } from '@/modules/book/infrastructure/repository/book.re
 // Use Cases
 import { LoginUseCase } from '@/modules/auth/application/use-case/login.usecase';
 import { RegisterUseCase } from '@/modules/auth/application/use-case/register.usecase';
+import { RefreshTokenUseCase } from '@/modules/auth/application/use-case/refresh-token.usecase';
+import { ValidateTokenUseCase } from '@/modules/auth/application/use-case/validate-token.usecase';
 import { GetAllBooksUseCase } from '@/modules/book/application/use-case/get-all-books.usecase';
 import { GetBookByIdUseCase } from '@/modules/book/application/use-case/get-book-by-id.usecase';
 
@@ -40,6 +42,8 @@ container.register({
 container.register({
   loginUseCase: asClass(LoginUseCase).singleton(),
   registerUseCase: asClass(RegisterUseCase).singleton(),
+  refreshTokenUseCase: asClass(RefreshTokenUseCase).singleton(),
+  validateTokenUseCase: asClass(ValidateTokenUseCase).singleton(),
   getAllBooksUseCase: asClass(GetAllBooksUseCase).singleton(),
   getBookByIdUseCase: asClass(GetBookByIdUseCase).singleton(),
 });
