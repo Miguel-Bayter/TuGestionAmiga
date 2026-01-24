@@ -1,10 +1,17 @@
 {
-  "active_plan": "D:\\ANDY2639\\Projects\\demos\\TuGestionAmiga\\.sisyphus\\plans\\backend-screaming-book.md",
+  "active_plan": "D:\ANDY2639\Projects\demos\TuGestionAmiga\.sisyphus\plans\backend-screaming-book.md",
   "started_at": "2026-01-24T20:02:24.547Z",
+  "completed_at": "2026-01-24T21:30:00.000Z",
   "session_ids": [
     "ses_40e663db6ffeizDLBTrcLQaxhE",
     "ses_40e5c81e3ffeOz4LsJcoL0ebjm",
+    "ses_40e3c65bdffeU3wCSYbVbpFZe0",
     "ses_40e3c65bdffeU3wCSYbVbpFZe0"
   ],
-  "plan_name": "backend-screaming-book"
+  "plan_name": "backend-screaming-book",
+  "status": "COMPLETE",
+  "tasks_completed": 5,
+  "tasks_total": 5,
+  "success_criteria_met": 4,
+  "success_criteria_total": 4
 }
