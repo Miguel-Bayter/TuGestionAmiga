@@ -7,11 +7,16 @@ export class BookRepository implements IBookRepository {
   constructor(private prisma: PrismaClient) {}
 
   async getAll(available?: boolean) {
-    return this.prisma.book.findMany({
+    const books = await this.prisma.book.findMany({
       where: available ? { available: true } : undefined,
       include: { category: true },
       orderBy: { id: 'desc' },
     });
+
+    return books.map((book) => ({
+      ...book,
+      price: book.price.toNumber(),
+    }));
   }
 
   async getById(id: number) {
@@ -24,11 +29,14 @@ export class BookRepository implements IBookRepository {
       throw new ApiError(404, 'Book not found');
     }
 
-    return book;
+    return {
+      ...book,
+      price: book.price.toNumber(),
+    };
   }
 
   async create(data: BookPayload) {
-    return this.prisma.book.create({
+    const book = await this.prisma.book.create({
       data: {
         title: data.title,
         author: data.author,
@@ -41,6 +49,11 @@ export class BookRepository implements IBookRepository {
       },
       include: { category: true },
     });
+
+    return {
+      ...book,
+      price: book.price.toNumber(),
+    };
   }
 
   async update(id: number, data: BookPayload) {
@@ -49,11 +62,16 @@ export class BookRepository implements IBookRepository {
       throw new ApiError(404, 'Book not found');
     }
 
-    return this.prisma.book.update({
+    const updatedBook = await this.prisma.book.update({
       where: { id },
       data,
       include: { category: true },
     });
+
+    return {
+      ...updatedBook,
+      price: updatedBook.price.toNumber(),
+    };
   }
 
   async delete(id: number) {

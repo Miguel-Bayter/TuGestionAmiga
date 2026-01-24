@@ -23,8 +23,32 @@ describe('GetAllBooksUseCase', () => {
     it('should call repository.getAll() with no parameters when available is undefined', async () => {
       // Arrange
       const mockBooks = [
-        { id: 1, title: 'Book 1', available: true },
-        { id: 2, title: 'Book 2', available: false },
+        {
+          id: 1,
+          title: 'Book 1',
+          author: 'Author 1',
+          description: 'Description for Book 1',
+          categoryId: 1,
+          price: 29.99,
+          purchaseStock: 10,
+          rentalStock: 5,
+          available: true,
+          createdAt: new Date('2024-01-01'),
+          updatedAt: new Date('2024-01-01'),
+        },
+        {
+          id: 2,
+          title: 'Book 2',
+          author: 'Author 2',
+          description: 'Description for Book 2',
+          categoryId: 2,
+          price: 19.99,
+          purchaseStock: 0,
+          rentalStock: 0,
+          available: false,
+          createdAt: new Date('2024-01-02'),
+          updatedAt: new Date('2024-01-02'),
+        },
       ];
       mockRepository.getAll.mockResolvedValue(mockBooks);
 
@@ -40,8 +64,32 @@ describe('GetAllBooksUseCase', () => {
     it('should call repository.getAll() with available=true filter', async () => {
       // Arrange
       const mockBooks = [
-        { id: 1, title: 'Book 1', available: true },
-        { id: 3, title: 'Book 3', available: true },
+        {
+          id: 1,
+          title: 'Book 1',
+          author: 'Author 1',
+          description: 'Description for Book 1',
+          categoryId: 1,
+          price: 29.99,
+          purchaseStock: 10,
+          rentalStock: 5,
+          available: true,
+          createdAt: new Date('2024-01-01'),
+          updatedAt: new Date('2024-01-01'),
+        },
+        {
+          id: 3,
+          title: 'Book 3',
+          author: 'Author 3',
+          description: 'Description for Book 3',
+          categoryId: 1,
+          price: 39.99,
+          purchaseStock: 15,
+          rentalStock: 8,
+          available: true,
+          createdAt: new Date('2024-01-03'),
+          updatedAt: new Date('2024-01-03'),
+        },
       ];
       mockRepository.getAll.mockResolvedValue(mockBooks);
 
@@ -56,7 +104,21 @@ describe('GetAllBooksUseCase', () => {
 
     it('should call repository.getAll() with available=false filter', async () => {
       // Arrange
-      const mockBooks = [{ id: 2, title: 'Book 2', available: false }];
+      const mockBooks = [
+        {
+          id: 2,
+          title: 'Book 2',
+          author: 'Author 2',
+          description: 'Description for Book 2',
+          categoryId: 2,
+          price: 19.99,
+          purchaseStock: 0,
+          rentalStock: 0,
+          available: false,
+          createdAt: new Date('2024-01-02'),
+          updatedAt: new Date('2024-01-02'),
+        },
+      ];
       mockRepository.getAll.mockResolvedValue(mockBooks);
 
       // Act
@@ -87,15 +149,27 @@ describe('GetAllBooksUseCase', () => {
           id: 1,
           title: 'The Great Gatsby',
           author: 'F. Scott Fitzgerald',
+          description: 'A classic American novel',
+          categoryId: 1,
+          price: 24.99,
+          purchaseStock: 5,
+          rentalStock: 3,
           available: true,
-          quantity: 5,
+          createdAt: new Date('2024-01-01'),
+          updatedAt: new Date('2024-01-01'),
         },
         {
           id: 2,
           title: '1984',
           author: 'George Orwell',
+          description: 'A dystopian social science fiction novel',
+          categoryId: 1,
+          price: 22.99,
+          purchaseStock: 3,
+          rentalStock: 2,
           available: true,
-          quantity: 3,
+          createdAt: new Date('2024-01-02'),
+          updatedAt: new Date('2024-01-02'),
         },
       ];
       mockRepository.getAll.mockResolvedValue(mockBooks);
