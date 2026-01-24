@@ -338,7 +338,7 @@ Final verification & testing
 
 ---
 
-- [ ] 6. Move config/env.ts to shared/config/
+- [x] 6. Move config/env.ts to shared/config/
 
   **What to do**:
   - Move `apps/backend/src/config/env.ts` → `apps/backend/src/shared/config/env.ts`

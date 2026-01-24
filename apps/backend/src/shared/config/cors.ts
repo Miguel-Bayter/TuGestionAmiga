@@ -1,5 +1,5 @@
 import cors from 'cors';
-import config from '../shared/config/env';
+import config from './env';
 
 export const corsMiddleware = cors({
   origin: config.cors.origin,

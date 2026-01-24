@@ -1,5 +1,5 @@
 import config from './shared/config/env';
-import prisma from './config/database';
+import prisma from './shared/config/database';
 import createApp from './app';
 import container from './shared/config/container';
 

@@ -1,6 +1,6 @@
 import express from 'express';
 import type { AwilixContainer } from 'awilix';
-import corsMiddleware from './config/cors';
+import corsMiddleware from './shared/config/cors';
 import { errorHandler } from './middleware/error';
 import { createApiRoutes } from './routes/index';
 

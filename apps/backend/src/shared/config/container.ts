@@ -1,5 +1,5 @@
 import { type AwilixContainer, createContainer, InjectionMode, asClass, asValue } from 'awilix';
-import prisma from '@/config/database';
+import prisma from '@/shared/config/database';
 
 // Repositories - Implementations
 import { AuthRepository } from '@/modules/auth/infrastructure/repository/auth.repository-impl';
