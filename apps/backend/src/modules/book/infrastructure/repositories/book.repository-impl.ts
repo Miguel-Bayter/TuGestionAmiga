@@ -1,10 +1,13 @@
-import { BookPayload } from '@/types';
-import prisma from '../config/database';
-import { ApiError } from '../middleware/error';
+import { PrismaClient } from '@prisma/client';
+import { ApiError } from '@/middleware/error';
+import type { BookPayload } from '@/types';
+import type { IBookRepository } from '@/modules/book/domain/book.repository';
 
-export class BookService {
+export class BookRepository implements IBookRepository {
+  constructor(private prisma: PrismaClient) {}
+
   async getAll(available?: boolean) {
-    return prisma.book.findMany({
+    return this.prisma.book.findMany({
       where: available ? { available: true } : undefined,
       include: { category: true },
       orderBy: { id: 'desc' },
@@ -12,7 +15,7 @@ export class BookService {
   }
 
   async getById(id: number) {
-    const book = await prisma.book.findUnique({
+    const book = await this.prisma.book.findUnique({
       where: { id },
       include: { category: true },
     });
@@ -25,7 +28,7 @@ export class BookService {
   }
 
   async create(data: BookPayload) {
-    return prisma.book.create({
+    return this.prisma.book.create({
       data: {
         title: data.title,
         author: data.author,
@@ -41,12 +44,12 @@ export class BookService {
   }
 
   async update(id: number, data: BookPayload) {
-    const book = await prisma.book.findUnique({ where: { id } });
+    const book = await this.prisma.book.findUnique({ where: { id } });
     if (!book) {
       throw new ApiError(404, 'Book not found');
     }
 
-    return prisma.book.update({
+    return this.prisma.book.update({
       where: { id },
       data,
       include: { category: true },
@@ -54,14 +57,12 @@ export class BookService {
   }
 
   async delete(id: number) {
-    const book = await prisma.book.findUnique({ where: { id } });
+    const book = await this.prisma.book.findUnique({ where: { id } });
     if (!book) {
       throw new ApiError(404, 'Book not found');
     }
 
-    await prisma.book.delete({ where: { id } });
+    await this.prisma.book.delete({ where: { id } });
     return { ok: true };
   }
 }
-
-export const bookService = new BookService();

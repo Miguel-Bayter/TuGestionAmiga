@@ -4,11 +4,13 @@ import { RequireAuth } from '@/presentation/features/auth/components/require-aut
 import { RequireAdmin } from '@/presentation/features/auth/components/require-admin'
 import { Layout } from '@/presentation/components/Layout'
 import { Toast } from '@/presentation/components/Toast'
+import { ContainerProvider } from '@/shared/hooks/use-container.hook'
 import { routes } from '@/data/routes'
 
 function App() {
   return (
-    <Router>
+    <ContainerProvider>
+      <Router>
       <div className='App'>
         <Routes>
           {routes.map((route) => {
@@ -64,6 +66,7 @@ function App() {
         <Toast />
       </div>
     </Router>
+    </ContainerProvider>
   )
 }
 

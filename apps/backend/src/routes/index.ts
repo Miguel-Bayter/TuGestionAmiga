@@ -1,21 +1,26 @@
 import { Router, type Request, type Response } from 'express';
-import authRoutes from './auth.routes';
-import booksRoutes from './books.routes';
+import type { AwilixContainer } from 'awilix';
+import { createAuthRoutes } from './auth.routes';
+import { createBooksRoutes } from './books.routes';
 
-const router = Router();
+export function createApiRoutes(container: AwilixContainer) {
+  const router = Router();
 
-// Health check
-router.get('/health', (_req: Request, res: Response) => {
-  res.json({ ok: true, message: 'Server is running' });
-});
+  // Health check
+  router.get('/health', (_req: Request, res: Response) => {
+    res.json({ ok: true, message: 'Server is running' });
+  });
 
-// Routes
-router.use('/auth', authRoutes);
-router.use('/books', booksRoutes);
+  // Routes
+  router.use('/auth', createAuthRoutes(container));
+  router.use('/books', createBooksRoutes(container));
 
-// 404 handler for API routes
-router.use('*', (_req: Request, res: Response) => {
-  res.status(404).json({ ok: false, error: 'Endpoint not found' });
-});
+  // 404 handler for API routes
+  router.use('*', (_req: Request, res: Response) => {
+    res.status(404).json({ ok: false, error: 'Endpoint not found' });
+  });
 
-export default router;
+  return router;
+}
+
+export default createApiRoutes;
