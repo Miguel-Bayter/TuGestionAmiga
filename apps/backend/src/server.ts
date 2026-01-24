@@ -1,7 +1,7 @@
 import config from './config/env';
 import prisma from './config/database';
 import createApp from './app';
-import container from './config/container';
+import container from './shared/config/container';
 
 const startServer = async () => {
   try {
