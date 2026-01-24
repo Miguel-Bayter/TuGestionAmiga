@@ -21,5 +21,13 @@
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "prisma"]
+  "exclude": ["node_modules", "dist", "prisma"],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    },
+    "transpileOnly": true,
+    "files": true,
+    "require": ["tsconfig-paths/register"]
+  }
 }

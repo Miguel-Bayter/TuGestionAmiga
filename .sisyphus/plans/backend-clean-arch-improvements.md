@@ -50,12 +50,12 @@ Refactor backend to follow Clean Architecture patterns correctly, standardize in
 
 ### Definition of Done
 
-- [ ] `pnpm --filter @tu-gestion-amiga/backend lint` passes with no errors
-- [ ] `pnpm --filter @tu-gestion-amiga/backend type-check` passes with no errors
-- [ ] `pnpm dev:backend` starts successfully
-- [ ] Login endpoint works: `curl -X POST http://localhost:3001/api/auth/login`
-- [ ] Refresh endpoint works: `curl -X POST http://localhost:3001/api/auth/refresh`
-- [ ] No direct Prisma imports in routes or middleware
+- [x] `pnpm --filter @tu-gestion-amiga/backend lint` passes with no errors
+- [x] `pnpm --filter @tu-gestion-amiga/backend type-check` passes with no errors
+- [x] `pnpm dev:backend` starts successfully
+- [x] Login endpoint works: `curl -X POST http://localhost:3001/api/auth/login`
+- [x] Refresh endpoint works: `curl -X POST http://localhost:3001/api/auth/refresh`
+- [x] No direct Prisma imports in routes or middleware
 
 ### Must Have
 
@@ -139,7 +139,7 @@ Task 10 (Final verification)
 
 ## TODOs
 
-- [ ] 0. Create AuthResponse type for API backward compatibility
+- [x] 0. Create AuthResponse type for API backward compatibility
 
   **What to do**:
   - Create a new type `AuthUserResponse` in `modules/auth/domain/entity/auth.entity.ts`
@@ -178,7 +178,7 @@ Task 10 (Final verification)
 
 ---
 
-- [ ] 1. Update IAuthRepository interface with new methods and English nomenclature
+- [x] 1. Update IAuthRepository interface with new methods and English nomenclature
 
   **What to do**:
   - Add `refreshToken(refreshToken: string)` method signature
@@ -219,7 +219,7 @@ Task 10 (Final verification)
 
 ---
 
-- [ ] 2. Update AuthRepository implementation with new methods
+- [x] 2. Update AuthRepository implementation with new methods
 
   **What to do**:
   - Implement `refreshToken(refreshToken: string)` method
@@ -271,7 +271,7 @@ Task 10 (Final verification)
 
 ---
 
-- [ ] 3. Create RefreshTokenUseCase
+- [x] 3. Create RefreshTokenUseCase
 
   **What to do**:
   - Create new file `modules/auth/application/use-case/refresh-token.usecase.ts`
@@ -309,7 +309,7 @@ Task 10 (Final verification)
 
 ---
 
-- [ ] 4. Create ValidateTokenUseCase
+- [x] 4. Create ValidateTokenUseCase
 
   **What to do**:
   - Create new file `modules/auth/application/use-case/validate-token.usecase.ts`
@@ -353,7 +353,7 @@ Task 10 (Final verification)
 
 ---
 
-- [ ] 5. Update AuthService with new use cases
+- [x] 5. Update AuthService with new use cases
 
   **What to do**:
   - Add `RefreshTokenUseCase` to constructor
@@ -389,7 +389,7 @@ Task 10 (Final verification)
 
 ---
 
-- [ ] 6. Register new use cases in DI container
+- [x] 6. Register new use cases in DI container
 
   **What to do**:
   - Import `RefreshTokenUseCase` and `ValidateTokenUseCase`
@@ -425,7 +425,7 @@ Task 10 (Final verification)
 
 ---
 
-- [ ] 7. Refactor auth.routes.ts to use AuthService
+- [x] 7. Refactor auth.routes.ts to use AuthService
 
   **What to do**:
   - Remove direct `prisma` import
@@ -483,7 +483,7 @@ Task 10 (Final verification)
 
 ---
 
-- [ ] 8. Refactor middleware/auth.ts and fix requireAdmin bug
+- [x] 8. Refactor middleware/auth.ts and fix requireAdmin bug
 
   **What to do**:
   - Remove direct `prisma` import
@@ -537,7 +537,7 @@ Task 10 (Final verification)
 
 ---
 
-- [ ] 9. Move BookPayload type to book module domain
+- [x] 9. Move BookPayload type to book module domain
 
   **What to do**:
   - Move `BookPayload` type from `src/types/index.ts` to `modules/book/domain/entity/book.entity.ts`
@@ -579,7 +579,7 @@ Task 10 (Final verification)
 
 ---
 
-- [ ] 10. Final verification and cleanup
+- [x] 10. Final verification and cleanup
 
   **What to do**:
   - Run full lint check
@@ -668,9 +668,9 @@ pnpm dev:backend                                   # Expected: Server running on
 
 ### Final Checklist
 
-- [ ] All "Must Have" present
-- [ ] All "Must NOT Have" absent
-- [ ] No direct Prisma imports in routes or middleware
-- [ ] All comments in English
-- [ ] API backward compatibility maintained (id_usuario in responses)
-- [ ] requireAdmin bug fixed
+- [x] All "Must Have" present
+- [x] All "Must NOT Have" absent
+- [x] No direct Prisma imports in routes or middleware
+- [x] All comments in English
+- [x] API backward compatibility maintained (id_usuario in responses)
+- [x] requireAdmin bug fixed
