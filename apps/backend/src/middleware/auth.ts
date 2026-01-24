@@ -1,64 +1,64 @@
-import jwt from 'jsonwebtoken';
 import { Response, NextFunction } from 'express';
+import type { AwilixContainer } from 'awilix';
 import { AuthRequest } from '../types/index';
-import prisma from '../config/database';
 
-export const requireAuth = async (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  const authHeader = req.headers.authorization;
+/**
+ * Create authentication middleware factory
+ * Returns middleware functions that use the container's validateTokenUseCase
+ */
+export const createAuthMiddleware = (container: AwilixContainer) => {
+  const { validateTokenUseCase } = container.cradle;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    res.status(401).json({ ok: false, error: 'Not authenticated' });
-    return;
-  }
+  const requireAuth = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    const authHeader = req.headers.authorization;
 
-  const token = authHeader.substring(7); // Remove 'Bearer '
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
-      userId: number;
-    };
-
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
-      include: { role: true },
-    });
-
-    if (!user) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       res.status(401).json({ ok: false, error: 'Not authenticated' });
       return;
     }
 
-    req.auth = {
-      userId: user.id,
-      roleId: user.roleId,
-      roleName: user.role.name,
-      isAdmin: user.role.name === 'ADMIN',
-    };
+    const token = authHeader.substring(7); // Remove 'Bearer '
+
+    try {
+      const authUser = await validateTokenUseCase.execute(token);
+
+      req.auth = authUser;
+
+      next();
+    } catch (error) {
+      console.error(error);
+      res.status(401).json({ ok: false, error: 'Not authenticated' });
+    }
+  };
+
+  const requireAdmin = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    // Wrap requireAuth in a Promise to properly wait for completion
+    await new Promise<void>((resolve) => {
+      requireAuth(req, res, () => {
+        resolve();
+      });
+    });
+
+    if (res.headersSent) return;
+
+    if (!req.auth?.isAdmin) {
+      res.status(403).json({ ok: false, error: 'Admin access required' });
+      return;
+    }
 
     next();
-  } catch (error) {
-    console.error(error);
-    res.status(401).json({ ok: false, error: 'Not authenticated' });
-  }
+  };
+
+  return { requireAuth, requireAdmin };
 };
 
-export const requireAdmin = async (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  await requireAuth(req, res, () => {});
-
-  if (res.headersSent) return;
-
-  if (!req.auth?.isAdmin) {
-    res.status(403).json({ ok: false, error: 'Admin access required' });
-    return;
-  }
-
-  next();
-};
+// Export factory function as default for easy access
+export default createAuthMiddleware;
