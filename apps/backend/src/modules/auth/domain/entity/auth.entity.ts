@@ -14,7 +14,7 @@ export type AuthUser = {
  * Used for API responses with Spanish field names for backward compatibility
  */
 export type AuthUserResponse = {
-  id_usuario: number;
+  id: number;
   email: string;
   name: string;
   roleId: number;

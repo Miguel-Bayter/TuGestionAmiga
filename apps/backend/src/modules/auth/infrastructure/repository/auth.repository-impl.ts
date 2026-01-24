@@ -50,7 +50,7 @@ export class AuthRepository implements IAuthRepository {
 
     return {
       user: {
-        id_usuario: user.id,
+        id: user.id,
         email: user.email,
         name: user.name,
         roleId: user.roleId,
@@ -94,7 +94,7 @@ export class AuthRepository implements IAuthRepository {
 
      return {
        user: {
-         id_usuario: user.id,
+         id: user.id,
          email: user.email,
          name: user.name,
          roleId: user.roleId,
