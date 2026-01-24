@@ -1,4 +1,4 @@
-import type { BookPayload } from '@/types';
+import type { BookPayload } from '@/modules/book/domain/entity/book.entity';
 import { BookEntity } from '@/modules/book/domain/entity/book.entity';
 
 export interface IBookRepository {
