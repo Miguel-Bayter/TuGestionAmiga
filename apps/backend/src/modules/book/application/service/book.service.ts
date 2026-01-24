@@ -1,5 +1,5 @@
-import { GetAllBooksUseCase } from './use-cases/get-all-books.usecase';
-import { GetBookByIdUseCase } from './use-cases/get-book-by-id.usecase';
+import { GetAllBooksUseCase } from '@/modules/book/application/use-case/get-all-books.usecase';
+import { GetBookByIdUseCase } from '@/modules/book/application/use-case/get-book-by-id.usecase';
 
 export class BookService {
   constructor(

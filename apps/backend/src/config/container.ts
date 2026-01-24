@@ -1,32 +1,33 @@
-import { createContainer, InjectionMode, asClass, asValue } from 'awilix';
-import type { AwilixContainer } from 'awilix';
+import { type AwilixContainer, createContainer, InjectionMode, asClass, asValue } from 'awilix';
 import prisma from './database';
 
-// Repositorios - Implementaciones
-import { AuthRepository } from '@/data/Repository/auth.repository-impl';
-import { BookRepository } from '@/modules/book/infrastructure/repositories/book.repository-impl';
+// Repositories - Implementations
+import { AuthRepository } from '@/modules/auth/infrastructure/repository/auth.repository-impl';
+import { BookRepository } from '@/modules/book/infrastructure/repository/book.repository-impl';
 
 // Use Cases
-import { LoginUseCase, RegisterUseCase } from '@/domain/UseCase/auth';
-import { GetAllBooksUseCase, GetBookByIdUseCase } from '@/domain/UseCase/book';
+import { LoginUseCase } from '@/modules/auth/application/use-case/login.usecase';
+import { RegisterUseCase } from '@/modules/auth/application/use-case/register.usecase';
+import { GetAllBooksUseCase } from '@/modules/book/application/use-case/get-all-books.usecase';
+import { GetBookByIdUseCase } from '@/modules/book/application/use-case/get-book-by-id.usecase';
 
-// Servicios
-import { AuthService } from '@/services/auth.service';
-import { BookService } from '@/modules/book/application/book.service';
+// Services
+import { AuthService } from '@/modules/auth/application/service/auth.service';
+import { BookService } from '@/modules/book/application/service/book.service';
 
 /**
- * Crear y configurar el contenedor IoC de Awilix
- * Centraliza la inyección de todas las dependencias de la aplicación
+ * Create and configure the IoC container of Awilix
+ * Centralize the injection of all application dependencies
  */
 export const container: AwilixContainer = createContainer({ injectionMode: InjectionMode.PROXY, strict: true });
 
 // ============================================
-// REGISTRAR VALORES PRIMITIVOS (Infraestructura)
+// REGISTER PRIMITIVE VALUES (Infrastructure)
 // ============================================
 container.register({ prisma: asValue(prisma) });
 
 // ============================================
-// REGISTRAR REPOSITORIOS (Data Layer)
+// REGISTER REPOSITORIES (Data Layer)
 // ============================================
 container.register({
   authRepository: asClass(AuthRepository).scoped(),
@@ -34,7 +35,7 @@ container.register({
 });
 
 // ============================================
-// REGISTRAR USE CASES (Domain Layer)
+// REGISTER USE CASES (Domain Layer)
 // ============================================
 container.register({
   loginUseCase: asClass(LoginUseCase).singleton(),
@@ -44,7 +45,7 @@ container.register({
 });
 
 // ============================================
-// REGISTRAR SERVICIOS (Application Layer)
+// REGISTER SERVICES (Application Layer)
 // ============================================
 container.register({
   authService: asClass(AuthService).singleton(),

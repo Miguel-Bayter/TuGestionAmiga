@@ -1,4 +1,4 @@
-import type { IAuthRepository } from '../../Repository/auth.repository';
+import type { IAuthRepository } from '@/modules/auth/domain/interface/auth.repository';
 
 export class LoginUseCase {
   constructor(private authRepository: IAuthRepository) {}

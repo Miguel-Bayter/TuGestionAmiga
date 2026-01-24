@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { ApiError } from '@/middleware/error';
 import type { BookPayload } from '@/types';
-import type { IBookRepository } from '@/modules/book/domain/book.repository';
+import type { IBookRepository } from '@/modules/book/domain/interface/book.repository';
 
 export class BookRepository implements IBookRepository {
   constructor(private prisma: PrismaClient) {}

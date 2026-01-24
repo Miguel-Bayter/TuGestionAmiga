@@ -1,4 +1,4 @@
-import type { IBookRepository } from '../../domain/book.repository';
+import type { IBookRepository } from '@/modules/book/domain/interface/book.repository';
 
 export class GetAllBooksUseCase {
   constructor(private bookRepository: IBookRepository) {}

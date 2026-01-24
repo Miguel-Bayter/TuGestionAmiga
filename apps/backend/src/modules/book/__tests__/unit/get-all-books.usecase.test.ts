@@ -1,5 +1,5 @@
-import { GetAllBooksUseCase } from '../../application/use-cases/get-all-books.usecase';
-import type { IBookRepository } from '../../domain/book.repository';
+import { GetAllBooksUseCase } from '../../application/use-case/get-all-books.usecase';
+import type { IBookRepository } from '../../domain/interface/book.repository';
 
 describe('GetAllBooksUseCase', () => {
   let useCase: GetAllBooksUseCase;
