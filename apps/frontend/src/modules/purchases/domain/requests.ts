@@ -9,5 +9,7 @@ export interface CreatePurchaseRequest {
 }
 
 export interface GetPurchasesRequest {
-  userId: number
+  userId?: number
+  page?: number
+  pageSize?: number
 }

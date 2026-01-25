@@ -6,15 +6,12 @@
 import type { Purchase } from './entities'
 
 export interface CreatePurchaseResponse {
-  id: number
-  userId: number
-  bookId: number
-  price: number
-  date: Date
-  createdAt: Date
-  updatedAt: Date
+  purchase: Purchase
 }
 
 export interface GetPurchasesResponse {
   purchases: Purchase[]
+  total: number
+  page?: number
+  pageSize?: number
 }
