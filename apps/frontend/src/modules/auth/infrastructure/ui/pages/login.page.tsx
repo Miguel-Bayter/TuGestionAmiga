@@ -5,7 +5,7 @@
 
 import { useState, FormEvent, ChangeEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useContainer } from '@/shared/infrastructure/hooks'
+import { useContainer, useUseCase } from '@/shared/infrastructure/hooks'
 import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { ROUTES } from '@/shared/application/config'
 import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
@@ -66,73 +66,69 @@ export function LoginPage() {
     setFpConfirmPassword('')
   }
 
-  // Send reset code
-  const handleSendCode = async () => {
-    setFpError('')
-    setFpSuccess('')
+   // Send reset code
+   const handleSendCode = async () => {
+     setFpError('')
+     setFpSuccess('')
 
-    if (!fpEmail) {
-      setFpError('Escribe tu correo')
-      return
-    }
+     if (!fpEmail) {
+       setFpError('Escribe tu correo')
+       return
+     }
 
-    setFpLoading(true)
+     setFpLoading(true)
 
-    try {
-      const response = await apiClient.post<{ demo_code?: string }>('/api/password/forgot', {
-        correo: fpEmail,
-      })
+     try {
+       const forgotPasswordUseCase = useUseCase('forgotPasswordUseCase')
+       const response = await forgotPasswordUseCase.execute(fpEmail)
 
-      setFpSuccess('Si el correo existe, se generó un código temporal.')
+       setFpSuccess('Si el correo existe, se generó un código temporal.')
 
-      if (response.data?.demo_code) {
-        setFpCode(String(response.data.demo_code))
-        setFpSuccess(`Código generado (demo): ${response.data.demo_code}`)
-      }
+       if (response?.demo_code) {
+         setFpCode(String(response.demo_code))
+         setFpSuccess(`Código generado (demo): ${response.demo_code}`)
+       }
 
-      setFpStep(2)
-    } catch (error: unknown) {
-      setFpError((error as { message?: string }).message || 'No se pudo enviar el código')
-    } finally {
-      setFpLoading(false)
-    }
-  }
+       setFpStep(2)
+     } catch (error: unknown) {
+       setFpError((error as { message?: string }).message || 'No se pudo enviar el código')
+     } finally {
+       setFpLoading(false)
+     }
+   }
 
-  // Reset password
-  const handleResetPassword = async () => {
-    setFpError('')
-    setFpSuccess('')
+   // Reset password
+   const handleResetPassword = async () => {
+     setFpError('')
+     setFpSuccess('')
 
-    if (!fpEmail || !fpCode || !fpNewPassword || !fpConfirmPassword) {
-      setFpError('Completa todos los campos')
-      return
-    }
+     if (!fpEmail || !fpCode || !fpNewPassword || !fpConfirmPassword) {
+       setFpError('Completa todos los campos')
+       return
+     }
 
-    if (fpNewPassword !== fpConfirmPassword) {
-      setFpError('La confirmación no coincide')
-      return
-    }
+     if (fpNewPassword !== fpConfirmPassword) {
+       setFpError('La confirmación no coincide')
+       return
+     }
 
-    setFpLoading(true)
+     setFpLoading(true)
 
-    try {
-      await apiClient.post('/api/password/reset', {
-        correo: fpEmail,
-        code: fpCode,
-        new_password: fpNewPassword,
-      })
+     try {
+       const verifyPasswordCodeUseCase = useUseCase('verifyPasswordCodeUseCase')
+       await verifyPasswordCodeUseCase.execute(fpEmail, fpCode, fpNewPassword)
 
-      setFpSuccess('Contraseña actualizada. Ya puedes iniciar sesión.')
-      setFpStep(1)
-      setFpCode('')
-      setFpNewPassword('')
-      setFpConfirmPassword('')
-    } catch (error: unknown) {
-      setFpError((error as { message?: string }).message || 'No se pudo restablecer la contraseña')
-    } finally {
-      setFpLoading(false)
-    }
-  }
+       setFpSuccess('Contraseña actualizada. Ya puedes iniciar sesión.')
+       setFpStep(1)
+       setFpCode('')
+       setFpNewPassword('')
+       setFpConfirmPassword('')
+     } catch (error: unknown) {
+       setFpError((error as { message?: string }).message || 'No se pudo restablecer la contraseña')
+     } finally {
+       setFpLoading(false)
+     }
+   }
 
   return (
     <div className='flex items-center justify-center min-h-screen bg-gray-100'>

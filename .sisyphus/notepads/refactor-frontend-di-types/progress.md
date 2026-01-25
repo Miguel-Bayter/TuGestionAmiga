@@ -1,109 +1,59 @@
-# Refactor Frontend DI + Types - Progress Tracker
+# Refactor Frontend DI Types - Progress Tracker
 
-## Session Info
+## Completed Tasks
 
-- **Started**: 2026-01-25T21:59:22.579Z
-- **Session ID**: ses_408ef8df1ffeKqn8b4VofBOO7E
-- **Plan**: refactor-frontend-di-types.md
+### ✅ Task 1: Create src/presentation/config/container.ts
+- **Status**: DONE
+- **File**: `apps/frontend/src/presentation/config/container.ts`
+- **Details**:
+  - Awilix container created with `InjectionMode.CLASSIC` and `strict: true`
+  - 4 repositories registered as singletons
+  - 22 use cases registered as singletons (Auth: 6, Books: 6, Cart: 4, Loans: 4, User: 2)
+  - 4 state services registered as singletons
+  - Default export configured
 
-## Task Progress
+### ✅ Task 2: Create State Services to Replace Zustand
+- **Status**: DONE
+- **Files Created**:
+  - `apps/frontend/src/shared/infrastructure/services/auth-state.service.ts`
+  - `apps/frontend/src/shared/infrastructure/services/book-state.service.ts`
+  - `apps/frontend/src/shared/infrastructure/services/cart-state.service.ts`
+  - `apps/frontend/src/shared/infrastructure/services/loan-state.service.ts`
+- **Details**: All services implement subscriber pattern for state management
 
-### Task 1: Create container.ts ✅ COMPLETED
+### ✅ Task 3: Register Services in Container & Initialize in main.tsx
+- **Status**: DONE
+- **Files Modified**:
+  - `apps/frontend/src/presentation/config/container.ts` - Services registered
+  - `apps/frontend/src/main.tsx` - ContainerProvider wraps App
+- **Details**: Container initialized before React render, ContainerProvider is outermost provider
 
-- [x] File created: `src/presentation/config/container.ts`
-- [x] Awilix imported and container created
-- [x] All use cases registered (20 total)
-- [x] All repositories registered (4 total)
-- [x] Default export added
-- [x] Commit: 61833c6
+## Current Work
 
-**Use Cases Found** (25 total):
+### 🔄 Task 4: Find All Zustand Imports & Direct axios Calls
+- **Status**: IN PROGRESS
+- **Objective**: Search for all Zustand store imports and direct axios calls
+- **Next**: Document findings and create migration list
 
-- Auth: login, register, get-profile, logout (4)
-- Books: get-books, get-available-books, get-book, create-book, update-book, delete-book (6)
-- Cart: add-to-cart, get-cart, remove-from-cart, checkout (4)
-- Loans: get-loans, create-loan, return-loan, get-overdue-loans (4)
-- User: get-user-profile, update-profile (2)
+## Pending Tasks
 
-**Repositories Found** (4 total):
+- Task 5: Create missing use cases
+- Task 6: Replace Zustand hooks with container services
+- Task 7: Replace direct axios calls with use case calls
+- Task 8: Create type definitions based on Prisma models
+- Task 9: Verify end-to-end flows work
+- Task 10: Remove all Zustand store files
 
-- AuthRepository (auth.repository-impl.ts)
-- BookRepository (book.repository-impl.ts)
-- CartRepository (cart.repository-impl.ts)
-- LoanRepository (loan.repository-impl.ts)
+## Git Status
 
-**Missing Repositories**:
+- **Staged Changes**: 7 files
+  - New use cases: forgot-password, verify-password-code
+  - Modified: container.ts, auth.repository, auth.repository-impl, login.page.tsx, constants.ts
+- **Commits Ahead**: 13 commits
 
-- UserRepository (user module has use cases but no repository)
-- PurchaseRepository (no purchase module yet)
+## Key Decisions
 
-### Task 2: Create state services ⏳ PENDING
-
-- [ ] AuthStateService created
-- [ ] BookStateService created
-- [ ] CartStateService created
-- [ ] LoanStateService created
-
-### Task 3: Initialize container in main.tsx ⏳ PENDING
-
-- [ ] Container imported in main.tsx
-- [ ] ContainerProvider wraps App
-- [ ] No initialization errors
-
-### Task 4: Find Zustand + axios locations ⏳ PENDING
-
-- [ ] Zustand imports documented
-- [ ] Direct axios calls documented
-
-### Task 5: Create missing use cases ⏳ PENDING
-
-- [ ] Password reset use cases (if needed)
-- [ ] User repository + use cases (if needed)
-
-### Task 6: Replace Zustand with services ⏳ PENDING
-
-- [ ] All Zustand imports removed
-- [ ] All components using services
-
-### Task 7: Update type definitions ⏳ PENDING
-
-- [ ] Auth types created
-- [ ] Books types created
-- [ ] Loans types created
-- [ ] Cart types created
-- [ ] Purchase types created
-
-### Task 8: Verify end-to-end ⏳ PENDING
-
-- [ ] Registration flow works
-- [ ] Login flow works
-- [ ] Protected routes work
-
-### Task 9: Remove Zustand files ⏳ PENDING
-
-- [ ] Store files deleted
-- [ ] Zustand removed from package.json
-
-## Key Findings
-
-### Architecture Notes
-
-- Frontend already has well-organized modules (auth, books, cart, loans, user)
-- Use cases exist but are not registered in a container
-- Repositories exist and are properly implemented
-- Zustand stores currently manage state directly
-
-### Dependencies to Register
-
-- All 25 use cases need to be registered in container
-- All 4 repositories need to be registered
-- Need to create UserRepository for user module
-- Need to create state services to replace Zustand
-
-## Next Steps
-
-1. Create container.ts with all registrations
-2. Create state services
-3. Initialize in main.tsx
-4. Replace Zustand hooks with services
-5. Create type definitions based on Prisma models
+1. **State Management**: Using Awilix services with subscriber pattern (no Zustand)
+2. **Type Generation**: Manual types + Zod validation (NOT OpenAPI)
+3. **Execution Order**: Container → Services → Find Zustand/axios → Replace → Verify
+4. **Architecture**: Module-based domain types (not shared folder)

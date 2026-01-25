@@ -18,6 +18,8 @@ export const API_ENDPOINTS = {
   REGISTER: '/api/auth/register',
   REFRESH_TOKEN: '/api/auth/refresh',
   LOGOUT: '/api/auth/logout',
+  PASSWORD_FORGOT: '/api/password/forgot',
+  PASSWORD_RESET: '/api/password/reset',
 
   // Books
   BOOKS: '/api/books',

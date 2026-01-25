@@ -1,28 +1,8 @@
 {
-  "active_plan": "D:\ANDY2639\Projects\demos\TuGestionAmiga\.sisyphus\plans\refactor-frontend-di-types.md",
-  "plan_name": "refactor-frontend-di-types",
-  "started_at": "2026-01-25T21:59:22.579Z",
-  "session_ids": ["ses_408ef8df1ffeKqn8b4VofBOO7E", "ses_408d3e559ffeqcWnE7oZPPiBcw", "ses_408d16d2bffe5FTSFqrDEHMVtf", "ses_408cf185fffeEn8SeQC4ks2vi1"],
-  "progress": {
-    "completed": 3,
-    "total": 10,
-    "current_task": "Task 4-8: Create types and refactor components"
-  },
-  "completed_tasks": [
-    {
-      "task": "Task 1: Create container.ts",
-      "status": "completed",
-      "commit": "61833c6"
-    },
-    {
-      "task": "Task 2: Create state services",
-      "status": "completed",
-      "commit": "f5fb171"
-    },
-    {
-      "task": "Task 3: Register services and initialize",
-      "status": "completed",
-      "commit": "latest"
-    }
-  ]
+  "active_plan": "D:\\ANDY2639\\Projects\\demos\\TuGestionAmiga\\.sisyphus\\plans\\refactor-frontend-di-types.md",
+  "started_at": "2026-01-25T23:08:07.779Z",
+  "session_ids": [
+    "ses_40895d941ffea1Wnr6D3FwT6lz"
+  ],
+  "plan_name": "refactor-frontend-di-types"
 }

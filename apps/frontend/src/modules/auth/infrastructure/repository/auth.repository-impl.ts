@@ -59,6 +59,27 @@ export class AuthRepository implements IAuthRepository {
       TokenManager.clearTokens()
     }
   }
+
+  /**
+   * Request password reset code
+   */
+  async forgotPassword(email: string): Promise<{ demo_code?: string }> {
+    const response = await axPublic.post(API_ENDPOINTS.PASSWORD_FORGOT, {
+      correo: email,
+    })
+    return response.data
+  }
+
+  /**
+   * Verify code and reset password
+   */
+  async verifyPasswordCode(email: string, code: string, newPassword: string): Promise<void> {
+    await axPublic.post(API_ENDPOINTS.PASSWORD_RESET, {
+      correo: email,
+      code,
+      new_password: newPassword,
+    })
+  }
 }
 
 /**

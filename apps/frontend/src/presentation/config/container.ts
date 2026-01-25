@@ -9,12 +9,14 @@ import { CartRepository } from '@/modules/cart/infrastructure/repository/cart.re
 import { LoanRepository } from '@/modules/loans/infrastructure/repository/loan.repository-impl'
 
 // ============================================
-// USE CASES - AUTH MODULE (4 total)
+// USE CASES - AUTH MODULE (6 total)
 // ============================================
 import { LoginUseCase } from '@/modules/auth/application/use-case/login.usecase'
 import { RegisterUseCase } from '@/modules/auth/application/use-case/register.usecase'
 import { GetProfileUseCase } from '@/modules/auth/application/use-case/get-profile.usecase'
 import { LogoutUseCase } from '@/modules/auth/application/use-case/logout.usecase'
+import { ForgotPasswordUseCase } from '@/modules/auth/application/use-case/forgot-password.usecase'
+import { VerifyPasswordCodeUseCase } from '@/modules/auth/application/use-case/verify-password-code.usecase'
 
 // ============================================
 // USE CASES - BOOKS MODULE (6 total)
@@ -55,6 +57,8 @@ import { AuthStateService } from '@/shared/infrastructure/services/auth-state.se
 import { BookStateService } from '@/shared/infrastructure/services/book-state.service'
 import { CartStateService } from '@/shared/infrastructure/services/cart-state.service'
 import { LoanStateService } from '@/shared/infrastructure/services/loan-state.service'
+import { UIStateService } from '@/shared/infrastructure/services/ui-state.service'
+import { ToastStateService } from '@/shared/infrastructure/services/toast-state.service'
 
 /**
  * Create and configure the IoC container of Awilix
@@ -62,8 +66,8 @@ import { LoanStateService } from '@/shared/infrastructure/services/loan-state.se
  *
  * Total registrations:
  * - Repositories: 4
- * - Use Cases: 20
- * - State Services: 4
+ * - Use Cases: 22
+ * - State Services: 6
  */
 export const container: AwilixContainer = createContainer({
   injectionMode: InjectionMode.CLASSIC,
@@ -84,11 +88,13 @@ container.register({
 // REGISTER USE CASES (Domain Layer)
 // ============================================
 container.register({
-  // Auth Module (4)
+  // Auth Module (6)
   loginUseCase: asClass(LoginUseCase).singleton(),
   registerUseCase: asClass(RegisterUseCase).singleton(),
   getProfileUseCase: asClass(GetProfileUseCase).singleton(),
   logoutUseCase: asClass(LogoutUseCase).singleton(),
+  forgotPasswordUseCase: asClass(ForgotPasswordUseCase).singleton(),
+  verifyPasswordCodeUseCase: asClass(VerifyPasswordCodeUseCase).singleton(),
 
   // Books Module (6)
   getBooksUseCase: asClass(GetBooksUseCase).singleton(),
@@ -123,6 +129,8 @@ container.register({
   bookStateService: asClass(BookStateService).singleton(),
   cartStateService: asClass(CartStateService).singleton(),
   loanStateService: asClass(LoanStateService).singleton(),
+  uiStateService: asClass(UIStateService).singleton(),
+  toastStateService: asClass(ToastStateService).singleton(),
 })
 
 export default container

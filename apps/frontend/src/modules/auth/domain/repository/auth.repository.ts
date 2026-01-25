@@ -4,7 +4,7 @@
  */
 
 import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '@/shared/domain/types'
-import { User } from '@/domain/Entity/user.entity'
+import type { User } from '@/modules/auth/domain/entity/user.entity'
 
 export interface IAuthRepository {
   /**
@@ -31,4 +31,14 @@ export interface IAuthRepository {
    * Logout user
    */
   logout(): Promise<void>
+
+  /**
+   * Request password reset code
+   */
+  forgotPassword(email: string): Promise<{ demo_code?: string }>
+
+  /**
+   * Verify code and reset password
+   */
+  verifyPasswordCode(email: string, code: string, newPassword: string): Promise<void>
 }
