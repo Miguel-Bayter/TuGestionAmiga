@@ -3,7 +3,7 @@
  * Output types for book endpoints
  */
 
-import type { Book } from './entities'
+import type { Book, Category } from './entities'
 
 export interface GetBooksResponse {
   data: Book[]
@@ -17,4 +17,17 @@ export interface GetBooksResponse {
 
 export interface GetBookResponse {
   data: Book
+  category?: Category
+}
+
+export interface CreateBookResponse {
+  data: Book
+}
+
+export interface UpdateBookResponse {
+  data: Book
+}
+
+export interface DeleteBookResponse {
+  message: string
 }

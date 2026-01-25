@@ -3,6 +3,13 @@
  * Book and Category types from Prisma schema
  */
 
+export interface Category {
+  id: number
+  name: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface Book {
   id: number
   title: string
@@ -15,9 +22,5 @@ export interface Book {
   available: boolean
   createdAt: Date
   updatedAt: Date
-}
-
-export interface Category {
-  id: number
-  name: string
+  category?: Category
 }

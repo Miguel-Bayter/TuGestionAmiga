@@ -13,7 +13,16 @@ export interface CreateBookRequest {
   rentalStock: number
 }
 
-export interface UpdateBookRequest extends Partial<CreateBookRequest> {}
+export interface UpdateBookRequest {
+  title?: string
+  author?: string
+  description?: string
+  categoryId?: number
+  price?: number
+  purchaseStock?: number
+  rentalStock?: number
+  available?: boolean
+}
 
 export interface GetBooksRequest {
   page?: number
