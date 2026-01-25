@@ -4,7 +4,8 @@
  */
 
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useContainer } from '@/shared/infrastructure/hooks/use-container.hook'
+import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { getInitials } from '@/shared/application/helpers'
 import { ROUTES } from '@/shared/application/config'
 
@@ -15,10 +16,12 @@ interface NavbarProps {
 
 export function Navbar(_props: NavbarProps) {
   const navigate = useNavigate()
-  const { user, logout } = useAuthStore()
+  const container = useContainer()
+  const authService = container.cradle.authStateService as any
+  const { user } = useServiceState(authService) as any
 
   const handleLogout = async () => {
-    await logout()
+    await authService.logout()
     navigate(ROUTES.LOGIN)
   }
 
