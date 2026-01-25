@@ -3,8 +3,8 @@
  * Adds an item to the shopping cart
  */
 
-import type { ICartRepository } from '@/domain/Repository/cart.repository'
-import type { CartItem } from '@/domain/Entity/cart.entity'
+import type { ICartRepository } from '@/modules/cart/domain'
+import type { CartItem } from '@/modules/cart/domain'
 
 export class AddToCartUseCase {
   constructor(private cartRepository: ICartRepository) {}

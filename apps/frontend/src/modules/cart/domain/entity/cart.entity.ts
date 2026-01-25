@@ -3,7 +3,7 @@
  * Domain model for shopping cart
  */
 
-import type { Book } from './book.entity'
+import type { Book } from '@/modules/books/domain'
 
 export interface CartItem {
   id: number

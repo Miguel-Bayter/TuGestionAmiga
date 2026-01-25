@@ -3,7 +3,7 @@
  * Logs out a user and clears tokens
  */
 
-import type { IAuthRepository } from '@/domain/Repository/auth.repository'
+import type { IAuthRepository } from '@/modules/auth/domain'
 
 export class LogoutUseCase {
   constructor(private authRepository: IAuthRepository) {}

@@ -3,9 +3,8 @@
  * Fetches user's loans with optional pagination
  */
 
-import type { ILoanRepository } from '@/domain/Repository/loan.repository'
-import type { Loan } from '@/domain/Entity/loan.entity'
-import type { PaginatedResponse } from '@/shared/domain/types'
+import { type ILoanRepository, type Loan } from '@/modules/loans/domain'
+import { type PaginatedResponse } from '@/shared/domain/types'
 
 export class GetLoansUseCase {
   constructor(private loanRepository: ILoanRepository) {}

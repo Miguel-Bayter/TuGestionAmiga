@@ -3,7 +3,7 @@
  * Contract for loan operations
  */
 
-import type { Loan } from '../Entity'
+import type { Loan } from '@/modules/loans/domain/entity/loan.entity'
 import type { PaginatedResponse } from '@/shared/domain/types'
 
 export interface ILoanRepository {

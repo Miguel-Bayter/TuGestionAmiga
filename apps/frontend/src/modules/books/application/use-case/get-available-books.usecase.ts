@@ -3,8 +3,8 @@
  * Fetches all available books for lending
  */
 
-import type { IBookRepository } from '@/domain/Repository/book.repository'
-import type { Book } from '@/domain/Entity/book.entity'
+import type { IBookRepository } from '@/modules/books/domain'
+import type { Book } from '@/modules/books/domain'
 
 export class GetAvailableBooksUseCase {
   constructor(private bookRepository: IBookRepository) {}

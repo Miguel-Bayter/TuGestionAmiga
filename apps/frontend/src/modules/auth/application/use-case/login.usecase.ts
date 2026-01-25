@@ -3,7 +3,7 @@
  * Authenticates a user and stores tokens
  */
 
-import type { IAuthRepository } from '@/domain/Repository/auth.repository'
+import type { IAuthRepository } from '@/modules/auth/domain'
 import type { LoginRequest, LoginResponse } from '@/shared/domain/types'
 
 export class LoginUseCase {

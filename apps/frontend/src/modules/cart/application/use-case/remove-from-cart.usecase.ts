@@ -3,7 +3,7 @@
  * Removes an item from the shopping cart
  */
 
-import type { ICartRepository } from '@/domain/Repository/cart.repository'
+import type { ICartRepository } from '@/modules/cart/domain'
 
 export class RemoveFromCartUseCase {
   constructor(private cartRepository: ICartRepository) {}

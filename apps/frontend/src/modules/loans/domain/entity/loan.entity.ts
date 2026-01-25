@@ -3,7 +3,7 @@
  * Domain model for book loan
  */
 
-import type { Book } from './book.entity'
+import type { Book } from '@/modules/books/domain'
 
 export interface Loan {
   id: number

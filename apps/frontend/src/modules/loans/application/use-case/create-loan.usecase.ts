@@ -3,8 +3,7 @@
  * Creates a new loan for a book
  */
 
-import type { ILoanRepository } from '@/domain/Repository/loan.repository'
-import type { Loan } from '@/domain/Entity/loan.entity'
+import { type ILoanRepository, type Loan } from '@/modules/loans/domain'
 
 export class CreateLoanUseCase {
   constructor(private loanRepository: ILoanRepository) {}

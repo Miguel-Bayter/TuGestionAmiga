@@ -3,8 +3,7 @@
  * Fetches all books with optional pagination
  */
 
-import type { IBookRepository } from '@/domain/Repository/book.repository'
-import type { Book } from '@/domain/Entity/book.entity'
+import type { IBookRepository, Book } from '@/modules/books/domain'
 import type { PaginatedResponse } from '@/shared/domain/types'
 
 export class GetBooksUseCase {

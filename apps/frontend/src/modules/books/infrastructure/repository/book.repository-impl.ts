@@ -5,8 +5,7 @@
 
 import { API_ENDPOINTS } from '@/shared/application/config'
 import { bookSchema, booksArraySchema } from '@/modules/books/infrastructure/schema/book.schema'
-import type { IBookRepository } from '@/modules/books/domain/repository/book.repository'
-import type { Book } from '@/modules/books/domain/entity/book.entity'
+import type { IBookRepository, Book } from '@/modules/books/domain'
 import type { PaginatedResponse } from '@/shared/domain/types'
 import { axPublic, axPrivate } from '@/shared/infrastructure/provider'
 

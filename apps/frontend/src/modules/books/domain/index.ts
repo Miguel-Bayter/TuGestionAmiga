@@ -3,5 +3,8 @@
  * Exports domain entities and repository interfaces
  */
 
-export type { Book } from './entity/book.entity'
-export type { IBookRepository } from './repository/book.repository'
+export * from './entities'
+export * from './contract'
+export * from './requests'
+export * from './responses'
+
