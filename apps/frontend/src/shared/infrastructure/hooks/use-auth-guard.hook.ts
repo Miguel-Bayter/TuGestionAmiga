@@ -5,7 +5,8 @@
 
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useContainer } from '@/shared/infrastructure/hooks/use-container.hook'
+import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { ROUTES } from '@/shared/application/config'
 import type { User } from '@/shared/domain/types'
 
@@ -39,7 +40,9 @@ interface UseAuthGuardReturn {
 export function useAuthGuard(options: UseAuthGuardOptions = {}): UseAuthGuardReturn {
   const { adminOnly = false, redirectTo } = options
   const navigate = useNavigate()
-  const { user, isAuthenticated, isLoading } = useAuthStore()
+  const container = useContainer()
+  const authService = container.cradle.authStateService as any
+  const { user, isAuthenticated, isLoading } = useServiceState(authService) as any
 
   useEffect(() => {
     // Wait for auth to initialize
