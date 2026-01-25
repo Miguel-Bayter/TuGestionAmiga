@@ -3,22 +3,22 @@
   "google_auth": false,
   "agents": {
     "sisyphus-junior": {
-      "model": "opencode/big-pickle"
+      "model": "anthropic/claude-haiku-4-5"
     },
     "sisyphus": {
-      "model": "opencode/big-pickle"
+      "model": "anthropic/claude-haiku-4-5"
     },
     "prometheus": {
-      "model": "opencode/big-pickle"
+      "model": "anthropic/claude-haiku-4-5"
     },
     "atlas": {
-      "model": "opencode/big-pickle"
+      "model": "anthropic/claude-haiku-4-5"
     },
     "metis": {
-      "model": "opencode/big-pickle"
+      "model": "anthropic/claude-haiku-4-5"
     },
     "momus": {
-      "model": "opencode/big-pickle"
+      "model": "anthropic/claude-haiku-4-5"
     },
     "librarian": {
       "model": "opencode/big-pickle"
