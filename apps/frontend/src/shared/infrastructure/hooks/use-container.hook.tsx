@@ -49,3 +49,13 @@ export function useRepository<T extends string>(repositoryName: T) {
   const container = useContainer()
   return container.cradle[repositoryName as never]
 }
+
+/**
+ * Hook especializado para resolver servicios del contenedor
+ * @param serviceName - Nombre del servicio registrado en el contenedor
+ * @returns Instancia del servicio
+ */
+export function useService<T extends string>(serviceName: T) {
+  const container = useContainer()
+  return container.cradle[serviceName as never]
+}

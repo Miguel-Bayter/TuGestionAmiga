@@ -1,9 +1,11 @@
 /**
  * useToast Hook
  * Convenient hook for toast notifications
+ * Uses ToastStateService instead of Zustand
  */
 
-import { useToastStore } from '@/shared/infrastructure/stores'
+import { useState, useEffect } from 'react'
+import { useService } from './use-container.hook'
 import type { ToastMessage } from '@/shared/domain/types'
 
 interface UseToastReturn {
@@ -34,15 +36,23 @@ interface UseToastReturn {
  * toast.clearAll()
  */
 export function useToast(): UseToastReturn {
-  const { toasts, success, error, warning, info, removeToast, clearAllToasts } = useToastStore()
+  const toastService = useService('toastStateService')
+  const [toasts, setToasts] = useState<ToastMessage[]>(() => toastService.getState().toasts)
+
+  useEffect(() => {
+    const unsubscribe = toastService.subscribe((state: any) => {
+      setToasts(state.toasts)
+    })
+    return unsubscribe
+  }, [toastService])
 
   return {
-    success,
-    error,
-    warning,
-    info,
-    remove: removeToast,
-    clearAll: clearAllToasts,
+    success: (message: string, duration?: number) => toastService.success(message, duration),
+    error: (message: string, duration?: number) => toastService.error(message, duration),
+    warning: (message: string, duration?: number) => toastService.warning(message, duration),
+    info: (message: string, duration?: number) => toastService.info(message, duration),
+    remove: (id: string) => toastService.removeToast(id),
+    clearAll: () => toastService.clearAllToasts(),
     toasts,
   }
 }

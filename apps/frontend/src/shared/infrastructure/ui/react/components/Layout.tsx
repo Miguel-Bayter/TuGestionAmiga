@@ -9,7 +9,7 @@ import { Sidebar } from './Sidebar'
 import { Toast } from './Toast'
 import { useContainer } from '@/shared/infrastructure/hooks/use-container.hook'
 import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
-import { useUIStore } from '@/shared/infrastructure/stores'
+import { useUIState } from '@/shared/infrastructure/hooks/use-ui-state.hook'
 import { cn } from '@/shared/application/helpers/classnames.helper'
 
 interface LayoutProps {
@@ -21,7 +21,8 @@ export function Layout({ children }: LayoutProps) {
   const authService = container.cradle.authStateService as any
   const { user } = useServiceState(authService) as any
   const cartService = container.cradle.cartStateService as any
-  const { isSidebarOpen, closeSidebar, toggleSidebar } = useUIStore()
+  const uiService = container.cradle.uiStateService as any
+  const { isSidebarOpen } = useUIState()
 
   // Local sidebar collapsed state (persisted in localStorage)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -67,7 +68,7 @@ export function Layout({ children }: LayoutProps) {
           type='button'
           aria-label='Cerrar menú'
           className='fixed inset-0 z-40 bg-black/30 md:hidden'
-          onClick={closeSidebar}
+          onClick={() => uiService.closeSidebar()}
         />
       )}
 
@@ -81,7 +82,7 @@ export function Layout({ children }: LayoutProps) {
               aria-label='Abrir menú'
               className='inline-flex items-center justify-center p-2 rounded-md text-gray-400'
               type='button'
-              onClick={toggleSidebar}
+              onClick={() => uiService.toggleSidebar()}
             >
               <svg
                 className='h-6 w-6'
@@ -112,12 +113,12 @@ export function Layout({ children }: LayoutProps) {
 
       <div className='flex-1 md:flex md:items-start'>
         {/* Sidebar */}
-        <Sidebar
-          isOpen={isSidebarOpen}
-          isCollapsed={sidebarCollapsed}
-          onClose={closeSidebar}
-          onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
-        />
+         <Sidebar
+           isOpen={isSidebarOpen}
+           isCollapsed={sidebarCollapsed}
+           onClose={() => uiService.closeSidebar()}
+           onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
+         />
 
         {/* Main content */}
         <main
