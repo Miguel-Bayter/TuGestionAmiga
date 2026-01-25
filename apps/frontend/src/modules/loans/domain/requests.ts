@@ -5,14 +5,19 @@
 
 export interface CreateLoanRequest {
   bookId: number
-  dueDate: Date
 }
 
 export interface ReturnLoanRequest {
   loanId: number
 }
 
+export interface ExtendLoanRequest {
+  loanId: number
+}
+
 export interface GetLoansRequest {
+  userId?: number
+  status?: string
   page?: number
   pageSize?: number
 }

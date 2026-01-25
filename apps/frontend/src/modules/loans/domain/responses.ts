@@ -18,3 +18,16 @@ export interface GetLoansResponse {
 export interface CreateLoanResponse {
   data: Loan
 }
+
+export interface ReturnLoanResponse {
+  data: Loan
+}
+
+export interface ExtendLoanResponse {
+  data: Loan
+}
+
+export interface GetOverdueLoansResponse {
+  data: Loan[]
+  total: number
+}
