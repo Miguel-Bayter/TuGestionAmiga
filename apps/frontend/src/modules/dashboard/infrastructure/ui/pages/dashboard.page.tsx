@@ -2,8 +2,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Book } from '@/shared/domain/types'
-import { api } from '@/data/Repository'
-import { useContainer } from '@/shared/infrastructure/hooks'
+import { useContainer, useUseCase } from '@/shared/infrastructure/hooks'
 import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import BookCard from '@/presentation/features/books/components/book-card'
 import BookDetailsModal from '@/presentation/features/books/components/book-details-modal'
@@ -89,6 +88,8 @@ export default function DashboardPage() {
   const container = useContainer()
   const authService = container.cradle.authStateService as any
   const { user } = useServiceState(authService) as any
+  const getBooksUseCase = useUseCase('getBooksUseCase')
+  const getLoansUseCase = useUseCase('getLoansUseCase')
 
   const showInicio = location.pathname === '/'
   const showBuscar = location.pathname === '/buscar' || location.pathname === '/rentable'
@@ -122,9 +123,9 @@ export default function DashboardPage() {
 
   const load = async () => {
     try {
-      const response = await api.get<Book[]>('/libros')
-      if (response.data && Array.isArray(response.data)) {
-        setBooks(response.data)
+      const books = await getBooksUseCase.execute()
+      if (books && Array.isArray(books)) {
+        setBooks(books)
       } else {
         setBooks([])
       }
@@ -139,22 +140,22 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const onCatalogUpdated = () => load()
-    const onLoansUpdated = () => {
-      const uid = user?.id_usuario
-      if (!uid) return
+     const onLoansUpdated = () => {
+       const uid = user?.id_usuario
+       if (!uid) return
 
-      api
-        .get(`/prestamos?id_usuario=${encodeURIComponent(uid)}`)
-        .then((response) => {
-          const list = Array.isArray(response.data) ? response.data : []
-          const active = list.filter((r) => {
-            const st = String(r?.estado || '').toLowerCase()
-            return !st.includes('devuel')
-          })
-          setMyLoansCount(active.length)
-        })
-        .catch(() => setMyLoansCount(0))
-    }
+       getLoansUseCase
+         .execute()
+         .then((list: any) => {
+           const loans = Array.isArray(list) ? list : []
+           const active = loans.filter((r: any) => {
+             const st = String(r?.estado || '').toLowerCase()
+             return !st.includes('devuel')
+           })
+           setMyLoansCount(active.length)
+         })
+         .catch(() => setMyLoansCount(0))
+     }
 
     window.addEventListener('tga_catalog_updated', onCatalogUpdated)
     window.addEventListener('tga_loans_updated', onLoansUpdated)
@@ -187,23 +188,23 @@ export default function DashboardPage() {
         return
       }
 
-      try {
-        const response = await api.get('/admin/usuarios')
-        if (alive && response.data) {
-          setUsersCount(Array.isArray(response.data) ? response.data.length : 0)
-        }
-      } catch {
-        if (alive) setUsersCount(0)
-      }
+       try {
+         const users = await getLoansUseCase.execute()
+         if (alive && users) {
+           setUsersCount(Array.isArray(users) ? users.length : 0)
+         }
+       } catch {
+         if (alive) setUsersCount(0)
+       }
 
-      try {
-        const response = await api.get<AdminLoan[]>('/admin/prestamos')
-        if (alive && response.data) {
-          setAdminLoans(Array.isArray(response.data) ? response.data : [])
-        }
-      } catch {
-        if (alive) setAdminLoans([])
-      }
+       try {
+         const loans = await getLoansUseCase.execute()
+         if (alive && loans) {
+           setAdminLoans(Array.isArray(loans) ? loans : [])
+         }
+       } catch {
+         if (alive) setAdminLoans([])
+       }
     }
 
     loadAdminMetrics()
@@ -222,17 +223,17 @@ export default function DashboardPage() {
         return
       }
 
-      try {
-        const response = await api.get(`/prestamos?id_usuario=${encodeURIComponent(uid)}`)
-        const list = Array.isArray(response.data) ? response.data : []
-        const active = list.filter((r) => {
-          const st = String(r?.estado || '').toLowerCase()
-          return !st.includes('devuel')
-        })
-        if (alive) setMyLoansCount(active.length)
-      } catch {
-        if (alive) setMyLoansCount(0)
-      }
+       try {
+         const loans = await getLoansUseCase.execute()
+         const list = Array.isArray(loans) ? loans : []
+         const active = list.filter((r: any) => {
+           const st = String(r?.estado || '').toLowerCase()
+           return !st.includes('devuel')
+         })
+         if (alive) setMyLoansCount(active.length)
+       } catch {
+         if (alive) setMyLoansCount(0)
+       }
     }
 
     loadMyLoans()
