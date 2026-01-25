@@ -9,6 +9,8 @@
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+    "dc:start": "docker compose up -d",
+    "dc:stop": "docker compose down",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
     "db:generate": "prisma generate",
@@ -56,6 +58,6 @@
     "typescript": "^5.3.3"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node prisma/seed/index.ts"
   }
 }

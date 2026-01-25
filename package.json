@@ -12,6 +12,8 @@
     "build:frontend": "pnpm --filter @tu-gestion-amiga/frontend build",
     "build:backend": "pnpm --filter @tu-gestion-amiga/backend build",
     "preview:frontend": "pnpm --filter @tu-gestion-amiga/frontend preview",
+    "dc:start": "pnpm --filter @tu-gestion-amiga/backend dc:start",
+    "dc:stop": "pnpm --filter @tu-gestion-amiga/backend dc:stop",
     "lint": "pnpm -r lint",
     "format": "pnpm -r format",
     "format:check": "pnpm -r format:check",

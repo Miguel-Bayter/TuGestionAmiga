@@ -22,7 +22,7 @@ import { BookService } from '@/modules/book/application/service/book.service';
  * Centralize the injection of all application dependencies
  */
 export const container: AwilixContainer = createContainer({
-  injectionMode: InjectionMode.PROXY,
+  injectionMode: InjectionMode.CLASSIC,
   strict: true,
 });
 
@@ -35,8 +35,8 @@ container.register({ prisma: asValue(prisma) });
 // REGISTER REPOSITORIES (Data Layer)
 // ============================================
 container.register({
-  authRepository: asClass(AuthRepository).scoped(),
-  bookRepository: asClass(BookRepository).scoped(),
+  authRepository: asClass(AuthRepository).singleton(),
+  bookRepository: asClass(BookRepository).singleton(),
 });
 
 // ============================================
