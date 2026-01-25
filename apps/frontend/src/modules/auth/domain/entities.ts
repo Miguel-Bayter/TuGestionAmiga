@@ -3,6 +3,13 @@
  * User and Role types from Prisma schema
  */
 
+export interface Role {
+  id: number
+  name: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface User {
   id: number
   email: string
@@ -10,9 +17,5 @@ export interface User {
   roleId: number
   createdAt: Date
   updatedAt: Date
-}
-
-export interface Role {
-  id: number
-  name: string
+  role?: Role
 }
