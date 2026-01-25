@@ -4,7 +4,8 @@
  */
 
 import { NavLink } from 'react-router-dom'
-import { useAuthStore, useCartStore } from '@/shared/infrastructure/stores'
+import { useContainer } from '@/shared/infrastructure/hooks/use-container.hook'
+import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { ROUTES } from '@/shared/application/config'
 import { cn } from '@/shared/application/helpers'
 
@@ -16,13 +17,16 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: SidebarProps) {
-  const { user } = useAuthStore()
-  const { items } = useCartStore()
+  const container = useContainer()
+  const authService = container.cradle.authStateService as any
+  const { user } = useServiceState(authService) as any
+  const cartService = container.cradle.cartStateService as any
+  const { items } = useServiceState(cartService) as any
 
   const isAdmin = user?.id_rol === 1
 
   // Calculate cart count
-  const cartCount = items.reduce((acc, item) => acc + (item.cantidad || 0), 0)
+  const cartCount = items.reduce((acc: number, item: any) => acc + (item.cantidad || 0), 0)
 
   const linkClass = ({ isActive }: { isActive: boolean }) => {
     const base = isActive
