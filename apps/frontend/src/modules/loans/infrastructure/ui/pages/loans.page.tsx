@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/data/Repository'
-import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useContainer } from '@/shared/infrastructure/hooks'
+import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
 import { formatDate } from '@/shared/application/helpers'
 
@@ -34,7 +35,9 @@ interface LoanRow {
 }
 
 export default function LoansPage() {
-  const { user } = useAuthStore()
+  const container = useContainer()
+  const authService = container.cradle.authStateService as any
+  const { user } = useServiceState(authService) as any
   const { error: showError, success: showSuccess } = useToast()
 
   const [rows, setRows] = useState<LoanRow[]>([])

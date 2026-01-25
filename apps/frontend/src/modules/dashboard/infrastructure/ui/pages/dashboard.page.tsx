@@ -3,7 +3,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Book } from '@/shared/domain/types'
 import { api } from '@/data/Repository'
-import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useContainer } from '@/shared/infrastructure/hooks'
+import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import BookCard from '@/presentation/features/books/components/book-card'
 import BookDetailsModal from '@/presentation/features/books/components/book-details-modal'
 
@@ -85,7 +86,9 @@ const isBookPurchasable = (b: Book): boolean => {
 export default function DashboardPage() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { user } = useAuthStore()
+  const container = useContainer()
+  const authService = container.cradle.authStateService as any
+  const { user } = useServiceState(authService) as any
 
   const showInicio = location.pathname === '/'
   const showBuscar = location.pathname === '/buscar' || location.pathname === '/rentable'

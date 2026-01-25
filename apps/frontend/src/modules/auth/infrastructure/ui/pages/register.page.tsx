@@ -5,13 +5,16 @@
 
 import { useState, FormEvent, ChangeEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useContainer } from '@/shared/infrastructure/hooks'
+import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
 import { ROUTES } from '@/shared/application/config'
 
 export function RegisterPage() {
   const navigate = useNavigate()
-  const { register } = useAuthStore()
+  const container = useContainer()
+  const { authService } = container.cradle
+  useServiceState(authService)
   const toast = useToast()
 
   // Form state
@@ -39,7 +42,7 @@ export function RegisterPage() {
     setIsSubmitting(true)
 
     try {
-      const success = await register({ nombre, email, password })
+      const success = await authService.register({ nombre, email, password })
 
       if (success) {
         toast.success('Cuenta creada exitosamente')

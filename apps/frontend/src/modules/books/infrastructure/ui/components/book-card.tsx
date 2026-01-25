@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Book } from '@/shared/domain/types'
 import { api } from '@/data/Repository'
-import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useContainer } from '@/shared/infrastructure/hooks'
+import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
 
 interface BookCardProps {
@@ -32,7 +33,9 @@ const getLocalCoverUrl = (_title?: string): string | null => {
 
 export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCardProps) {
   const navigate = useNavigate()
-  const { user, logout } = useAuthStore()
+  const container = useContainer()
+  const authService = container.cradle.authStateService as any
+  const { user } = useServiceState(authService) as any
   const { success, error: showError } = useToast()
 
   const [buyQty, setBuyQty] = useState<number>(1)
@@ -107,7 +110,7 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
 
   const handleCompraError = (msg: string) => {
     if (msg.toLowerCase().includes('usuario no encontrado')) {
-      logout()
+      authService.logout()
       showError(msg)
       navigate('/login')
       return

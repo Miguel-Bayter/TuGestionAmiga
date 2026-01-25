@@ -5,14 +5,17 @@
 
 import { useState, FormEvent, ChangeEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useContainer } from '@/shared/infrastructure/hooks'
+import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { ROUTES } from '@/shared/application/config'
 import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
 
 export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { login } = useAuthStore()
+  const container = useContainer()
+  const { authService } = container.cradle
+  useServiceState(authService)
   const toast = useToast()
 
   // Login form state
@@ -37,7 +40,7 @@ export function LoginPage() {
     setIsSubmitting(true)
 
     try {
-      const success = await login({ email, password })
+      const success = await authService.login({ email, password })
 
       if (success) {
         toast.success('Bienvenido de nuevo')

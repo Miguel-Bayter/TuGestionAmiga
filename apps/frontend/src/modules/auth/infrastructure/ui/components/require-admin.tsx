@@ -5,7 +5,8 @@
 
 import { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useContainer } from '@/shared/infrastructure/hooks'
+import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { ROUTES } from '@/shared/application/config'
 
 interface RequireAdminProps {
@@ -14,7 +15,10 @@ interface RequireAdminProps {
 
 export function RequireAdmin({ children }: RequireAdminProps) {
   const location = useLocation()
-  const { user, isAuthenticated, isLoading } = useAuthStore()
+  const container = useContainer()
+  const authService = container.cradle.authStateService as any
+  const state = useServiceState(authService) as any
+  const { user, isAuthenticated, isLoading } = state
 
   // Show loading state while checking auth
   if (isLoading) {

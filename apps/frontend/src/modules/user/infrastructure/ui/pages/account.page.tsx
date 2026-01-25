@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '@/data/Repository'
-import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useContainer } from '@/shared/infrastructure/hooks'
+import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { formatCurrency, getInitials } from '@/shared/application/helpers'
 import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
 
@@ -17,7 +18,9 @@ type TabType = 'info' | 'seguridad' | 'notificaciones'
 
 export default function AccountPage() {
   const navigate = useNavigate()
-  const { user, logout: logoutStore } = useAuthStore()
+  const container = useContainer()
+  const authService = container.cradle.authStateService as any
+  const { user } = useServiceState(authService) as any
   const { success: showSuccess, error: showError } = useToast()
 
   const [tab, setTab] = useState<TabType>('info')
@@ -168,8 +171,8 @@ export default function AccountPage() {
     }
   }
 
-  const onLogout = () => {
-    logoutStore()
+  const onLogout = async () => {
+    await authService.logout()
     navigate('/login')
   }
 

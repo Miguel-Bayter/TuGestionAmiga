@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api } from '@/data/Repository'
-import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useContainer } from '@/shared/infrastructure/hooks'
+import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
 import { formatCurrency } from '@/shared/application/helpers'
 
@@ -13,7 +14,9 @@ interface CartItemData {
 }
 
 export default function CartPage() {
-  const { user } = useAuthStore()
+  const container = useContainer()
+  const { authService } = container.cradle
+  const { user } = useServiceState(authService)
   const { success: showSuccess, error: showError } = useToast()
 
   const [items, setItems] = useState<CartItemData[]>([])

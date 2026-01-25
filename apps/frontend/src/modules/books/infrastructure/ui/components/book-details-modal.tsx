@@ -4,7 +4,8 @@ import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { Book } from '@/shared/domain/types'
 import { api } from '@/data/Repository'
-import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useContainer } from '@/shared/infrastructure/hooks'
+import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
 import { formatCurrency } from '@/shared/application/helpers'
 
@@ -60,7 +61,9 @@ export default function BookDetailsModal({
   mode = 'todos',
 }: BookDetailsModalProps) {
   const navigate = useNavigate()
-  const { user, logout } = useAuthStore()
+  const container = useContainer()
+  const authService = container.cradle.authStateService as any
+  const { user } = useServiceState(authService) as any
   const { success, error: showError } = useToast()
   const dialogRef = useRef<HTMLDivElement>(null)
   const scrollYRef = useRef<number>(0)
@@ -246,7 +249,7 @@ export default function BookDetailsModal({
 
   const handleUserError = (msg: string) => {
     if (msg.toLowerCase().includes('usuario no encontrado')) {
-      logout()
+      authService.logout()
       showError(msg)
       navigate('/login')
       return

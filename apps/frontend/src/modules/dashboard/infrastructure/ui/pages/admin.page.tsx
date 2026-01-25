@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { api } from '@/data/Repository'
-import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useContainer } from '@/shared/infrastructure/hooks'
+import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
 import { formatDate } from '@/shared/application/helpers'
 import { User } from '@/shared/domain/types'
@@ -62,7 +63,9 @@ const emptyBook: AdminBook = {
 
 export default function AdminPage() {
   const location = useLocation()
-  const { user } = useAuthStore()
+  const container = useContainer()
+  const authService = container.cradle.authStateService as any
+  const { user } = useServiceState(authService) as any
   const { success: showSuccess, error: showError } = useToast()
 
   const [tab, setTab] = useState<TabType>('libros')
