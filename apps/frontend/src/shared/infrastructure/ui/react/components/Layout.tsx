@@ -7,7 +7,9 @@ import { ReactNode, useEffect, useState } from 'react'
 import { Navbar } from './Navbar'
 import { Sidebar } from './Sidebar'
 import { Toast } from './Toast'
-import { useUIStore, useCartStore, useAuthStore } from '@/shared/infrastructure/stores'
+import { useContainer } from '@/shared/infrastructure/hooks/use-container.hook'
+import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
+import { useUIStore } from '@/shared/infrastructure/stores'
 import { cn } from '@/shared/application/helpers/classnames.helper'
 
 interface LayoutProps {
@@ -15,8 +17,10 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
-  const { user, checkAuth } = useAuthStore()
-  const { getCart } = useCartStore()
+  const container = useContainer()
+  const authService = container.cradle.authStateService as any
+  const { user } = useServiceState(authService) as any
+  const cartService = container.cradle.cartStateService as any
   const { isSidebarOpen, closeSidebar, toggleSidebar } = useUIStore()
 
   // Local sidebar collapsed state (persisted in localStorage)
@@ -33,27 +37,27 @@ export function Layout({ children }: LayoutProps) {
 
   // Check auth on mount
   useEffect(() => {
-    checkAuth()
-  }, [checkAuth])
+    authService.checkAuth()
+  }, [authService])
 
   // Fetch cart on mount and when user changes
   useEffect(() => {
     if (user?.id_usuario) {
-      getCart()
+      cartService.getCart()
     }
-  }, [user?.id_usuario, getCart])
+  }, [user?.id_usuario, cartService])
 
   // Listen for cart updates from events (for backward compatibility)
   useEffect(() => {
     const handleCartUpdate = () => {
       if (user?.id_usuario) {
-        getCart()
+        cartService.getCart()
       }
     }
 
     window.addEventListener('tga_cart_updated', handleCartUpdate)
     return () => window.removeEventListener('tga_cart_updated', handleCartUpdate)
-  }, [user?.id_usuario, getCart])
+  }, [user?.id_usuario, cartService])
 
   return (
     <div className='relative min-h-screen flex flex-col overflow-x-hidden'>
