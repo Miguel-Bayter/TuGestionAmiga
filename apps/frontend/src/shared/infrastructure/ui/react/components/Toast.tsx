@@ -5,8 +5,8 @@
 
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { useToast } from '@/shared/hooks/use-toast.hook'
-import { cn } from '@/shared/helpers/classnames.helper'
+import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
+import { cn } from '@/shared/application/helpers/classnames.helper'
 
 export function Toast() {
   const { toasts, remove } = useToast()

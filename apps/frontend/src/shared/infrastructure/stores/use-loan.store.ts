@@ -5,14 +5,14 @@
 
 import { create } from 'zustand'
 import {
-  GetLoansUseCase,
-  CreateLoanUseCase,
-  ReturnLoanUseCase,
-  GetOverdueLoansUseCase,
+    GetLoansUseCase,
+    CreateLoanUseCase,
+    ReturnLoanUseCase,
+    GetOverdueLoansUseCase,
 } from '@/domain/UseCase/loan'
 import { loanRepository } from '@/data/Repository/loan.repository-impl'
 import type { Loan } from '@/domain/Entity/loan.entity'
-import type { PaginatedResponse } from '@/shared/types'
+import type { PaginatedResponse } from '@/shared/domain/types'
 
 interface LoanState {
   // State

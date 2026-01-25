@@ -5,7 +5,7 @@
 
 import type { ILoanRepository } from '@/domain/Repository/loan.repository'
 import type { Loan } from '@/domain/Entity/loan.entity'
-import type { PaginatedResponse } from '@/shared/types'
+import type { PaginatedResponse } from '@/shared/domain/types'
 
 export class GetLoansUseCase {
   constructor(private loanRepository: ILoanRepository) {}

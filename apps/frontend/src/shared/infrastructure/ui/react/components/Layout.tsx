@@ -7,8 +7,8 @@ import { ReactNode, useEffect, useState } from 'react'
 import { Navbar } from './Navbar'
 import { Sidebar } from './Sidebar'
 import { Toast } from './Toast'
-import { useUIStore, useCartStore, useAuthStore } from '@/shared/stores'
-import { cn } from '@/shared/helpers/classnames.helper'
+import { useUIStore, useCartStore, useAuthStore } from '@/shared/infrastructure/stores'
+import { cn } from '@/shared/application/helpers/classnames.helper'
 
 interface LayoutProps {
   children: ReactNode

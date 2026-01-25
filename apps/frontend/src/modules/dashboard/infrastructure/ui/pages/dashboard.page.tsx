@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Book } from '@/shared/types'
+import { Book } from '@/shared/domain/types'
 import { api } from '@/data/Repository'
-import { useAuthStore } from '@/shared/stores'
+import { useAuthStore } from '@/shared/infrastructure/stores'
 import BookCard from '@/presentation/features/books/components/book-card'
 import BookDetailsModal from '@/presentation/features/books/components/book-details-modal'
 

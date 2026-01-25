@@ -4,12 +4,12 @@
  */
 
 import { axPrivate } from '@/shared/infrastructure/provider'
-import { API_ENDPOINTS } from '@/shared/config'
+import { API_ENDPOINTS } from '@/shared/application/config'
 import { loanSchema, loansArraySchema } from '@/modules/loans/infrastructure/schema'
 import type { ILoanRepository } from '@/modules/loans/domain/repository/loan.repository'
 import type { Loan } from '@/modules/loans/domain/entity/loan.entity'
-import type { PaginatedResponse } from '@/shared/types'
-import { isOverdue } from '@/shared/helpers'
+import type { PaginatedResponse } from '@/shared/domain/types'
+import { isOverdue } from '@/shared/application/helpers'
 
 export class LoanRepository implements ILoanRepository {
   /**

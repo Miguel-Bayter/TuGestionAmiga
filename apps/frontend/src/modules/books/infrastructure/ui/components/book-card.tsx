@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Book } from '@/shared/types'
+import { Book } from '@/shared/domain/types'
 import { api } from '@/data/Repository'
-import { useAuthStore } from '@/shared/stores'
-import { useToast } from '@/shared/hooks/use-toast.hook'
+import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
 
 interface BookCardProps {
   book: Book

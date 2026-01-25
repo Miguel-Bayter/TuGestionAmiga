@@ -5,9 +5,9 @@
 
 import { useState, FormEvent, ChangeEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/shared/stores'
-import { ROUTES } from '@/shared/config'
-import { useToast } from '@/shared/hooks/use-toast.hook'
+import { useAuthStore } from '@/shared/infrastructure/stores'
+import { ROUTES } from '@/shared/application/config'
+import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
 
 export function LoginPage() {
   const navigate = useNavigate()

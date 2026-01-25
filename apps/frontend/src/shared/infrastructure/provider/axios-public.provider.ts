@@ -4,7 +4,7 @@
  */
 
 import axios from 'axios'
-import { API_BASE_URL } from '@/shared/config'
+import { API_BASE_URL } from '@/shared/application/config'
 
 /**
  * Public Axios instance

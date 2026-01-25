@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/data/Repository'
-import { useAuthStore } from '@/shared/stores'
-import { useToast } from '@/shared/hooks/use-toast.hook'
-import { formatDate } from '@/shared/helpers'
+import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
+import { formatDate } from '@/shared/application/helpers'
 
 // Temporary placeholder functions until covers lib is migrated
 const createCoverDataUri = (title?: string): string => {

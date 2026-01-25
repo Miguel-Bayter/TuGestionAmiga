@@ -4,7 +4,7 @@
  */
 
 import axios, { type AxiosError } from 'axios'
-import { API_BASE_URL, HTTP_STATUS } from '@/shared/config'
+import { API_BASE_URL, HTTP_STATUS } from '@/shared/application/config'
 import { TokenManager } from './token-manager.provider'
 
 /**

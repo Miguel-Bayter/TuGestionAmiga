@@ -3,8 +3,8 @@
  * Convenient hook for toast notifications
  */
 
-import { useToastStore } from '@/shared/stores'
-import type { ToastMessage } from '@/shared/types'
+import { useToastStore } from '@/shared/infrastructure/stores'
+import type { ToastMessage } from '@/shared/domain/types'
 
 interface UseToastReturn {
   success: (message: string, duration?: number) => void

@@ -4,8 +4,8 @@
  */
 
 import axios from 'axios'
-import { API_BASE_URL, API_ENDPOINTS, STORAGE_KEYS } from '@/shared/config'
-import type { RefreshTokenResponse } from '@/shared/types'
+import { API_BASE_URL, API_ENDPOINTS, STORAGE_KEYS } from '@/shared/application/config'
+import type { RefreshTokenResponse } from '@/shared/domain/types'
 
 /**
  * Token Manager Class

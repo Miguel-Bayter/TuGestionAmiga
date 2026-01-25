@@ -2,11 +2,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
-import { Book } from '@/shared/types'
+import { Book } from '@/shared/domain/types'
 import { api } from '@/data/Repository'
-import { useAuthStore } from '@/shared/stores'
-import { useToast } from '@/shared/hooks/use-toast.hook'
-import { formatCurrency } from '@/shared/helpers'
+import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
+import { formatCurrency } from '@/shared/application/helpers'
 
 interface BookDetailsModalProps {
   open: boolean

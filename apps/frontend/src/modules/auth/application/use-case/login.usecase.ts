@@ -4,7 +4,7 @@
  */
 
 import type { IAuthRepository } from '@/domain/Repository/auth.repository'
-import type { LoginRequest, LoginResponse } from '@/shared/types'
+import type { LoginRequest, LoginResponse } from '@/shared/domain/types'
 
 export class LoginUseCase {
   constructor(private authRepository: IAuthRepository) {}

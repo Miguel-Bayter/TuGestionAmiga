@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api } from '@/data/Repository'
-import { useAuthStore } from '@/shared/stores'
-import { useToast } from '@/shared/hooks/use-toast.hook'
-import { formatCurrency } from '@/shared/helpers'
+import { useAuthStore } from '@/shared/infrastructure/stores'
+import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
+import { formatCurrency } from '@/shared/application/helpers'
 
 interface CartItemData {
   id_libro: number

@@ -4,7 +4,7 @@
  */
 
 import { axPrivate } from '@/shared/infrastructure/provider'
-import { API_ENDPOINTS } from '@/shared/config'
+import { API_ENDPOINTS } from '@/shared/application/config'
 import { cartItemSchema, cartItemsArraySchema } from '@/modules/cart/infrastructure/schema'
 import type { ICartRepository } from '@/modules/cart/domain/repository/cart.repository'
 import type { Cart, CartItem } from '@/modules/cart/domain/entity/cart.entity'

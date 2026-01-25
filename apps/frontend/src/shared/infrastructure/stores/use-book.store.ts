@@ -7,7 +7,7 @@ import { create } from 'zustand'
 import { GetBooksUseCase, GetBookUseCase, GetAvailableBooksUseCase } from '@/domain/UseCase/book'
 import { bookRepository } from '@/data/Repository/book.repository-impl'
 import type { Book } from '@/domain/Entity/book.entity'
-import type { PaginatedResponse } from '@/shared/types'
+import type { PaginatedResponse } from '@/shared/domain/types'
 
 interface BookState {
   // State

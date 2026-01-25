@@ -4,7 +4,7 @@
  */
 
 import type { Book } from '@/domain/Entity/book.entity'
-import type { PaginatedResponse } from '@/shared/types'
+import type { PaginatedResponse } from '@/shared/domain/types'
 
 export interface IBookRepository {
   /**

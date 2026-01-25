@@ -5,8 +5,8 @@
 
 import { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuthStore } from '@/shared/stores'
-import { ROUTES } from '@/shared/config'
+import { useAuthStore } from '@/shared/infrastructure/stores'
+import { ROUTES } from '@/shared/application/config'
 
 interface RequireAuthProps {
   children: ReactNode

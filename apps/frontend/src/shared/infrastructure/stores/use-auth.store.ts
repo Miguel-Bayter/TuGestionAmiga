@@ -12,8 +12,8 @@ import {
 } from '@/domain/UseCase/auth'
 import { authRepository } from '@/data/Repository/auth.repository-impl'
 import { TokenManager } from '@/data/Provider'
-import { STORAGE_KEYS } from '@/shared/config'
-import type { User, LoginRequest, RegisterRequest } from '@/shared/types'
+import { STORAGE_KEYS } from '@/shared/application/config'
+import type { User, LoginRequest, RegisterRequest } from '@/shared/domain/types'
 
 interface AuthState {
   // State

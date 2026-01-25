@@ -4,9 +4,9 @@
  */
 
 import { create } from 'zustand'
-import { generateId } from '@/shared/helpers'
-import { TOAST_DURATION } from '@/shared/config'
-import type { ToastMessage } from '@/shared/types'
+import { generateId } from '@/shared/application/helpers'
+import { TOAST_DURATION } from '@/shared/application/config'
+import type { ToastMessage } from '@/shared/domain/types'
 
 interface ToastState {
   // State

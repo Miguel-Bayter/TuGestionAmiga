@@ -1,13 +1,13 @@
 import { ComponentType, lazy } from 'react'
-import { LoginPage } from '@/presentation/features/auth/pages/login.page'
-import { RegisterPage } from '@/presentation/features/auth/pages/register.page'
+import { LoginPage } from '@/modules/auth/infrastructure/ui/pages/login.page'
+import { RegisterPage } from '@/modules/auth/infrastructure/ui/pages/register.page'
 // Lazy-loaded pages for code splitting
-const DashboardPage = lazy(() => import('@/presentation/features/dashboard/pages/dashboard.page'))
-const CartPage = lazy(() => import('@/presentation/features/cart/pages/cart.page'))
-const LoansPage = lazy(() => import('@/presentation/features/loans/pages/loans.page'))
-const AccountPage = lazy(() => import('@/presentation/features/account/pages/account.page'))
-const AdminPage = lazy(() => import('@/presentation/features/admin/pages/admin.page'))
-const HelpPage = lazy(() => import('@/presentation/features/help/pages/help.page'))
+const DashboardPage = lazy(() => import('@/modules/dashboard/infrastructure/ui/pages/dashboard.page'))
+const CartPage = lazy(() => import('@/modules/cart/infrastructure/ui/pages/cart.page'))
+const LoansPage = lazy(() => import('@/modules/loans/infrastructure/ui/pages/loans.page'))
+const AccountPage = lazy(() => import('@/modules/user/infrastructure/ui/pages/account.page'))
+const AdminPage = lazy(() => import('@/modules/dashboard/infrastructure/ui/pages/admin.page'))
+const HelpPage = lazy(() => import('@/modules/dashboard/infrastructure/ui/pages/help.page'))
 
 export interface RouteConfig {
   path: string

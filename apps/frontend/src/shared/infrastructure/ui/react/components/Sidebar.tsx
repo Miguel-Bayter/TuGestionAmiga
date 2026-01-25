@@ -4,9 +4,9 @@
  */
 
 import { NavLink } from 'react-router-dom'
-import { useAuthStore, useCartStore } from '@/shared/stores'
-import { ROUTES } from '@/shared/config'
-import { cn } from '@/shared/helpers'
+import { useAuthStore, useCartStore } from '@/shared/infrastructure/stores'
+import { ROUTES } from '@/shared/application/config'
+import { cn } from '@/shared/application/helpers'
 
 interface SidebarProps {
   isOpen: boolean

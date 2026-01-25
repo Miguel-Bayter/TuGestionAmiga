@@ -4,9 +4,9 @@
  */
 
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/shared/stores'
-import { getInitials } from '@/shared/helpers'
-import { ROUTES } from '@/shared/config'
+import { useAuthStore } from '@/shared/infrastructure/stores'
+import { getInitials } from '@/shared/application/helpers'
+import { ROUTES } from '@/shared/application/config'
 
 interface NavbarProps {
   onToggleSidebar?: () => void

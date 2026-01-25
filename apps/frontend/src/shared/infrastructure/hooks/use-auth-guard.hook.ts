@@ -5,9 +5,9 @@
 
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/shared/stores'
-import { ROUTES } from '@/shared/config'
-import type { User } from '@/shared/types'
+import { useAuthStore } from '@/shared/infrastructure/stores'
+import { ROUTES } from '@/shared/application/config'
+import type { User } from '@/shared/domain/types'
 
 interface UseAuthGuardOptions {
   adminOnly?: boolean

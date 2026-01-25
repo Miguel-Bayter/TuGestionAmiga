@@ -1,11 +1,11 @@
 import { Suspense } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { RequireAuth } from '@/presentation/features/auth/components/require-auth'
-import { RequireAdmin } from '@/presentation/features/auth/components/require-admin'
-import { Layout } from '@/presentation/components/Layout'
-import { Toast } from '@/presentation/components/Toast'
-import { ContainerProvider } from '@/shared/hooks/use-container.hook'
-import { routes } from '@/data/routes'
+import { routes } from '@/shared/infrastructure/ui/react/routes'
+import { Toast } from '@/shared/infrastructure/ui/react/components/Toast'
+import { Layout } from '@/shared/infrastructure/ui/react/components/Layout'
+import { ContainerProvider } from '@/shared/infrastructure/hooks/use-container.hook'
+import { RequireAuth } from '@/modules/auth/infrastructure/ui/components/require-auth'
+import { RequireAdmin } from '@/modules/auth/infrastructure/ui/components/require-admin'
 
 function App() {
   return (

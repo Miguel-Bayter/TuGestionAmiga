@@ -4,7 +4,7 @@
  */
 
 import type { Loan } from '../Entity'
-import type { PaginatedResponse } from '@/shared/types'
+import type { PaginatedResponse } from '@/shared/domain/types'
 
 export interface ILoanRepository {
   /**
