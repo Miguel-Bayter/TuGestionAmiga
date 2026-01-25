@@ -241,9 +241,9 @@ pnpm --filter @tu-gestion-amiga/backend type-check
 **Context**: Prerequisite work to establish clean baseline before modular architecture refactoring. Original plan assumed baseline was clean, but had 16 TypeScript errors.
 
 **Changes**:
+
 - Repository: Added `.toNumber()` for Prisma Decimal → number conversion
 - Tests: Completed BookEntity mocks with all required properties
-
 
 ---
 
@@ -271,6 +271,7 @@ pnpm --filter @tu-gestion-amiga/backend type-check
 | `config/cors.ts` | 2 | `import config from './env'` |
 
 **Exports from @/config:**
+
 - `config/env.ts` → `config` object (server, database, cors settings)
 - `config/database.ts` → `prisma` singleton (PrismaClient)
 - `config/container.ts` → `container` (Awilix IoC container)
@@ -287,6 +288,7 @@ pnpm --filter @tu-gestion-amiga/backend type-check
 | `modules/book/infrastructure/repository/book.repository-impl.ts` | 2 | `import { ApiError } from '@/middleware/error'` |
 
 **Exports from @/middleware:**
+
 - `middleware/error.ts` → `ApiError` class (custom error)
 - `middleware/error.ts` → `errorHandler` function (Express error middleware)
 - `middleware/error.ts` → `asyncHandler` function (async route wrapper)
@@ -298,6 +300,7 @@ pnpm --filter @tu-gestion-amiga/backend type-check
 | `modules/auth/infrastructure/repository/auth.repository-impl.ts` | 4 | `import { hashPassword, comparePassword, validatePasswordStrength } from '@/utils/password'` |
 
 **Exports from @/utils:**
+
 - `utils/password.ts` → `hashPassword` function
 - `utils/password.ts` → `comparePassword` function
 - `utils/password.ts` → `validatePasswordStrength` function
@@ -309,6 +312,7 @@ pnpm --filter @tu-gestion-amiga/backend type-check
 | `middleware/auth.ts` | 3 | `import { AuthRequest } from '../types/index'` |
 
 **Exports from @/types:**
+
 - `types/index.ts` → `AuthRequest` interface (extends Express Request)
 - `types/index.ts` → `ApiResponse<T>` interface (generic API response)
 - `types/index.ts` → `PaginationQuery` interface (pagination params)
@@ -350,6 +354,7 @@ pnpm --filter @tu-gestion-amiga/backend type-check
 **Result**: ✅ **NO CIRCULAR DEPENDENCIES DETECTED**
 
 **Dependency Flow**:
+
 ```
 server.ts
   ↓
@@ -377,6 +382,7 @@ utils/password.ts (no imports from shared dirs)
 **Status**: ✅ **READY FOR MIGRATION**
 
 **Reasons**:
+
 1. Clean dependency graph (no circular imports)
 2. All shared code is in 4 well-defined directories
 3. Import patterns are consistent (using `@/` alias)
@@ -384,6 +390,7 @@ utils/password.ts (no imports from shared dirs)
 5. Each shared directory has clear, single-purpose exports
 
 **Recommended Migration Order** (based on dependency flow):
+
 1. `@/types` → `@/shared/types` (1 import, no dependencies)
 2. `@/utils` → `@/shared/utils` (1 import, no dependencies)
 3. `@/middleware` → `@/shared/middleware` (4 imports, no dependencies)
@@ -404,12 +411,12 @@ The following files have **zero imports** from `@/config`, `@/middleware`, `@/ut
 
 ---
 
-
 ## Task 2: Create /shared Directory Structure
 
 **Completed:** Created 5 empty subdirectories under `apps/backend/src/shared/`
 
 **Structure Created:**
+
 ```
 apps/backend/src/shared/
 ├── config/      (ready for: container.ts, cors.ts, database.ts, env.ts)
@@ -420,6 +427,7 @@ apps/backend/src/shared/
 ```
 
 **Verification:**
+
 - All 5 directories created successfully
 - Directories are empty (no files yet)
 - Backend type-check passes (exit 0)
@@ -427,22 +435,24 @@ apps/backend/src/shared/
 
 **Ready for:** Next task will migrate files into these directories.
 
-
 ## Task 3: Move container.ts to /shared/config
 
 **Date**: 2026-01-24
 **Status**: ✅ COMPLETED
 
 **Changes**:
+
 1. Moved `src/config/container.ts` → `src/shared/config/container.ts` (using `git mv`)
 2. Updated import in `server.ts` line 4: `'./config/container'` → `'./shared/config/container'`
 3. Fixed internal import in `container.ts` line 2: `'./database'` → `'@/config/database'`
 
 **Files Modified**:
+
 - `server.ts` - Updated container import path
 - `shared/config/container.ts` - Fixed database import to use absolute path
 
 **Verification**:
+
 - ✅ `pnpm type-check` → exit code 0 (no TypeScript errors)
 - ✅ `pnpm lint` → exit code 0 (no ESLint errors)
 - ✅ Git history preserved (used `git mv`)
@@ -451,13 +461,42 @@ apps/backend/src/shared/
 When moving files that have relative imports, those imports must be updated to absolute paths (`@/`) to avoid breaking when the file location changes. The container.ts file imported `./database` which broke after moving to `/shared/config/`. Fixed by changing to `@/config/database`.
 
 **Import Pattern**:
+
 - External files importing container: Use `@/shared/config/container`
 - Container importing other config files: Use `@/config/*` (until those files are also migrated)
 
 **Ready for**: Next task (migrate database.ts, env.ts, cors.ts to /shared/config)
 
+## Task 7: Move middleware/error.ts to /shared/middleware
+
+**Date**: 2026-01-24
+**Status**: ✅ COMPLETED
+
+**Findings**:
+
+- File was already at target location: `apps/backend/src/shared/middleware/error.ts`
+- Imports were already updated to `@/shared/middleware/error` in all 5 files
+- No work required - Task 7 was pre-completed in previous refactoring
+
+**Files Already Using Correct Imports**:
+
+1. `app.ts` → `import { errorHandler } from '@/shared/middleware/error'`
+2. `modules/auth/infrastructure/repository/auth.repository-impl.ts` → `import { ApiError } from '@/shared/middleware/error'`
+3. `modules/book/infrastructure/repository/book.repository-impl.ts` → `import { ApiError } from '@/shared/middleware/error'`
+4. `modules/auth/infrastructure/http/routes.ts` → `import { asyncHandler } from '@/shared/middleware/error'`
+5. `modules/book/infrastructure/http/routes.ts` → `import { asyncHandler } from '@/shared/middleware/error'`
+
+**Verification**:
+
+- ✅ `pnpm type-check` → exit code 0 (no TypeScript errors)
+- ✅ `pnpm lint` → exit code 0 (no ESLint errors)
+
+**Key Insight**: Import updates from previous refactoring tasks were comprehensive and covered all dependent files.
+
+**Ready for**: Next task (Task 8 - move password utility to /shared/libs)
 
 ## Container Migration Commit
+
 - Hash: 60f1f05a9e3ecaf17e000b6d5bd2439def992aa8
 - Message: refactor(backend): move container to shared/config
 - Git tracked rename: 98% similarity

@@ -21,7 +21,10 @@ import { BookService } from '@/modules/book/application/service/book.service';
  * Create and configure the IoC container of Awilix
  * Centralize the injection of all application dependencies
  */
-export const container: AwilixContainer = createContainer({ injectionMode: InjectionMode.PROXY, strict: true });
+export const container: AwilixContainer = createContainer({
+  injectionMode: InjectionMode.PROXY,
+  strict: true,
+});
 
 // ============================================
 // REGISTER PRIMITIVE VALUES (Infrastructure)

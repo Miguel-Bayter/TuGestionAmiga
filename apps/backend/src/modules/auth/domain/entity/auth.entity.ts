@@ -7,7 +7,7 @@ export type AuthUser = {
   roleId: number;
   roleName: string;
   isAdmin: boolean;
-}
+};
 
 /**
  * API response representation of authenticated user
@@ -18,4 +18,4 @@ export type AuthUserResponse = {
   email: string;
   name: string;
   roleId: number;
-}
+};

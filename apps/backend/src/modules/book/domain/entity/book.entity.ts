@@ -10,7 +10,7 @@ export type BookEntity = {
   available: boolean;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 export type BookPayload = {
   title: string;
@@ -21,4 +21,4 @@ export type BookPayload = {
   purchaseStock?: number;
   rentalStock?: number;
   available?: boolean;
-}
+};

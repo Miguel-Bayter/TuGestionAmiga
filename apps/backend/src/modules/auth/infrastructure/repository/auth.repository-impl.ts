@@ -60,124 +60,124 @@ export class AuthRepository implements IAuthRepository {
     };
   }
 
-   async login(email: string, password: string) {
-     // Find user by email
-     const user = await this.prisma.user.findUnique({
-       where: { email },
-       include: { role: true },
-     });
+  async login(email: string, password: string) {
+    // Find user by email
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      include: { role: true },
+    });
 
-     if (!user) {
-       throw new ApiError(401, 'Invalid credentials');
-     }
+    if (!user) {
+      throw new ApiError(401, 'Invalid credentials');
+    }
 
-     // Verify password
-     const valid = await comparePassword(password, user.password);
-     if (!valid) {
-       throw new ApiError(401, 'Invalid credentials');
-     }
+    // Verify password
+    const valid = await comparePassword(password, user.password);
+    if (!valid) {
+      throw new ApiError(401, 'Invalid credentials');
+    }
 
-     // Generate JWT tokens
-     const payload = {
-       userId: user.id,
-       roleId: user.roleId,
-       roleName: user.role.name,
-     };
+    // Generate JWT tokens
+    const payload = {
+      userId: user.id,
+      roleId: user.roleId,
+      roleName: user.role.name,
+    };
 
-     const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, {
-       expiresIn: '15m',
-     });
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, {
+      expiresIn: '15m',
+    });
 
-     const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, {
-       expiresIn: '7d',
-     });
+    const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, {
+      expiresIn: '7d',
+    });
 
-     return {
-       user: {
-         id: user.id,
-         email: user.email,
-         name: user.name,
-         roleId: user.roleId,
-       },
-       accessToken,
-       refreshToken,
-     };
-   }
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        roleId: user.roleId,
+      },
+      accessToken,
+      refreshToken,
+    };
+  }
 
-   async refreshToken(refreshToken: string) {
-     try {
-       // Verify and decode refresh token
-       const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET as string) as {
-         userId: number;
-       };
+  async refreshToken(refreshToken: string) {
+    try {
+      // Verify and decode refresh token
+      const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET as string) as {
+        userId: number;
+      };
 
-       // Find user by decoded userId
-       const user = await this.prisma.user.findUnique({
-         where: { id: decoded.userId },
-         include: { role: true },
-       });
+      // Find user by decoded userId
+      const user = await this.prisma.user.findUnique({
+        where: { id: decoded.userId },
+        include: { role: true },
+      });
 
-       if (!user) {
-         throw new ApiError(401, 'Invalid refresh token');
-       }
+      if (!user) {
+        throw new ApiError(401, 'Invalid refresh token');
+      }
 
-       // Generate new access token
-       const payload = {
-         userId: user.id,
-         roleId: user.roleId,
-         roleName: user.role.name,
-       };
+      // Generate new access token
+      const payload = {
+        userId: user.id,
+        roleId: user.roleId,
+        roleName: user.role.name,
+      };
 
-       const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, {
-         expiresIn: '15m',
-       });
+      const accessToken = jwt.sign(payload, process.env.JWT_SECRET as string, {
+        expiresIn: '15m',
+      });
 
-       return { accessToken };
-     } catch (error) {
-       // Handle JWT verification errors (invalid, expired, etc.)
-       if (error instanceof jwt.JsonWebTokenError) {
-         throw new ApiError(401, 'Invalid refresh token');
-       }
-       if (error instanceof jwt.TokenExpiredError) {
-         throw new ApiError(401, 'Refresh token expired');
-       }
-       throw error;
-     }
-   }
+      return { accessToken };
+    } catch (error) {
+      // Handle JWT verification errors (invalid, expired, etc.)
+      if (error instanceof jwt.JsonWebTokenError) {
+        throw new ApiError(401, 'Invalid refresh token');
+      }
+      if (error instanceof jwt.TokenExpiredError) {
+        throw new ApiError(401, 'Refresh token expired');
+      }
+      throw error;
+    }
+  }
 
-   async validateToken(token: string): Promise<AuthUser> {
-     try {
-       // Verify and decode access token
-       const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
-         userId: number;
-       };
+  async validateToken(token: string): Promise<AuthUser> {
+    try {
+      // Verify and decode access token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+        userId: number;
+      };
 
-       // Find user by decoded userId
-       const user = await this.prisma.user.findUnique({
-         where: { id: decoded.userId },
-         include: { role: true },
-       });
+      // Find user by decoded userId
+      const user = await this.prisma.user.findUnique({
+        where: { id: decoded.userId },
+        include: { role: true },
+      });
 
-       if (!user) {
-         throw new ApiError(401, 'User not found');
-       }
+      if (!user) {
+        throw new ApiError(401, 'User not found');
+      }
 
-       // Return internal AuthUser type with English field names
-       return {
-         userId: user.id,
-         roleId: user.roleId,
-         roleName: user.role.name,
-         isAdmin: user.role.name === 'ADMIN',
-       };
-     } catch (error) {
-       // Handle JWT verification errors (invalid, expired, etc.)
-       if (error instanceof jwt.JsonWebTokenError) {
-         throw new ApiError(401, 'Invalid token');
-       }
-       if (error instanceof jwt.TokenExpiredError) {
-         throw new ApiError(401, 'Token expired');
-       }
-       throw error;
-     }
-   }
+      // Return internal AuthUser type with English field names
+      return {
+        userId: user.id,
+        roleId: user.roleId,
+        roleName: user.role.name,
+        isAdmin: user.role.name === 'ADMIN',
+      };
+    } catch (error) {
+      // Handle JWT verification errors (invalid, expired, etc.)
+      if (error instanceof jwt.JsonWebTokenError) {
+        throw new ApiError(401, 'Invalid token');
+      }
+      if (error instanceof jwt.TokenExpiredError) {
+        throw new ApiError(401, 'Token expired');
+      }
+      throw error;
+    }
+  }
 }

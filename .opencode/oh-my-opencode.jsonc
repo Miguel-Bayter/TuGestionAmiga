@@ -3,22 +3,22 @@
   "google_auth": false,
   "agents": {
     "sisyphus-junior": {
-      "model": "anthropic/claude-sonnet-4-5"
+      "model": "opencode/big-pickle"
     },
     "sisyphus": {
-      "model": "anthropic/claude-sonnet-4-5"
+      "model": "opencode/big-pickle"
     },
     "prometheus": {
-      "model": "anthropic/claude-sonnet-4-5"
+      "model": "opencode/big-pickle"
     },
     "atlas": {
-      "model": "anthropic/claude-sonnet-4-5"
+      "model": "opencode/big-pickle"
     },
     "metis": {
-      "model": "anthropic/claude-sonnet-4-5"
+      "model": "opencode/big-pickle"
     },
     "momus": {
-      "model": "anthropic/claude-sonnet-4-5"
+      "model": "opencode/big-pickle"
     },
     "librarian": {
       "model": "opencode/big-pickle"
@@ -30,13 +30,13 @@
       "model": "opencode/big-pickle"
     },
     "frontend-ui-ux-engineer": {
-      "model": "google/antigravity-gemini-3-pro"
+      "model": "opencode/big-pickle"
     },
     "document-writer": {
-      "model": "google/antigravity-gemini-3-flash"
+      "model": "opencode/big-pickle"
     },
     "multimodal-looker": {
-      "model": "google/antigravity-gemini-3-flash"
+      "model": "opencode/big-pickle"
     }
   }
 }

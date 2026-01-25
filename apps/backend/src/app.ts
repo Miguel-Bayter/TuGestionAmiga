@@ -1,8 +1,8 @@
 import express from 'express';
 import type { AwilixContainer } from 'awilix';
-import corsMiddleware from './shared/config/cors';
-import { errorHandler } from './shared/middleware/error';
-import { createApiRoutes } from './routes/index';
+import corsMiddleware from '@/shared/config/cors';
+import { createApiRoutes } from '@/shared/http/routes';
+import { errorHandler } from '@/shared/middleware/error';
 
 export const createApp = (container: AwilixContainer) => {
   const app = express();

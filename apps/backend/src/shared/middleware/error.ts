@@ -24,14 +24,13 @@ export const errorHandler = (
     console.error('[ERROR]', { status, message, stack: err.stack });
   }
 
-  res.status(status).json({
-    ok: false,
-    error: message,
-  });
+  res.status(status).json({ ok: false, error: message });
 };
 
-export const asyncHandler =
-  (fn: (req: Request, res: Response, next: NextFunction) => Promise<void>) =>
-  (req: Request, res: Response, next: NextFunction) => {
+export const asyncHandler = (
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>
+) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
+};
