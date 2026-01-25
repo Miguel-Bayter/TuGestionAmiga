@@ -1,19 +1,25 @@
 {
-  "active_plan": "D:\\ANDY2639\\Projects\\demos\\TuGestionAmiga\\.sisyphus\\plans\\refactor-frontend-di-types.md",
+  "active_plan": "D:\ANDY2639\Projects\demos\TuGestionAmiga\.sisyphus\plans\refactor-frontend-di-types.md",
   "plan_name": "refactor-frontend-di-types",
   "started_at": "2026-01-25T21:59:22.579Z",
-  "session_ids": ["ses_408ef8df1ffeKqn8b4VofBOO7E", "ses_408d3e559ffeqcWnE7oZPPiBcw"],
+  "session_ids": ["ses_408ef8df1ffeKqn8b4VofBOO7E", "ses_408d3e559ffeqcWnE7oZPPiBcw", "ses_408d16d2bffe5FTSFqrDEHMVtf"],
   "progress": {
-    "completed": 1,
+    "completed": 2,
     "total": 10,
-    "current_task": "Task 2: Create state services"
+    "current_task": "Task 3: Initialize container in main.tsx"
   },
   "completed_tasks": [
     {
       "task": "Task 1: Create container.ts",
       "status": "completed",
       "commit": "61833c6",
-      "notes": "All 20 use cases and 4 repositories registered as singletons"
+      "notes": "All 20 use cases and 4 repositories registered"
+    },
+    {
+      "task": "Task 2: Create state services",
+      "status": "completed",
+      "commit": "f5fb171",
+      "notes": "4 services created: auth, book, cart, loan"
     }
   ]
 }

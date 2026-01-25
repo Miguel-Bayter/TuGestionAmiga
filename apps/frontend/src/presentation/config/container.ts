@@ -48,6 +48,14 @@ import { GetOverdueLoansUseCase } from '@/modules/loans/application/use-case/get
 import { GetProfileUseCase as GetUserProfileUseCase } from '@/modules/user/application/use-case/get-user-profile.usecase'
 import { UpdateProfileUseCase } from '@/modules/user/application/use-case/update-profile.usecase'
 
+// ============================================
+// STATE SERVICES (Application Layer)
+// ============================================
+import { AuthStateService } from '@/shared/infrastructure/services/auth-state.service'
+import { BookStateService } from '@/shared/infrastructure/services/book-state.service'
+import { CartStateService } from '@/shared/infrastructure/services/cart-state.service'
+import { LoanStateService } from '@/shared/infrastructure/services/loan-state.service'
+
 /**
  * Create and configure the IoC container of Awilix
  * Centralize the injection of all application dependencies
@@ -55,6 +63,7 @@ import { UpdateProfileUseCase } from '@/modules/user/application/use-case/update
  * Total registrations:
  * - Repositories: 4
  * - Use Cases: 20
+ * - State Services: 4
  */
 export const container: AwilixContainer = createContainer({
   injectionMode: InjectionMode.CLASSIC,
@@ -101,9 +110,19 @@ container.register({
   returnLoanUseCase: asClass(ReturnLoanUseCase).singleton(),
   getOverdueLoansUseCase: asClass(GetOverdueLoansUseCase).singleton(),
 
-  // User Module (2)
-  getUserProfileUseCase: asClass(GetUserProfileUseCase).singleton(),
-  updateProfileUseCase: asClass(UpdateProfileUseCase).singleton(),
+   // User Module (2)
+   getUserProfileUseCase: asClass(GetUserProfileUseCase).singleton(),
+   updateProfileUseCase: asClass(UpdateProfileUseCase).singleton(),
+})
+
+// ============================================
+// REGISTER STATE SERVICES (Application Layer)
+// ============================================
+container.register({
+  authStateService: asClass(AuthStateService).singleton(),
+  bookStateService: asClass(BookStateService).singleton(),
+  cartStateService: asClass(CartStateService).singleton(),
+  loanStateService: asClass(LoanStateService).singleton(),
 })
 
 export default container
