@@ -9,6 +9,7 @@
 ## Completed Tasks
 
 ### ✅ Task 1: Create container.ts
+
 - **Status**: COMPLETED
 - **Commit**: 61833c6
 - **What was done**:
@@ -19,6 +20,7 @@
   - Follows backend container pattern exactly
 
 ### ✅ Task 2: Create state services
+
 - **Status**: COMPLETED
 - **Commit**: f5fb171
 - **What was done**:
@@ -32,6 +34,7 @@
   - Preserved TokenManager and localStorage logic
 
 ### ✅ Task 3: Register services & initialize container
+
 - **Status**: COMPLETED
 - **Commit**: Latest
 - **What was done**:
@@ -45,25 +48,30 @@
 ## Remaining Tasks (7/10)
 
 ### ⏳ Task 4: Find Zustand + axios locations
+
 - Search for all Zustand store imports
 - Search for all direct axios calls
 - Document locations for replacement
 
 ### ⏳ Task 5: Create missing use cases
+
 - Create password reset use cases (if needed)
 - Create user repository + use cases (if needed)
 
 ### ⏳ Task 6: Replace Zustand with services
+
 - Remove all Zustand imports from components
 - Replace with useService() calls
 - Update component state management
 
 ### ⏳ Task 7: Replace axios with use cases
+
 - Remove direct axios calls from components
 - Replace with useUseCase() calls
 - Update login.page.tsx (lines 79, 116)
 
 ### ⏳ Task 8: Create type definitions
+
 - Create auth domain types (entities, requests, responses)
 - Create books domain types
 - Create loans domain types
@@ -72,12 +80,14 @@
 - Base types on Prisma schema models
 
 ### ⏳ Task 9: Verify end-to-end flows
+
 - Test registration flow
 - Test login flow
 - Test protected routes
 - Verify no console errors
 
 ### ⏳ Task 10: Remove Zustand files
+
 - Delete all Zustand store files
 - Remove Zustand from package.json
 - Verify no remaining Zustand imports
@@ -85,17 +95,20 @@
 ## Key Achievements
 
 ✅ **DI Foundation Established**
+
 - Container properly configured with Awilix
 - All use cases and repositories registered
 - State services created with clean pattern
 - Container initialized before React render
 
 ✅ **No Breaking Changes**
+
 - Existing code still works
 - Zustand stores still functional (not yet removed)
 - No modifications to use case or repository logic
 
 ✅ **Architecture Aligned**
+
 - Frontend DI pattern matches backend
 - State services follow consistent pattern
 - All dependencies properly injected
@@ -103,6 +116,7 @@
 ## Next Steps
 
 The foundation is solid. Next phase focuses on:
+
 1. Creating type definitions based on Prisma models
 2. Replacing Zustand hooks with container services
 3. Replacing direct axios calls with use cases
