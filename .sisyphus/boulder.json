@@ -1,10 +1,8 @@
 {
-  "active_plan": "D:\\ANDY2639\\Projects\\demos\\TuGestionAmiga\\.sisyphus\\plans\\refactor-backend-modular-architecture.md",
-  "started_at": "2026-01-24T22:57:56.519Z",
+  "active_plan": "D:\\ANDY2639\\Projects\\demos\\TuGestionAmiga\\.sisyphus\\plans\\frontend-module-refactor.md",
+  "started_at": "2026-01-25T20:21:36.902Z",
   "session_ids": [
-    "ses_40dd57371ffe9DwXgLAd1T7VBr",
-    "ses_40d9c1a93ffeAeOiIkb89YnkLR",
-    "ses_40d98a545ffef94sFmMKZAFDRy"
+    "ses_4092e4c2cffedGQ60C7zqFHEDp"
   ],
-  "plan_name": "refactor-backend-modular-architecture"
+  "plan_name": "frontend-module-refactor"
 }
