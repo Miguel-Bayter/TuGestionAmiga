@@ -6,11 +6,26 @@
 import type { CartItem } from './entities'
 
 export interface GetCartResponse {
-  data: CartItem[]
+  items: CartItem[]
   total: number
+  subtotal?: number
+}
+
+export interface AddToCartResponse {
+  item: CartItem
+  cart: CartItem[]
+}
+
+export interface RemoveFromCartResponse {
+  cart: CartItem[]
+}
+
+export interface UpdateCartItemResponse {
+  item: CartItem
+  cart: CartItem[]
 }
 
 export interface CheckoutResponse {
+  orderId: number
   message: string
-  orderId: string
 }
