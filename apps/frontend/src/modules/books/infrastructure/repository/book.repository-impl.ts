@@ -4,11 +4,11 @@
  */
 
 import { API_ENDPOINTS } from '@/shared/config'
-import { bookSchema, booksArraySchema } from '@/data/Schema/book.schema'
-import type { IBookRepository } from '@/domain/Repository/book.repository'
-import type { Book } from '@/domain/Entity/book.entity'
+import { bookSchema, booksArraySchema } from '@/modules/books/infrastructure/schema/book.schema'
+import type { IBookRepository } from '@/modules/books/domain/repository/book.repository'
+import type { Book } from '@/modules/books/domain/entity/book.entity'
 import type { PaginatedResponse } from '@/shared/types'
-import { axPublic, axPrivate } from '@/data/Provider'
+import { axPublic, axPrivate } from '@/shared/infrastructure/provider'
 
 export class BookRepository implements IBookRepository {
   /**

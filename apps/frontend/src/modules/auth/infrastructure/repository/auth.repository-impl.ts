@@ -4,11 +4,11 @@
  */
 
 import { API_ENDPOINTS } from '@/shared/config'
-import type { IAuthRepository } from '@/domain/Repository/auth.repository'
+import type { IAuthRepository } from '@/modules/auth/domain/repository/auth.repository'
 import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '@/shared/types'
-import type { User } from '@/domain/Entity/user.entity'
-import { axPrivate, axPublic, TokenManager } from '@/data/Provider'
-import { loginResponseSchema, registerResponseSchema } from '@/data/Schema/auth.schema'
+import type { User } from '@/modules/auth/domain/entity/user.entity'
+import { axPrivate, axPublic, TokenManager } from '@/shared/infrastructure/provider'
+import { loginResponseSchema, registerResponseSchema } from '@/modules/auth/infrastructure/schema/auth.schema'
 
 export class AuthRepository implements IAuthRepository {
   /**

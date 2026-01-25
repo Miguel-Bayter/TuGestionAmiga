@@ -3,11 +3,11 @@
  * Concrete implementation of loan operations
  */
 
-import { axPrivate } from '@/data/Provider'
+import { axPrivate } from '@/shared/infrastructure/provider'
 import { API_ENDPOINTS } from '@/shared/config'
-import { loanSchema, loansArraySchema } from '@/data/Schema'
-import type { ILoanRepository } from '@/domain/Repository/loan.repository'
-import type { Loan } from '@/domain/Entity/loan.entity'
+import { loanSchema, loansArraySchema } from '@/modules/loans/infrastructure/schema'
+import type { ILoanRepository } from '@/modules/loans/domain/repository/loan.repository'
+import type { Loan } from '@/modules/loans/domain/entity/loan.entity'
 import type { PaginatedResponse } from '@/shared/types'
 import { isOverdue } from '@/shared/helpers'
 

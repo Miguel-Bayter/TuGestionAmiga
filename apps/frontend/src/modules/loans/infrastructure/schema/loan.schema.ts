@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod'
-import { bookSchema } from './book.schema'
+import { bookSchema } from '@/modules/books/infrastructure/schema/book.schema'
 
 /**
  * Loan validation schema
