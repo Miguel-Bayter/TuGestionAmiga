@@ -1,0 +1,182 @@
+================================================================================
+FRONTEND STRUCTURE EXPLORATION - SUMMARY
+================================================================================
+
+PROJECT: Tu Gestion Amiga - Library Management System
+DATE: 2025-01-25
+SCOPE: Complete frontend structure mapping for DI refactoring
+
+================================================================================
+KEY FINDINGS
+================================================================================
+
+1. MODULE ORGANIZATION
+   ✅ 7 modules following Clean Architecture
+   ✅ Consistent structure: application/domain/infrastructure layers
+   ⚠️  User module incomplete (no domain/repository layer)
+   ⚠️  Dashboard module UI-only (no application/domain layer)
+
+2. USE CASES
+   ✅ 20 use cases implemented across 4 modules
+   ❌ 9 use cases missing (password reset, search, etc.)
+   
+   Breakdown:
+   - Auth: 4/7 use cases (missing: reset password, change password, refresh token)
+   - Books: 6/8 use cases (missing: search, get by category)
+   - Cart: 4/6 use cases (missing: update item, clear cart)
+   - Loans: 4/6 use cases (missing: get active, renew)
+   - User: 2/2 use cases (but uses auth repository)
+
+3. REPOSITORIES
+   ✅ 4 complete repository pairs (interface + implementation)
+   ❌ 1 missing: IUserRepository (user module uses auth repo instead)
+   
+   Repositories:
+   - AuthRepository (4 methods)
+   - BookRepository (7 methods)
+   - CartRepository (7 methods)
+   - LoanRepository (6 methods)
+
+4. ZUSTAND STORES
+   ✅ 6 stores fully functional
+   ⚠️  Manual DI in each store (use cases instantiated at load time)
+   ⚠️  No way to inject dependencies for testing
+   
+   Stores:
+   - useAuthStore (user, login, register, logout, getProfile)
+   - useBookStore (books, getBooks, getBook, getAvailableBooks)
+   - useCartStore (cart, addToCart, removeFromCart, checkout)
+   - useLoanStore (loans, createLoan, returnLoan, getOverdueLoans)
+   - useUIStore (sidebar, search, mobile menu, modal, theme)
+   - useToastStore (notifications with auto-dismiss)
+
+5. AXIOS/API CLIENT
+   ✅ Properly configured with public/private instances
+   ✅ Token refresh interceptor implemented
+   ✅ Centralized API endpoints
+   ✅ Zod validation schemas for all responses
+   
+   Setup:
+   - axPublic: No auth, for login/register/public endpoints
+   - axPrivate: Bearer token, auto-refresh on 401
+   - TokenManager: localStorage-based token storage
+   - API_ENDPOINTS: Centralized endpoint constants
+
+6. VALIDATION
+   ✅ Zod schemas for all modules
+   ✅ Schemas used in repositories for response validation
+   
+   Schemas:
+   - Auth: loginResponseSchema, registerResponseSchema
+   - Books: bookSchema, booksArraySchema
+   - Cart: cartItemSchema, cartItemsArraySchema
+   - Loans: loanSchema, loansArraySchema
+   - User: userSchema
+
+================================================================================
+CRITICAL ISSUES FOR DI REFACTORING
+================================================================================
+
+ISSUE #1: No DI Container
+  Problem: Manual instantiation of use cases in each store
+  Impact: Hard to test, tight coupling, no dependency inversion
+  Location: shared/infrastructure/stores/*.ts
+  
+  Current Pattern:
+    const loginUseCase = new LoginUseCase(authRepository)
+    const registerUseCase = new RegisterUseCase(authRepository)
+    // ... repeated in every store
+
+ISSUE #2: Missing User Repository
+  Problem: User module uses IAuthRepository instead of IUserRepository
+  Impact: Can't separate user concerns from auth
+  Location: modules/user/
+  
+  Missing:
+    - modules/user/domain/repository/user.repository.ts
+    - modules/user/infrastructure/repository/user.repository-impl.ts
+
+ISSUE #3: Incomplete Dashboard Module
+  Problem: Dashboard has only UI pages, no application/domain layer
+  Impact: Can't reuse dashboard logic, hard to test
+  Location: modules/dashboard/
+  
+  Missing:
+    - modules/dashboard/application/use-case/
+    - modules/dashboard/domain/
+
+ISSUE #4: Missing Use Cases
+  Problem: Some repository methods don't have corresponding use cases
+  Impact: Inconsistent API, harder to maintain
+  
+  Examples:
+    - BookRepository.getBooksByCategory() → no GetBooksByCategoryUseCase
+    - CartRepository.updateItem() → no UpdateCartItemUseCase
+    - LoanRepository.getActiveLoans() → no GetActiveLoanUseCase
+
+================================================================================
+FILE INVENTORY
+================================================================================
+
+Total TypeScript Files: ~120+
+
+By Type:
+  - Use Cases: 20 files
+  - Repository Interfaces: 4 files
+  - Repository Implementations: 4 files
+  - Entities: 4 files
+  - Validation Schemas: 5 files
+  - Zustand Stores: 6 files
+  - Pages: 8 files
+  - Components: 7 files
+  - Shared Components: 4 files
+  - Providers: 3 files
+  - Config/Helpers: 10+ files
+
+Document Size: 583 lines, 20KB
+
+================================================================================
+RECOMMENDATIONS
+================================================================================
+
+PHASE 1: Create DI Container
+  - Implement dependency registration system
+  - Create factory functions for use cases
+  - Support lazy initialization
+
+PHASE 2: Refactor Stores
+  - Update stores to use DI container
+  - Remove manual use case instantiation
+  - Add dependency injection support
+
+PHASE 3: Complete Missing Pieces
+  - Create IUserRepository and UserRepository
+  - Add missing use cases
+  - Complete dashboard module
+
+PHASE 4: Testing Infrastructure
+  - Create mock repositories
+  - Add test utilities
+  - Update stores for testability
+
+================================================================================
+DELIVERABLE
+================================================================================
+
+File: .sisyphus/findings/frontend-structure.md
+Size: 20KB, 583 lines
+Content:
+  ✅ Complete module structure overview
+  ✅ All use cases documented with status
+  ✅ All repositories documented
+  ✅ Zustand stores analysis
+  ✅ Axios/API client configuration
+  ✅ Current DI issues identified
+  ✅ Missing pieces listed
+  ✅ Recommendations for refactoring
+  ✅ File inventory
+  ✅ Next steps
+
+================================================================================
+STATUS: READY FOR DI REFACTORING PLANNING
+================================================================================

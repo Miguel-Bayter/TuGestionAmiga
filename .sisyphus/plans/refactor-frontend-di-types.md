@@ -49,15 +49,38 @@ Establish proper dependency injection architecture in frontend by:
 
 ### Concrete Deliverables
 
-- `src/presentation/config/container.ts` - DI container with all registrations
-- `src/shared/infrastructure/services/auth.service.ts` - Auth state management service
-- `src/shared/infrastructure/services/book.service.ts` - Book state management service
-- `src/shared/infrastructure/services/cart.service.ts` - Cart state management service
-- `src/shared/infrastructure/services/loan.service.ts` - Loan state management service
-- Updated `main.tsx` - Container initialization before React render
-- Updated `login.page.tsx` - Replace direct apiClient calls with use case calls
-- Updated all components - Replace Zustand hooks with container services
-- Updated type definitions - Ensure all endpoint types are properly typed
+**DI Container:**
+
+- `src/presentation/config/container.ts` - Awilix DI container with all registrations
+
+**State Services (replace Zustand):**
+
+- `src/shared/infrastructure/services/auth-state.service.ts` - Auth state management
+- `src/shared/infrastructure/services/book-state.service.ts` - Book state management
+- `src/shared/infrastructure/services/cart-state.service.ts` - Cart state management
+- `src/shared/infrastructure/services/loan-state.service.ts` - Loan state management
+
+**Type Definitions (based on Prisma models):**
+
+- `src/modules/auth/domain/entities.ts` - User, Role types
+- `src/modules/auth/domain/requests.ts` - LoginRequest, RegisterRequest, ForgotPasswordRequest
+- `src/modules/auth/domain/responses.ts` - LoginResponse, RegisterResponse, etc
+- `src/modules/books/domain/entities.ts` - Book, Category types
+- `src/modules/books/domain/requests.ts` - CreateBookRequest, UpdateBookRequest, etc
+- `src/modules/books/domain/responses.ts` - Book response types
+- `src/modules/loans/domain/entities.ts` - Loan type
+- `src/modules/loans/domain/requests.ts` - Loan request types
+- `src/modules/loans/domain/responses.ts` - Loan response types
+- `src/modules/cart/domain/entities.ts` - CartItem type
+- `src/modules/cart/domain/requests.ts` - Cart request types
+- `src/modules/purchases/domain/entities.ts` - Purchase type
+- `src/modules/purchases/domain/requests.ts` - Purchase request types
+
+**Updated Files:**
+
+- `src/main.tsx` - Initialize container before React render
+- `src/modules/auth/infrastructure/ui/pages/login.page.tsx` - Replace direct axios calls
+- All components - Replace Zustand hooks with container services
 
 ### Definition of Done
 
@@ -231,7 +254,7 @@ All tasks are **sequential** (each depends on previous).
 **Service Pattern (to implement):**
 
 ```typescript
-// Simple state service pattern (no RxJS needed initially)
+// State service with subscriber pattern (no RxJS, pure TypeScript)
 export class AuthStateService {
   private state = {
     user: null as User | null,
@@ -241,19 +264,25 @@ export class AuthStateService {
     error: null as string | null,
   }
 
+  private subscribers: Set<(state: typeof this.state) => void> = new Set()
+
   constructor(private loginUseCase: LoginUseCase, ...) {}
 
   async login(request: LoginRequest) {
     this.state.isLoading = true
+    this.notifySubscribers()
+    
     try {
       const response = await this.loginUseCase.execute(request)
       this.state.user = response.user
       this.state.accessToken = response.accessToken
       this.state.refreshToken = response.refreshToken
+      this.state.error = null
     } catch (error) {
       this.state.error = error.message
     } finally {
       this.state.isLoading = false
+      this.notifySubscribers()
     }
   }
 
@@ -262,8 +291,19 @@ export class AuthStateService {
   }
 
   subscribe(listener: (state: typeof this.state) => void) {
-    // Basic subscription pattern
+    this.subscribers.add(listener)
+    // Immediately call listener with current state
     listener(this.state)
+    // Return unsubscribe function
+    return () => {
+      this.subscribers.delete(listener)
+    }
+  }
+
+  private notifySubscribers() {
+    this.subscribers.forEach((listener) => {
+      listener({ ...this.state })
+    })
   }
 }
 ```
@@ -581,48 +621,284 @@ const handleForgotPassword = async (email: string) => {
 
 ---
 
-### Task 8: Update Type Definitions
+### Task 8: Create Type Definitions Based on Prisma Models
 
 **What to do:**
 
-- Review backend endpoints
-- Verify all request/response types defined in frontend
-- Add any missing types to `src/shared/domain/types/`
-- Use Zod schemas for runtime validation (existing pattern)
+- Create types based on **Prisma schema** models (NOT shared folder)
+- Each domain module gets its own `domain` folder with types
+- Follow structure: `src/modules/{module}/domain/entities.ts` (NO subfolders)
+- Types reflect database models exactly (from Prisma schema)
+- Include request/response types for each endpoint
+
+**Type Organization (Per Module):**
+
+```
+src/modules/auth/domain/
+  └── entities.ts          # User, Role models
+  └── requests.ts          # Login, Register request types
+  └── responses.ts         # Auth response types
+
+src/modules/books/domain/
+  └── entities.ts          # Book, Category models
+  └── requests.ts          # Book CRUD request types
+  └── responses.ts         # Book response types
+
+src/modules/loans/domain/
+  └── entities.ts          # Loan model
+  └── requests.ts          # Loan request types
+  └── responses.ts         # Loan response types
+
+src/modules/purchases/domain/
+  └── entities.ts          # Purchase model
+  └── requests.ts          # Purchase request types
+  └── responses.ts         # Purchase response types
+
+src/modules/cart/domain/
+  └── entities.ts          # CartItem model
+  └── requests.ts          # Cart request types
+  └── responses.ts         # Cart response types
+```
 
 **Must NOT do:**
 
+- ❌ Don't use `src/shared/domain/types/` for module-specific types
 - ❌ Don't implement OpenAPI generation
+- ❌ Don't create subdirectories in domain (flat structure)
 - ❌ Don't change existing type definitions (only add missing)
 
 **Parallelizable:** YES (can do after Task 3)
 
-**References:**
+**References (From Prisma Schema):**
 
-**Type Definition Pattern:**
+**User Model (from Prisma):**
+
+```prisma
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+  roleId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+}
+```
+
+**Book Model (from Prisma):**
+
+```prisma
+model Book {
+  id             Int      @id @default(autoincrement())
+  title          String
+  author         String
+  description    String?
+  categoryId     Int?
+  price          Decimal  @db.Decimal(10, 2)
+  purchaseStock  Int
+  rentalStock    Int
+  available      Boolean
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+}
+```
+
+**Loan Model (from Prisma):**
+
+```prisma
+model Loan {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  bookId       Int
+  loanDate     DateTime  @default(now())
+  dueDate      DateTime
+  returnedDate DateTime?
+  status       String
+  extensions   Int
+}
+```
+
+**Purchase Model (from Prisma):**
+
+```prisma
+model Purchase {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  bookId    Int
+  price     Decimal
+  date      DateTime
+}
+```
+
+**CartItem Model (from Prisma):**
+
+```prisma
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  bookId    Int
+  quantity  Int
+}
+```
+
+**Type Definition Patterns to Create:**
+
+**Auth Types** (`src/modules/auth/domain/entities.ts`):
 
 ```typescript
+export interface User {
+  id: number
+  email: string
+  name: string
+  roleId: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Role {
+  id: number
+  name: string
+}
+```
+
+**Auth Requests** (`src/modules/auth/domain/requests.ts`):
+
+```typescript
+export interface LoginRequest {
+  email: string
+  password: string
+}
+
+export interface RegisterRequest {
+  email: string
+  name: string
+  password: string
+}
+
 export interface ForgotPasswordRequest {
   email: string
 }
 
+export interface VerifyPasswordCodeRequest {
+  email: string
+  code: string
+  newPassword: string
+}
+```
+
+**Auth Responses** (`src/modules/auth/domain/responses.ts`):
+
+```typescript
+export interface LoginResponse {
+  user: User
+  accessToken: string
+  refreshToken: string
+}
+
+export interface RegisterResponse extends LoginResponse {}
+
 export interface ForgotPasswordResponse {
   message: string
+}
+
+export interface RefreshTokenResponse {
+  accessToken: string
+}
+```
+
+**Books Types** (`src/modules/books/domain/entities.ts`):
+
+```typescript
+export interface Book {
+  id: number
+  title: string
+  author: string
+  description?: string
+  categoryId?: number
+  price: number
+  purchaseStock: number
+  rentalStock: number
+  available: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Category {
+  id: number
+  name: string
+}
+```
+
+**Loans Types** (`src/modules/loans/domain/entities.ts`):
+
+```typescript
+export interface Loan {
+  id: number
+  userId: number
+  bookId: number
+  loanDate: Date
+  dueDate: Date
+  returnedDate?: Date
+  status: string
+  extensions: number
+}
+```
+
+**Purchases Types** (`src/modules/purchases/domain/entities.ts`):
+
+```typescript
+export interface Purchase {
+  id: number
+  userId: number
+  bookId: number
+  price: number
+  date: Date
+}
+```
+
+**Cart Types** (`src/modules/cart/domain/entities.ts`):
+
+```typescript
+export interface CartItem {
+  id: number
+  userId: number
+  bookId: number
+  quantity: number
 }
 ```
 
 **Acceptance Criteria:**
 
-- [ ] All backend endpoint types defined
-- [ ] Types exported from `src/shared/domain/types/index.ts`
-- [ ] Password reset types added
-- [ ] All types match backend contracts
-- [ ] `pnpm type-check` passes
+- [ ] All module domains have `entities.ts`, `requests.ts`, `responses.ts`
+- [ ] Types match Prisma models exactly
+- [ ] No subdirectories in domain folders (flat)
+- [ ] All types properly exported
+- [ ] `src/shared/domain/types/index.ts` re-exports module types if needed
+- [ ] `pnpm type-check` passes with zero errors
+- [ ] All endpoint payloads have matching request types
+
+**Manual Verification:**
+
+- [ ] Import types from module domains: `import { User } from '@/modules/auth/domain/entities'`
+- [ ] No "cannot find module" errors
+- [ ] TypeScript IntelliSense shows all properties
+- [ ] Build succeeds: `pnpm build:frontend`
 
 **Commit:** YES
 
-- Message: `feat(frontend): add missing type definitions`
-- Files: `src/shared/domain/types/*.ts`
+- Message: `feat(frontend): add domain type definitions based on Prisma models`
+- Files: `src/modules/*/domain/*.ts` (all new type files)
+- Verification: `pnpm type-check` passes
 
 ---
 
@@ -798,33 +1074,91 @@ If something breaks:
 ### BEFORE (Current)
 
 ```
-Components
-  ├─ useAuthStore (Zustand) ─> directly instantiate LoginUseCase
-  ├─ useBookStore (Zustand)
-  ├─ useCartStore (Zustand)
-  └─ Direct axios calls (apiClient.post)
+src/modules/
+  ├── auth/
+  │   ├── domain/repository/
+  │   ├── application/use-case/
+  │   └── infrastructure/
+  │       ├── repository/
+  │       └── ui/
+  │
+  └── books/
+      └── (similar structure)
+
+src/shared/domain/types/
+  └── auth.types.ts (mixed auth types)
+  └── api.types.ts (mixed all types)
+
+State Management:
+  ├── useAuthStore (Zustand)
+  ├── useBookStore (Zustand)
+  └── Direct axios calls
 ```
 
-### AFTER (New)
+### AFTER (New - Proper Domain Organization)
 
 ```
-Components
-  ├─ useService('authStateService') ─> Awilix container
-  ├─ useUseCase('loginUseCase') ─> Awilix container
-  ├─ State services (no Zustand)
-  └─ All HTTP via use cases (no direct axios)
+src/modules/
+  ├── auth/
+  │   ├── domain/
+  │   │   ├── entities.ts (User, Role types)
+  │   │   ├── requests.ts (LoginRequest, RegisterRequest)
+  │   │   └── responses.ts (LoginResponse, etc)
+  │   ├── application/use-case/
+  │   ├── infrastructure/
+  │   │   ├── repository/
+  │   │   ├── schema/ (Zod validation)
+  │   │   └── ui/
+  │   └── index.ts (re-exports)
+  │
+  ├── books/
+  │   ├── domain/
+  │   │   ├── entities.ts (Book, Category)
+  │   │   ├── requests.ts (CreateBookRequest, etc)
+  │   │   └── responses.ts
+  │   └── (similar structure)
+  │
+  ├── loans/
+  │   ├── domain/
+  │   │   ├── entities.ts (Loan)
+  │   │   ├── requests.ts
+  │   │   └── responses.ts
+  │   └── (similar structure)
+  │
+  ├── cart/
+  │   ├── domain/
+  │   │   ├── entities.ts (CartItem)
+  │   │   └── requests.ts
+  │   └── (similar structure)
+  │
+  └── purchases/
+      ├── domain/
+      │   ├── entities.ts (Purchase)
+      │   └── requests.ts
+      └── (similar structure)
 
-Container (Awilix)
-  ├─ Services
-  ├─ Use Cases
-  ├─ Repositories
-  └─ Infrastructure
+src/shared/
+  └── domain/types/ (only cross-cutting shared types if needed)
+  └── infrastructure/
+      ├── services/ (state management - no Zustand!)
+      ├── hooks/
+      └── providers/
+
+Dependency Injection (Awilix):
+  └── Container registers:
+      ├── Repositories
+      ├── Use Cases
+      ├── State Services (replaces Zustand)
+      └── Providers
 ```
 
 **Benefits:**
 
-- ✅ Single source of truth for DI (container)
-- ✅ No duplication (no Zustand + container)
-- ✅ Type-safe everywhere
-- ✅ Testable (easy to mock)
-- ✅ Consistent with backend architecture
+- ✅ **Clear module ownership**: Each module owns its domain types
+- ✅ **Flat type structure**: No nested subfolders in domain
+- ✅ **Matches Prisma models**: Types derived from database schema
+- ✅ **Single source of truth for DI**: Container instead of scattered Zustand
+- ✅ **Type-safe everywhere**: All endpoints strongly typed
+- ✅ **Testable**: Easy to mock via container
+- ✅ **Consistent with backend architecture**
+- ✅ **No Zustand duplication**: State managed via services in container
