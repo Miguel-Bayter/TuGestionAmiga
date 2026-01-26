@@ -3,12 +3,12 @@
  * Processes checkout for cart items
  */
 
-import { ICartRepository } from '@/domain/Repository/cart.repository'
+import { ICartRepository } from '@/modules/cart/domain'
 
 export class CheckoutUseCase {
   constructor(private cartRepository: ICartRepository) {}
 
-  async execute(items: Array<{ id_libro: number; cantidad: number }>): Promise<void> {
+  async execute(items: Array<{ id: number; quantity: number }>): Promise<void> {
     return this.cartRepository.checkout(items)
   }
 }

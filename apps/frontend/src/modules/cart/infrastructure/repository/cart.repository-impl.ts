@@ -6,8 +6,8 @@
 import { axPrivate } from '@/shared/infrastructure/provider'
 import { API_ENDPOINTS } from '@/shared/application/config'
 import { cartItemSchema, cartItemsArraySchema } from '@/modules/cart/infrastructure/schema'
-import type { ICartRepository } from '@/modules/cart/domain/repository/cart.repository'
-import type { Cart, CartItem } from '@/modules/cart/domain/entity/cart.entity'
+import type { ICartRepository } from '@/modules/cart/domain/contract'
+import type { Cart, CartItem } from '@/modules/cart/domain'
 
 export class CartRepository implements ICartRepository {
   /**
@@ -15,6 +15,7 @@ export class CartRepository implements ICartRepository {
    */
   async getCart(): Promise<Cart> {
     const response = await axPrivate.get(API_ENDPOINTS.CART)
+
     return response.data as Cart
   }
 
@@ -24,6 +25,7 @@ export class CartRepository implements ICartRepository {
   async getCartItems(): Promise<CartItem[]> {
     const response = await axPrivate.get(API_ENDPOINTS.CART)
     const cartData = response.data as Cart
+
     return cartItemsArraySchema.parse(cartData.items || [])
   }
 
@@ -32,8 +34,8 @@ export class CartRepository implements ICartRepository {
    */
   async addItem(bookId: number, quantity: number): Promise<CartItem> {
     const response = await axPrivate.post(API_ENDPOINTS.CART, {
-      id_libro: bookId,
-      cantidad: quantity,
+      bookId,
+      quantity,
     })
     return cartItemSchema.parse(response.data)
   }
@@ -50,7 +52,7 @@ export class CartRepository implements ICartRepository {
    */
   async updateItem(cartItemId: number, quantity: number): Promise<CartItem> {
     const response = await axPrivate.patch(API_ENDPOINTS.CART_ITEM(cartItemId), {
-      cantidad: quantity,
+      quantity,
     })
     return cartItemSchema.parse(response.data)
   }
@@ -67,7 +69,7 @@ export class CartRepository implements ICartRepository {
   /**
    * Checkout cart items
    */
-  async checkout(items: Array<{ id_libro: number; cantidad: number }>): Promise<void> {
+  async checkout(items: Array<{ bookId: number; quantity: number }>): Promise<void> {
     await axPrivate.post(API_ENDPOINTS.CART_CHECKOUT, { items })
   }
 }

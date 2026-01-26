@@ -7,29 +7,29 @@
  * Book entity from backend
  */
 export interface Book {
-  id_libro: number
-  titulo: string
-  autor: string
-  descripcion?: string
-  valor?: number // precio field from DB
-  disponibilidad?: number // 0 or 1
+  id: number
+  title: string
+  author: string
+  description?: string
+  value?: number // precio field from DB
+  availability?: number // 0 or 1
   stock?: number
-  stock_compra?: number
-  stock_renta?: number
-  nombre_categoria?: string
-  portada_url?: string
+  dueStock?: number
+  rentalStock?: number
+  category_name?: string
+  cover_url?: string
 }
 
 /**
  * Cart item entity
  */
 export interface CartItem {
-  id_carrito: number
-  id_usuario: number
-  id_libro: number
-  cantidad: number
-  precio_unitario: number
-  libro?: Book
+  id: number
+  userId: number
+  bookId: number
+  quantity: number
+  unitPrice: number
+  book?: Book
 }
 
 /**
@@ -37,12 +37,12 @@ export interface CartItem {
  */
 export interface Loan {
   id_prestamo: number
-  id_usuario: number
-  id_libro: number
-  fecha_prestamo: string
-  fecha_vencimiento: string
-  devuelto: boolean
-  libro?: Book
+  userId: number
+  bookId: number
+  loanDate: string
+  dueDate: string
+  returned: boolean
+  book?: Book
 }
 
 /**

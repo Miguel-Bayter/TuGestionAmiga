@@ -10,13 +10,13 @@ import { bookSchema } from '@/modules/books/infrastructure/schema/book.schema'
  * Loan validation schema
  */
 export const loanSchema = z.object({
-  id_prestamo: z.number(),
-  id_usuario: z.number(),
-  id_libro: z.number(),
-  fecha_prestamo: z.string(),
-  fecha_vencimiento: z.string(),
-  devuelto: z.boolean(),
-  libro: bookSchema.optional(),
+  id: z.number(),
+  userId: z.number(),
+  bookId: z.number(),
+  loanDate: z.string(),
+  returnDate: z.string(),
+  dueDate: z.boolean(),
+  book: bookSchema.optional(),
 })
 
 export type LoanType = z.infer<typeof loanSchema>
@@ -32,7 +32,7 @@ export type LoansArrayType = z.infer<typeof loansArraySchema>
  * Create loan request validation schema
  */
 export const createLoanSchema = z.object({
-  id_libro: z.number().min(1, 'Book ID is required'),
+  bookId: z.number().min(1, 'Book ID is required'),
 })
 
 export type CreateLoanType = z.infer<typeof createLoanSchema>
@@ -41,7 +41,7 @@ export type CreateLoanType = z.infer<typeof createLoanSchema>
  * Return loan request validation schema
  */
 export const returnLoanSchema = z.object({
-  id_libro: z.number().min(1, 'Book ID is required'),
+  bookId: z.number().min(1, 'Book ID is required'),
 })
 
 export type ReturnLoanType = z.infer<typeof returnLoanSchema>

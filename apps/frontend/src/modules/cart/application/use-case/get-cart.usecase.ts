@@ -4,7 +4,7 @@
  */
 
 import type { ICartRepository } from '@/modules/cart/domain'
-import type { Cart } from '@/domain/Entity/cart.entity'
+import type { Cart } from '@/modules/cart/domain/entities'
 
 export class GetCartUseCase {
   constructor(private cartRepository: ICartRepository) {}

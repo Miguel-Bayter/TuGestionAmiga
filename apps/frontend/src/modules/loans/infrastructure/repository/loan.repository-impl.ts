@@ -7,7 +7,7 @@ import { axPrivate } from '@/shared/infrastructure/provider'
 import { API_ENDPOINTS } from '@/shared/application/config'
 import { loanSchema, loansArraySchema } from '@/modules/loans/infrastructure/schema'
 import type { ILoanRepository } from '@/modules/loans/domain/repository/loan.repository'
-import type { Loan } from '@/modules/loans/domain/entity/loan.entity'
+import type { Loan } from '@/modules/loans/domain'
 import type { PaginatedResponse } from '@/shared/domain/types'
 import { isOverdue } from '@/shared/application/helpers'
 
@@ -46,7 +46,7 @@ export class LoanRepository implements ILoanRepository {
    */
   async createLoan(bookId: number): Promise<Loan> {
     const response = await axPrivate.post(API_ENDPOINTS.LOANS, {
-      id_libro: bookId,
+      bookId,
     })
     return loanSchema.parse(response.data)
   }
@@ -63,7 +63,7 @@ export class LoanRepository implements ILoanRepository {
    */
   async getActiveLoans(): Promise<Loan[]> {
     const response = await axPrivate.get(API_ENDPOINTS.LOANS, {
-      params: { devuelto: false },
+      params: { returned: false },
     })
     return loansArraySchema.parse(response.data)
   }
@@ -73,7 +73,7 @@ export class LoanRepository implements ILoanRepository {
    */
   async getOverdueLoans(): Promise<Loan[]> {
     const loans = await this.getActiveLoans()
-    return loans.filter((loan) => isOverdue(loan.fecha_vencimiento))
+    return loans.filter((loan) => isOverdue(loan.date))
   }
 }
 

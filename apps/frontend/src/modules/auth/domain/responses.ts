@@ -3,7 +3,7 @@
  * Output types for authentication endpoints
  */
 
-import type { User } from './entities'
+import type { User } from '@/modules/user/domain/entities'
 
 export interface LoginResponse {
   user: User

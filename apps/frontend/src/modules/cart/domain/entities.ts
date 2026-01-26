@@ -1,6 +1,6 @@
 /**
- * Cart Domain Entities
- * CartItem type from Prisma schema
+ * Cart Entity
+ * Domain model for shopping cart
  */
 
 export interface CartItem {
@@ -10,4 +10,10 @@ export interface CartItem {
   quantity: number
   createdAt: Date
   updatedAt: Date
+}
+
+export interface Cart {
+  id: number
+  items: CartItem[]
+  total: number
 }

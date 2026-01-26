@@ -9,10 +9,10 @@ import { z } from 'zod'
  * User profile validation schema
  */
 export const userProfileSchema = z.object({
-  id_usuario: z.number(),
-  nombre: z.string(),
-  email: z.string().email(),
-  id_rol: z.number(),
+  id: z.number(),
+  name: z.string(),
+  email: z.email(),
+  roleId: z.number(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
 })

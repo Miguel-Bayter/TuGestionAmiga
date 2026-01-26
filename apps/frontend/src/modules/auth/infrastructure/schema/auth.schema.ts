@@ -9,7 +9,7 @@ import { z } from 'zod'
  * Login request validation schema
  */
 export const loginRequestSchema = z.object({
-  email: z.string().email('Invalid email format'),
+  email: z.email('Invalid email format'),
   password: z.string().min(1, 'Password is required'),
 })
 
@@ -19,8 +19,8 @@ export type LoginRequestType = z.infer<typeof loginRequestSchema>
  * Register request validation schema
  */
 export const registerRequestSchema = z.object({
-  nombre: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email format'),
+  name: z.string().min(1, 'Name is required'),
+  email: z.email('Invalid email format'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 })
 
@@ -30,11 +30,10 @@ export type RegisterRequestType = z.infer<typeof registerRequestSchema>
  * User validation schema
  */
 export const userSchema = z.object({
-  id_usuario: z.number(),
-  nombre: z.string(),
+  id: z.number(),
+  name: z.string(),
   email: z.string().optional(),
-  correo: z.string().optional(),
-  id_rol: z.number(),
+  roleId: z.number(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
 })

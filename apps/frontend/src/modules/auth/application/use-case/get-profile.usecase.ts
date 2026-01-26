@@ -3,7 +3,8 @@
  * Fetches the current user's profile
  */
 
-import { type IAuthRepository, type User } from '@/modules/auth/domain'
+import { type IAuthRepository } from '@/modules/auth/domain'
+import { type User } from '@/modules/user/domain'
 
 export class GetProfileUseCase {
   constructor(private authRepository: IAuthRepository) {}

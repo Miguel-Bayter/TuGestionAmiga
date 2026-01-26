@@ -3,7 +3,7 @@
  * Handles password reset code generation
  */
 
-import type { IAuthRepository } from '@/modules/auth/domain/repository/auth.repository'
+import type { IAuthRepository } from '@/modules/auth/domain/contract'
 
 export class ForgotPasswordUseCase {
   constructor(private authRepository: IAuthRepository) {}

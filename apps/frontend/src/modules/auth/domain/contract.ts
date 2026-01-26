@@ -3,8 +3,13 @@
  * Contract for authentication operations
  */
 
-import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '@/shared/domain/types'
-import type { User } from '@/modules/auth/domain/entity/user.entity'
+import type {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+} from '@/shared/domain/types'
+import type { User } from '@/modules/user/domain/entities'
 
 export interface IAuthRepository {
   /**

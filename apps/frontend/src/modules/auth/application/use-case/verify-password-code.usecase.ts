@@ -3,7 +3,7 @@
  * Handles password reset with code verification
  */
 
-import type { IAuthRepository } from '@/modules/auth/domain/repository/auth.repository'
+import type { IAuthRepository } from '@/modules/auth/domain/contract'
 
 export class VerifyPasswordCodeUseCase {
   constructor(private authRepository: IAuthRepository) {}

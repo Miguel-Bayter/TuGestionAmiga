@@ -9,17 +9,17 @@ import { z } from 'zod'
  * Book validation schema
  */
 export const bookSchema = z.object({
-  id_libro: z.number(),
-  titulo: z.string(),
-  autor: z.string(),
-  descripcion: z.string().optional(),
-  valor: z.number().optional(),
-  disponibilidad: z.number().optional(),
+  id: z.number(),
+  title: z.string(),
+  author: z.string(),
+  description: z.string().optional(),
+  price: z.number().optional(),
+  available: z.number().optional(),
   stock: z.number().optional(),
-  stock_compra: z.number().optional(),
-  stock_renta: z.number().optional(),
-  nombre_categoria: z.string().optional(),
-  portada_url: z.string().optional(),
+  purchaseStock: z.number().optional(),
+  rentalStock: z.number().optional(),
+  categoryId: z.string().optional(),
+  coverUrl: z.string().optional(),
 })
 
 export type BookType = z.infer<typeof bookSchema>
@@ -35,12 +35,12 @@ export type BooksArrayType = z.infer<typeof booksArraySchema>
  * Create book request validation schema
  */
 export const createBookSchema = z.object({
-  titulo: z.string().min(1, 'Title is required'),
-  autor: z.string().min(1, 'Author is required'),
-  descripcion: z.string().optional(),
-  valor: z.number().optional(),
-  stock_compra: z.number().optional(),
-  stock_renta: z.number().optional(),
+  title: z.string().min(1, 'Title is required'),
+  author: z.string().min(1, 'Author is required'),
+  description: z.string().optional(),
+  price: z.number().optional(),
+  stockPurchase: z.number().optional(),
+  stockRental: z.number().optional(),
 })
 
 export type CreateBookType = z.infer<typeof createBookSchema>

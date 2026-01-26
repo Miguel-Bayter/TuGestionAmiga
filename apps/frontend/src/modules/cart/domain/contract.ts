@@ -3,7 +3,7 @@
  * Contract for shopping cart operations
  */
 
-import type { Cart, CartItem } from '../Entity'
+import type { Cart, CartItem } from './entities'
 
 export interface ICartRepository {
   /**
@@ -39,5 +39,5 @@ export interface ICartRepository {
   /**
    * Checkout cart items
    */
-  checkout(items: Array<{ id_libro: number; cantidad: number }>): Promise<void>
+  checkout(items: Array<{ id: number; quantity: number }>): Promise<void>
 }
