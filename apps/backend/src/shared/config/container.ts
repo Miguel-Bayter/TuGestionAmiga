@@ -8,6 +8,7 @@ import { CategoryRepository } from '@/modules/category/infrastructure/repository
 import { UserRepository } from '@/modules/user/infrastructure/repository/user.repository-impl';
 import { PurchaseRepository } from '@/modules/purchase/infrastructure/repository/purchase.repository-impl';
 import { LoanRepository } from '@/modules/loan/infrastructure/repository/loan.repository-impl';
+import { CartRepository } from '@/modules/cart/infrastructure/repository/cart.repository-impl';
 
 // Use Cases
 import { LoginUseCase } from '@/modules/auth/application/use-case/login.usecase';
@@ -20,6 +21,7 @@ import { GetAllCategoriesUseCase } from '@/modules/category/application/use-case
 import { GetAllUsersUseCase } from '@/modules/user/application/use-case/get-all-users.usecase';
 import { GetPurchasesByUserUseCase } from '@/modules/purchase/application/use-case/get-purchases-by-user.usecase';
 import { GetAllLoansUseCase } from '@/modules/loan/application/use-case/get-all-loans.usecase';
+import { GetCartByUserUseCase } from '@/modules/cart/application/use-case/get-cart-by-user.usecase';
 
 // Services
 import { AuthService } from '@/modules/auth/application/service/auth.service';
@@ -28,6 +30,7 @@ import { CategoryService } from '@/modules/category/application/service/category
 import { UserService } from '@/modules/user/application/service/user.service';
 import { PurchaseService } from '@/modules/purchase/application/service/purchase.service';
 import { LoanService } from '@/modules/loan/application/service/loan.service';
+import { CartService } from '@/modules/cart/application/service/cart.service';
 
 /**
  * Create and configure the IoC container of Awilix
@@ -53,6 +56,7 @@ container.register({
   userRepository: asClass(UserRepository).singleton(),
   purchaseRepository: asClass(PurchaseRepository).singleton(),
   loanRepository: asClass(LoanRepository).singleton(),
+  cartRepository: asClass(CartRepository).singleton(),
 });
 
 // ============================================
@@ -69,6 +73,7 @@ container.register({
   getAllUsersUseCase: asClass(GetAllUsersUseCase).singleton(),
   getPurchasesByUserUseCase: asClass(GetPurchasesByUserUseCase).singleton(),
   getAllLoansUseCase: asClass(GetAllLoansUseCase).singleton(),
+  getCartByUserUseCase: asClass(GetCartByUserUseCase).singleton(),
 });
 
 // ============================================
@@ -81,6 +86,7 @@ container.register({
   userService: asClass(UserService).singleton(),
   purchaseService: asClass(PurchaseService).singleton(),
   loanService: asClass(LoanService).singleton(),
+  cartService: asClass(CartService).singleton(),
 });
 
 export default container;

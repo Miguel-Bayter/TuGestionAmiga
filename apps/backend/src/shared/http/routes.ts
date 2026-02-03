@@ -6,6 +6,7 @@ import { createCategoryRoutes } from '@/modules/category/infrastructure/http/rou
 import { createUserRoutes } from '@/modules/user/infrastructure/http/routes';
 import { createPurchaseRoutes } from '@/modules/purchase/infrastructure/http/routes';
 import { createLoanRoutes } from '@/modules/loan/infrastructure/http/routes';
+import { createCartRoutes } from '@/modules/cart/infrastructure/http/routes';
 import { requireAuth } from '@/shared/middleware/jwt';
 import { listAvailableCovers } from '@/shared/utils/covers';
 
@@ -39,6 +40,7 @@ export function createApiRoutes(container: AwilixContainer) {
   router.use('/admin/users', createUserRoutes(container));
   router.use('/admin/loans', createLoanRoutes(container));
   router.use('/purchases', createPurchaseRoutes(container));
+  router.use('/cart', createCartRoutes(container));
 
   // 404 handler for API routes
   router.use('*', (_req: Request, res: Response) => {
