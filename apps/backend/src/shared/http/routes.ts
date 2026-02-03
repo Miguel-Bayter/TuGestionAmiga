@@ -3,6 +3,7 @@ import type { AwilixContainer } from 'awilix';
 import { createAuthRoutes } from '@/modules/auth/infrastructure/http/routes';
 import { createBooksRoutes } from '@/modules/book/infrastructure/http/routes';
 import { createCategoryRoutes } from '@/modules/category/infrastructure/http/routes';
+import { createUserRoutes } from '@/modules/user/infrastructure/http/routes';
 import { requireAuth } from '@/shared/middleware/jwt';
 
 export function createApiRoutes(container: AwilixContainer) {
@@ -26,6 +27,7 @@ export function createApiRoutes(container: AwilixContainer) {
   router.use('/auth', createAuthRoutes(container));
   router.use('/books', createBooksRoutes(container));
   router.use('/admin/categories', createCategoryRoutes(container));
+  router.use('/admin/users', createUserRoutes(container));
 
   // 404 handler for API routes
   router.use('*', (_req: Request, res: Response) => {
