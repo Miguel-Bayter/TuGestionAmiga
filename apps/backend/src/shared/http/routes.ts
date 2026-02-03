@@ -2,6 +2,7 @@ import { Router, type Request, type Response } from 'express';
 import type { AwilixContainer } from 'awilix';
 import { createAuthRoutes } from '@/modules/auth/infrastructure/http/routes';
 import { createBooksRoutes } from '@/modules/book/infrastructure/http/routes';
+import { createAdminBooksRoutes } from '@/modules/book/infrastructure/http/admin-routes';
 import { createCategoryRoutes } from '@/modules/category/infrastructure/http/routes';
 import { createUserRoutes } from '@/modules/user/infrastructure/http/routes';
 import { createPurchaseRoutes } from '@/modules/purchase/infrastructure/http/routes';
@@ -36,6 +37,7 @@ export function createApiRoutes(container: AwilixContainer) {
   // Routes
   router.use('/auth', createAuthRoutes(container));
   router.use('/books', createBooksRoutes(container));
+  router.use('/admin/books', createAdminBooksRoutes(container));
   router.use('/admin/categories', createCategoryRoutes(container));
   router.use('/admin/users', createUserRoutes(container));
   router.use('/admin/loans', createLoanRoutes(container));

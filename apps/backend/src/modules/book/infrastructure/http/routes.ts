@@ -6,6 +6,7 @@ export function createBooksRoutes(container: AwilixContainer) {
   const router = Router();
   const { bookService } = container.cradle;
 
+  // Public route - can filter by available
   router.get(
     '/',
     asyncHandler(async (req, res) => {
