@@ -1,0 +1,4 @@
+
+> @tu-gestion-amiga/backend@2.0.0 type-check C:\Users\mbayt\Documents\Proyectos\sena\Finish\apps\backend
+> tsc --noEmit
+

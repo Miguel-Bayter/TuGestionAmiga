@@ -1,0 +1,38 @@
+
+> @tu-gestion-amiga/backend@2.0.0 test C:\Users\mbayt\Documents\Proyectos\sena\Finish\apps\backend
+> jest "src/shared/middleware/__tests__/jwt.test.ts"
+
+PASS src/shared/middleware/__tests__/jwt.test.ts (5.075 s)
+  JWT Middleware - requireAuth
+    Valid JWT Token
+      √ should decode valid token and attach user data to req.user (32 ms)
+      √ should set isAdmin=false for non-ADMIN roles (4 ms)
+      √ should call findUnique with correct userId (7 ms)
+    Missing Authorization Header
+      √ should return 401 when Authorization header is missing (6 ms)
+      √ should return 401 when Authorization header is empty (4 ms)
+    Malformed Authorization Header
+      √ should return 401 when Authorization header has no Bearer prefix (3 ms)
+      √ should return 401 when Authorization header has Bearer but no token (4 ms)
+      √ should return 401 when Authorization header has Bearer but only whitespace (2 ms)
+    Invalid JWT Token
+      √ should return 401 for invalid token signature (3 ms)
+      √ should return 401 for token signed with different secret (5 ms)
+      √ should return 401 for malformed JWT (2 ms)
+    Expired JWT Token
+      √ should return 401 with "Token expired" message for expired token (4 ms)
+    User Not Found in Database
+      √ should return 401 when user does not exist in database (1 ms)
+    Case Sensitivity
+      √ should accept "bearer" in lowercase (2 ms)
+      √ should accept "Bearer" in mixed case (6 ms)
+    Request User Typing
+      √ should have correct TypeScript typing for req.user (3 ms)
+    Database Errors
+      √ should pass database errors to next() via asyncHandler (3 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       17 passed, 17 total
+Snapshots:   0 total
+Time:        6.111 s, estimated 8 s
+Ran all test suites matching src/shared/middleware/__tests__/jwt.test.ts.

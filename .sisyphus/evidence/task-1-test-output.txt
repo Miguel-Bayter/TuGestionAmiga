@@ -1,0 +1,13 @@
+
+> @tu-gestion-amiga/backend@2.0.0 test C:\Users\mbayt\Documents\Proyectos\sena\Finish\apps\backend
+> jest
+
+PASS src/modules/book/__tests__/unit/get-book-by-id.usecase.test.ts (8.738 s)
+PASS src/shared/middleware/__tests__/jwt.test.ts (9.5 s)
+PASS src/modules/book/__tests__/unit/get-all-books.usecase.test.ts (10.021 s)
+
+Test Suites: 3 passed, 3 total
+Tests:       36 passed, 36 total
+Snapshots:   0 total
+Time:        12.748 s, estimated 13 s
+Ran all test suites.

@@ -4,6 +4,7 @@ import prisma from '@/shared/config/database';
 // Repositories - Implementations
 import { AuthRepository } from '@/modules/auth/infrastructure/repository/auth.repository-impl';
 import { BookRepository } from '@/modules/book/infrastructure/repository/book.repository-impl';
+import { CategoryRepository } from '@/modules/category/infrastructure/repository/category.repository-impl';
 
 // Use Cases
 import { LoginUseCase } from '@/modules/auth/application/use-case/login.usecase';
@@ -12,10 +13,12 @@ import { RefreshTokenUseCase } from '@/modules/auth/application/use-case/refresh
 import { ValidateTokenUseCase } from '@/modules/auth/application/use-case/validate-token.usecase';
 import { GetAllBooksUseCase } from '@/modules/book/application/use-case/get-all-books.usecase';
 import { GetBookByIdUseCase } from '@/modules/book/application/use-case/get-book-by-id.usecase';
+import { GetAllCategoriesUseCase } from '@/modules/category/application/use-case/get-all-categories.usecase';
 
 // Services
 import { AuthService } from '@/modules/auth/application/service/auth.service';
 import { BookService } from '@/modules/book/application/service/book.service';
+import { CategoryService } from '@/modules/category/application/service/category.service';
 
 /**
  * Create and configure the IoC container of Awilix
@@ -37,6 +40,7 @@ container.register({ prisma: asValue(prisma) });
 container.register({
   authRepository: asClass(AuthRepository).singleton(),
   bookRepository: asClass(BookRepository).singleton(),
+  categoryRepository: asClass(CategoryRepository).singleton(),
 });
 
 // ============================================
@@ -49,6 +53,7 @@ container.register({
   validateTokenUseCase: asClass(ValidateTokenUseCase).singleton(),
   getAllBooksUseCase: asClass(GetAllBooksUseCase).singleton(),
   getBookByIdUseCase: asClass(GetBookByIdUseCase).singleton(),
+  getAllCategoriesUseCase: asClass(GetAllCategoriesUseCase).singleton(),
 });
 
 // ============================================
@@ -57,6 +62,7 @@ container.register({
 container.register({
   authService: asClass(AuthService).singleton(),
   bookService: asClass(BookService).singleton(),
+  categoryService: asClass(CategoryService).singleton(),
 });
 
 export default container;
