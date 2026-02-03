@@ -7,6 +7,7 @@ import { createUserRoutes } from '@/modules/user/infrastructure/http/routes';
 import { createPurchaseRoutes } from '@/modules/purchase/infrastructure/http/routes';
 import { createLoanRoutes } from '@/modules/loan/infrastructure/http/routes';
 import { requireAuth } from '@/shared/middleware/jwt';
+import { listAvailableCovers } from '@/shared/utils/covers';
 
 export function createApiRoutes(container: AwilixContainer) {
   const router = Router();
@@ -24,6 +25,12 @@ export function createApiRoutes(container: AwilixContainer) {
       res.json({ ok: true, user: _req.user });
     }
   );
+
+  // Public utility endpoint - list available book covers
+  router.get('/covers', async (_req: Request, res: Response) => {
+    const covers = await listAvailableCovers();
+    res.json({ ok: true, data: covers });
+  });
 
   // Routes
   router.use('/auth', createAuthRoutes(container));
