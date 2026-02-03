@@ -6,6 +6,7 @@ import { AuthRepository } from '@/modules/auth/infrastructure/repository/auth.re
 import { BookRepository } from '@/modules/book/infrastructure/repository/book.repository-impl';
 import { CategoryRepository } from '@/modules/category/infrastructure/repository/category.repository-impl';
 import { UserRepository } from '@/modules/user/infrastructure/repository/user.repository-impl';
+import { PurchaseRepository } from '@/modules/purchase/infrastructure/repository/purchase.repository-impl';
 
 // Use Cases
 import { LoginUseCase } from '@/modules/auth/application/use-case/login.usecase';
@@ -16,12 +17,14 @@ import { GetAllBooksUseCase } from '@/modules/book/application/use-case/get-all-
 import { GetBookByIdUseCase } from '@/modules/book/application/use-case/get-book-by-id.usecase';
 import { GetAllCategoriesUseCase } from '@/modules/category/application/use-case/get-all-categories.usecase';
 import { GetAllUsersUseCase } from '@/modules/user/application/use-case/get-all-users.usecase';
+import { GetPurchasesByUserUseCase } from '@/modules/purchase/application/use-case/get-purchases-by-user.usecase';
 
 // Services
 import { AuthService } from '@/modules/auth/application/service/auth.service';
 import { BookService } from '@/modules/book/application/service/book.service';
 import { CategoryService } from '@/modules/category/application/service/category.service';
 import { UserService } from '@/modules/user/application/service/user.service';
+import { PurchaseService } from '@/modules/purchase/application/service/purchase.service';
 
 /**
  * Create and configure the IoC container of Awilix
@@ -45,6 +48,7 @@ container.register({
   bookRepository: asClass(BookRepository).singleton(),
   categoryRepository: asClass(CategoryRepository).singleton(),
   userRepository: asClass(UserRepository).singleton(),
+  purchaseRepository: asClass(PurchaseRepository).singleton(),
 });
 
 // ============================================
@@ -59,6 +63,7 @@ container.register({
   getBookByIdUseCase: asClass(GetBookByIdUseCase).singleton(),
   getAllCategoriesUseCase: asClass(GetAllCategoriesUseCase).singleton(),
   getAllUsersUseCase: asClass(GetAllUsersUseCase).singleton(),
+  getPurchasesByUserUseCase: asClass(GetPurchasesByUserUseCase).singleton(),
 });
 
 // ============================================
@@ -69,6 +74,7 @@ container.register({
   bookService: asClass(BookService).singleton(),
   categoryService: asClass(CategoryService).singleton(),
   userService: asClass(UserService).singleton(),
+  purchaseService: asClass(PurchaseService).singleton(),
 });
 
 export default container;
