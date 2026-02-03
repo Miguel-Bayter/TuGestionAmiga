@@ -9,7 +9,7 @@ import {
   LogoutUseCase,
   GetProfileUseCase,
 } from '@/domain/UseCase/auth'
-import { TokenManager } from '@/data/Provider'
+import { TokenManager } from '@/shared/infrastructure/provider'
 import { STORAGE_KEYS } from '@/shared/application/config'
 import type { User, LoginRequest, RegisterRequest } from '@/shared/domain/types'
 
