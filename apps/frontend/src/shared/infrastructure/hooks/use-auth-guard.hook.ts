@@ -25,7 +25,7 @@ interface UseAuthGuardReturn {
  * Hook to guard routes and check authentication/authorization
  *
  * @param options - Configuration options
- * @param options.adminOnly - If true, requires admin role (id_rol === 1)
+ * @param options.adminOnly - If true, requires admin role (roleId === 1)
  * @param options.redirectTo - Custom redirect path (defaults to /login or /)
  * @returns Authentication state
  *
@@ -55,7 +55,7 @@ export function useAuthGuard(options: UseAuthGuardOptions = {}): UseAuthGuardRet
     }
 
     // Admin check
-    if (adminOnly && user.id_rol !== 1) {
+    if (adminOnly && user.roleId !== 1) {
       // Not an admin - redirect to home
       navigate(redirectTo || ROUTES.HOME, { replace: true })
       return

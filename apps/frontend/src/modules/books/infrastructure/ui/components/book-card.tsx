@@ -8,12 +8,12 @@ import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
 interface BookCardProps {
   book: Book
   onOpenDetails?: (book: Book) => void
-  mode?: 'todos' | 'comprar' | 'rentable'
+  mode?: 'all' | 'buy' | 'rental'
 }
 
 // Temporary placeholder functions until covers lib is migrated
 const createCoverDataUri = (title?: string): string => {
-  const text = (title || 'Libro').substring(0, 2).toUpperCase()
+  const text = (title || 'Book').substring(0, 2).toUpperCase()
   const colors = ['#3B82F6', '#8B5CF6', '#EC4899', '#10B981', '#F59E0B']
   const color = colors[Math.floor(Math.random() * colors.length)]
 
@@ -30,7 +30,7 @@ const getLocalCoverUrl = (_title?: string): string | null => {
   return null
 }
 
-export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCardProps) {
+export default function BookCard({ book, onOpenDetails, mode = 'all' }: BookCardProps) {
   const navigate = useNavigate()
   const container = useContainer()
   const { authStateService, logoutUseCase } = container.cradle
@@ -54,9 +54,9 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
   }, [])
 
   // Stock calculations
-  const stockCompra = Number(book.stock)
-  const stockRenta = Number(book.rentalStock)
-  const hasSplitStock = Number.isFinite(stockCompra) || Number.isFinite(stockRenta)
+  const purchaseStock = Number(book.stock)
+  const rentalStock = Number(book.rentalStock)
+  const hasSplitStock = Number.isFinite(purchaseStock) || Number.isFinite(rentalStock)
 
   const getInCartQty = (): number => {
     try {
@@ -64,10 +64,8 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
       const items = Array.isArray(list) ? list : []
       const id = Number(book.id)
       if (!Number.isFinite(id)) return 0
-      const found = items.find(
-        (it: unknown) => Number((it as { id_libro?: unknown })?.id_libro) === id
-      )
-      const n = Number((found as { cantidad?: unknown })?.cantidad)
+      const found = items.find((it: unknown) => Number((it as { id?: unknown })?.id) === id)
+      const n = Number((found as { quantity?: unknown })?.quantity)
       return Number.isFinite(n) && n > 0 ? Math.trunc(n) : 0
     } catch {
       return 0
@@ -75,21 +73,21 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
   }
 
   const inCartQty = cartRev >= 0 ? getInCartQty() : 0
-  const buyRemaining = Number.isFinite(stockCompra)
-    ? Math.max(Math.trunc(stockCompra) - inCartQty, 0)
+  const buyRemaining = Number.isFinite(purchaseStock)
+    ? Math.max(Math.trunc(purchaseStock) - inCartQty, 0)
     : undefined
 
-  const buyAvailable = Number.isFinite(stockCompra)
+  const buyAvailable = Number.isFinite(purchaseStock)
     ? (buyRemaining ?? 0) > 0
-    : book.availability === 1
-  const rentAvailable = Number.isFinite(stockRenta) ? stockRenta > 0 : book.availability === 1
-  const isAvailable = hasSplitStock ? buyAvailable || rentAvailable : book.availability === 1
+    : book.availability === true
+  const rentAvailable = Number.isFinite(rentalStock) ? rentalStock > 0 : book.availability === true
+  const isAvailable = hasSplitStock ? buyAvailable || rentAvailable : book.availability === true
 
-  const statusText = isAvailable ? 'En stock' : 'No disponible'
+  const statusText = isAvailable ? 'In stock' : 'Not available'
 
   const stockValue = hasSplitStock
-    ? (Number.isFinite(stockCompra) ? stockCompra : 0) +
-      (Number.isFinite(stockRenta) ? stockRenta : 0)
+    ? (Number.isFinite(purchaseStock) ? purchaseStock : 0) +
+      (Number.isFinite(rentalStock) ? rentalStock : 0)
     : typeof book.stock === 'number' || Number.isFinite(Number(book.stock))
       ? Number(book.stock)
       : isAvailable
@@ -107,8 +105,8 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
     return user
   }
 
-  const handleCompraError = (msg: string) => {
-    if (msg.toLowerCase().includes('usuario no encontrado')) {
+  const handlePurchaseError = (msg: string) => {
+    if (msg.toLowerCase().includes('user not found')) {
       logoutUseCase.execute()
       showError(msg)
       navigate('/login')
@@ -122,43 +120,43 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
     const currentUser = ensureUserOrRedirect()
     if (!currentUser) return
 
-    const cantidad = Number(buyQty)
-    if (!Number.isFinite(cantidad) || cantidad <= 0) {
-      showError('Cantidad inválida')
+    const quantity = Number(buyQty)
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      showError('Invalid quantity')
       return
     }
 
     const cartQty = getInCartQty()
-    const remaining = Number.isFinite(stockCompra)
-      ? Math.max(Math.trunc(stockCompra) - cartQty, 0)
+    const remaining = Number.isFinite(purchaseStock)
+      ? Math.max(Math.trunc(purchaseStock) - cartQty, 0)
       : undefined
 
-    if (Number.isFinite(remaining) && cantidad > remaining!) {
+    if (Number.isFinite(remaining) && quantity > remaining!) {
       showError(
         remaining! <= 0
-          ? 'Ya tienes el stock máximo de este libro en tu carrito.'
-          : 'No hay stock suficiente para esa cantidad'
+          ? 'You already have the maximum stock of this book in your cart'
+          : 'Not enough stock for that quantity'
       )
       return
     }
 
     try {
       /*const response = await api.post('/cart', {
-        id_usuario: currentUser.id,
-        id_libro: book.id,
-        cantidad,
+        userId: currentUser.id,
+        bookId: book.id,
+        quantity,
         })*/
 
       if (response.error) {
-        handleCompraError(response.error.message || 'No se pudo registrar la compra')
+        handlePurchaseError(response.error.message || 'Could not register purchase')
         return
       }
 
       window.dispatchEvent(new Event('tga_cart_updated'))
       window.dispatchEvent(new Event('tga_catalog_updated'))
-      success('Agregado al carrito')
+      success('Added to cart')
     } catch (e: unknown) {
-      handleCompraError((e as { message?: string }).message || 'No se pudo registrar la compra')
+      handlePurchaseError((e as { message?: string }).message || 'Could not register purchase')
     }
   }
 
@@ -167,57 +165,57 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
     const currentUser = ensureUserOrRedirect()
     if (!currentUser) return
 
-    const cantidad = Number(buyQty)
-    if (!Number.isFinite(cantidad) || cantidad <= 0) {
-      showError('Cantidad inválida')
+    const quantity = Number(buyQty)
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      showError('Invalid quantity')
       return
     }
 
-    if (Number.isFinite(stockRenta) && cantidad > stockRenta) {
-      showError('No hay stock suficiente para esa cantidad')
+    if (Number.isFinite(rentalStock) && quantity > rentalStock) {
+      showError('Not enough stock for that quantity')
       return
     }
 
     try {
       const response = await api.post('/loans', {
-        id_user: currentUser.id,
-        id_libro: book.id,
-        cantidad,
+        userId: currentUser.id,
+        bookId: book.id,
+        quantity,
       })
 
       if (response.error) {
-        handleCompraError(response.error.message || 'No se pudo registrar el préstamo')
+        handlePurchaseError(response.error.message || 'Could not register loan')
         return
       }
 
       window.dispatchEvent(new Event('tga_catalog_updated'))
       window.dispatchEvent(new Event('tga_loans_updated'))
-      success('Agregado a su lista de renta')
+      success('Added to your rental list')
     } catch (e: unknown) {
-      handleCompraError((e as { message?: string }).message || 'No se pudo registrar el préstamo')
+      handlePurchaseError((e as { message?: string }).message || 'Could not register loan')
     }
   }
 
-  const showRent = mode !== 'comprar'
-  const showBuy = mode !== 'rentable'
+  const showRent = mode !== 'buy'
+  const showBuy = mode !== 'rental'
   const showQty = showBuy || showRent
 
   const qtyMax =
-    showBuy && !showRent && Number.isFinite(stockCompra)
+    showBuy && !showRent && Number.isFinite(purchaseStock)
       ? buyRemaining
-      : showRent && !showBuy && Number.isFinite(stockRenta)
-        ? stockRenta
+      : showRent && !showBuy && Number.isFinite(rentalStock)
+        ? rentalStock
         : undefined
 
   const inputMax =
     Number.isFinite(qtyMax) && qtyMax! > 0
       ? qtyMax
-      : Number.isFinite(stockCompra) && Number.isFinite(stockRenta)
-        ? Math.max(buyRemaining ?? 0, stockRenta)
-        : Number.isFinite(stockCompra)
+      : Number.isFinite(purchaseStock) && Number.isFinite(rentalStock)
+        ? Math.max(buyRemaining ?? 0, rentalStock)
+        : Number.isFinite(purchaseStock)
           ? (buyRemaining ?? undefined)
-          : Number.isFinite(stockRenta)
-            ? stockRenta
+          : Number.isFinite(rentalStock)
+            ? rentalStock
             : undefined
 
   return (
@@ -225,7 +223,7 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
       <div className='p-4 flex flex-col sm:flex-row gap-4 items-start'>
         <img
           src={coverSrc}
-          alt={`Portada del libro ${book.title || ''}`.trim()}
+          alt={`Book cover ${book.title || ''}`.trim()}
           className='w-20 sm:w-24 md:w-28 object-cover rounded-md border border-gray-200 shrink-0 bg-gray-50'
           onError={(ev) => {
             ev.currentTarget.onerror = null
@@ -236,10 +234,10 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
         <div className='flex-1'>
           <div className='flex items-start justify-between gap-3'>
             <div>
-              <h3 className='text-lg font-bold text-gray-900'>{book.title || 'Sin título'}</h3>
+              <h3 className='text-lg font-bold text-gray-900'>{book.title || 'Untitled'}</h3>
               <p className='text-sm text-gray-600 mt-1'>
-                {(book.author || 'Autor desconocido') +
-                  (book.category_name ? ` · ${book.category_name}` : '')}
+                {(book.author || 'Unknown author') +
+                  (book.categoryName ? ` · ${book.categoryName}` : '')}
               </p>
             </div>
             <span
@@ -252,8 +250,8 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
           <div className='mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500'>
             {hasSplitStock ? (
               <>
-                <span>Stock compra: {Number.isFinite(stockCompra) ? stockCompra : 0}</span>
-                <span>Stock préstamo: {Number.isFinite(stockRenta) ? stockRenta : 0}</span>
+                <span>Purchase stock: {Number.isFinite(purchaseStock) ? purchaseStock : 0}</span>
+                <span>Rental stock: {Number.isFinite(rentalStock) ? rentalStock : 0}</span>
               </>
             ) : (
               <span>Stock: {stockValue}</span>
@@ -261,7 +259,7 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
 
             {showQty && (
               <div className='flex items-center gap-2'>
-                <span className='font-semibold text-gray-700'>Cantidad</span>
+                <span className='font-semibold text-gray-700'>Quantity</span>
                 <input
                   type='number'
                   min={1}
@@ -295,7 +293,7 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
 
           <div
             className={
-              mode !== 'todos'
+              mode !== 'all'
                 ? 'mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2'
                 : 'mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2'
             }
@@ -305,7 +303,7 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
               className='w-full px-3 py-2 text-xs font-semibold rounded-md bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500'
               onClick={() => onOpenDetails?.(book)}
             >
-              Ver detalles
+              View details
             </button>
 
             {showBuy && (
@@ -315,7 +313,7 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
                 disabled={!buyAvailable}
                 onClick={onBuy}
               >
-                Comprar
+                Buy
               </button>
             )}
 
@@ -326,7 +324,7 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
                 disabled={!rentAvailable}
                 onClick={onRent}
               >
-                Rentar
+                Rent
               </button>
             )}
           </div>

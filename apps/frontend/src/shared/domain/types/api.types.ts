@@ -11,13 +11,13 @@ export interface Book {
   title: string
   author: string
   description?: string
-  value?: number // precio field from DB
-  availability?: number // 0 or 1
+  price?: number
+  availability?: boolean
   stock?: number
-  dueStock?: number
+  purchaseStock?: number
   rentalStock?: number
-  category_name?: string
-  cover_url?: string
+  categoryName?: string
+  coverUrl?: string
 }
 
 /**
@@ -36,7 +36,7 @@ export interface CartItem {
  * Loan entity
  */
 export interface Loan {
-  id_prestamo: number
+  id: number
   userId: number
   bookId: number
   loanDate: string

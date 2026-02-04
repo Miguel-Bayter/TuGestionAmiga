@@ -5,14 +5,14 @@
 
 export interface Book {
   id: number
-  titulo: string
-  autor: string
-  descripcion?: string
-  valor?: number
-  disponibilidad: boolean
+  title: string
+  author: string
+  description?: string
+  price?: number
+  availability: boolean
   stock?: number
-  stock_compra?: number
-  stock_renta?: number
-  nombre_categoria?: string
-  portada_url?: string
+  purchaseStock?: number
+  rentalStock?: number
+  categoryName?: string
+  coverUrl?: string
 }

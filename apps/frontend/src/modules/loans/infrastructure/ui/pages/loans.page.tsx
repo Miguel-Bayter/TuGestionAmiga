@@ -7,7 +7,7 @@ import { formatDate } from '@/shared/application/helpers'
 
 // Temporary placeholder functions until covers lib is migrated
 const createCoverDataUri = (title?: string): string => {
-  const text = (title || 'Libro').substring(0, 2).toUpperCase()
+  const text = (title || 'Book').substring(0, 2).toUpperCase()
   const colors = ['#3B82F6', '#8B5CF6', '#EC4899', '#10B981', '#F59E0B']
   const color = colors[Math.floor(Math.random() * colors.length)]
 
@@ -24,14 +24,14 @@ const getLocalCoverUrl = (_title?: string): string | null => {
 }
 
 interface LoanRow {
-  id_prestamo: number
-  titulo?: string
-  autor?: string
-  estado?: string
-  extensiones?: number
-  fecha_prestamo?: string
-  fecha_devolucion?: string
-  fecha_devolucion_real?: string
+  loanId: number
+  title?: string
+  author?: string
+  status?: string
+  extensions?: number
+  loanDate?: string
+  returnDate?: string
+  actualReturnDate?: string
 }
 
 export default function LoansPage() {
@@ -46,20 +46,20 @@ export default function LoansPage() {
   const load = async () => {
     setError('')
 
-    if (!user?.id_usuario) {
+    if (!user?.id) {
       setRows([])
-      setError('Inicia sesión para ver tus préstamos.')
+      setError('Sign in to view your loans.')
       return
     }
 
     try {
       const response = await api.get<LoanRow[]>(
-        `/prestamos?id_usuario=${encodeURIComponent(user.id_usuario)}`
+        `/loans?userId=${encodeURIComponent(user.id)}`
       )
       setRows(Array.isArray(response.data) ? response.data : [])
     } catch {
       setRows([])
-      setError('No se pudieron cargar los préstamos.')
+      setError('Could not load loans.')
     }
   }
 
@@ -75,53 +75,53 @@ export default function LoansPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const onExtender = async (id_prestamo: number) => {
-    if (!user?.id_usuario) return
+  const onExtend = async (loanId: number) => {
+    if (!user?.id) return
 
     try {
-      const response = await api.post(`/prestamos/${encodeURIComponent(id_prestamo)}/extender`, {
-        id_usuario: user.id_usuario,
+      const response = await api.post(`/loans/${encodeURIComponent(loanId)}/extend`, {
+        userId: user.id,
       })
 
       if (response.error) {
-        showError(response.error.message || 'No se pudo extender el préstamo')
+        showError(response.error.message || 'Could not extend loan')
         return
       }
 
-      showSuccess('Préstamo extendido (+5 días)')
+      showSuccess('Loan extended (+5 days)')
       await load()
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'No se pudo extender el préstamo')
+      showError((e as { message?: string }).message || 'Could not extend loan')
     }
   }
 
   return (
     <div>
-      <h1 className='text-3xl font-bold text-gray-900 mb-6'>Mis Préstamos</h1>
+      <h1 className='text-3xl font-bold text-gray-900 mb-6'>My Loans</h1>
 
       <div className='bg-white shadow rounded-lg overflow-hidden'>
         <div className='lg:hidden'>
           {error && <p className='px-4 py-4 text-sm text-gray-500'>{error}</p>}
 
           {!error && rows.length === 0 && (
-            <p className='px-4 py-4 text-sm text-gray-500'>No tienes préstamos todavía.</p>
+            <p className='px-4 py-4 text-sm text-gray-500'>You have no loans yet.</p>
           )}
 
           {(rows || []).map((row) => {
-            const estado = String(row?.estado || '').toLowerCase()
-            const badgeClass = estado.includes('activo')
+            const status = String(row?.status || '').toLowerCase()
+            const badgeClass = status.includes('active')
               ? 'bg-green-100 text-green-800'
-              : estado.includes('venc')
+              : status.includes('overdue')
                 ? 'bg-red-100 text-red-800'
                 : 'bg-gray-100 text-gray-800'
 
-            const ext = Number(row?.extensiones) || 0
-            const canExtend = estado.includes('activo') && ext < 2
+            const ext = Number(row?.extensions) || 0
+            const canExtend = status.includes('active') && ext < 2
 
-            const imgSrc = getLocalCoverUrl(row?.titulo) || createCoverDataUri(row?.titulo)
+            const imgSrc = getLocalCoverUrl(row?.title) || createCoverDataUri(row?.title)
 
             return (
-              <div key={row.id_prestamo} className='border-t border-gray-200 p-4'>
+              <div key={row.loanId} className='border-t border-gray-200 p-4'>
                 <div className='flex items-start gap-3'>
                   <img
                     className='h-12 w-12 rounded-xl shrink-0'
@@ -129,40 +129,40 @@ export default function LoansPage() {
                     src={imgSrc}
                     onError={(ev) => {
                       ev.currentTarget.onerror = null
-                      ev.currentTarget.src = createCoverDataUri(row?.titulo)
+                      ev.currentTarget.src = createCoverDataUri(row?.title)
                     }}
                   />
                   <div className='min-w-0 flex-1'>
                     <div className='flex items-start justify-between gap-2'>
                       <p
-                        title={String(row?.titulo || 'Sin título')}
+                        title={String(row?.title || 'No title')}
                         className='min-w-0 text-sm font-semibold text-gray-900 truncate'
                       >
-                        {row?.titulo || 'Sin título'}
+                        {row?.title || 'No title'}
                       </p>
                       <span
                         className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${badgeClass}`}
                       >
-                        {(row?.estado || 'Desconocido') +
-                          (estado.includes('activo') ? ` (${ext}/2)` : '')}
+                        {(row?.status || 'Unknown') +
+                          (status.includes('active') ? ` (${ext}/2)` : '')}
                       </span>
                     </div>
 
                     <p
-                      title={String(row?.autor || 'Autor desconocido')}
+                      title={String(row?.author || 'Unknown author')}
                       className='mt-1 text-xs text-gray-500 truncate'
                     >
-                      {row?.autor || 'Autor desconocido'}
+                      {row?.author || 'Unknown author'}
                     </p>
 
                     <div className='mt-3 grid grid-cols-1 gap-2 text-sm text-gray-700'>
                       <p>
-                        <span className='font-semibold text-gray-900'>Préstamo:</span>{' '}
-                        {formatDate(row?.fecha_prestamo || '')}
+                        <span className='font-semibold text-gray-900'>Loan date:</span>{' '}
+                        {formatDate(row?.loanDate || '')}
                       </p>
                       <p>
-                        <span className='font-semibold text-gray-900'>Devolución:</span>{' '}
-                        {formatDate(row?.fecha_devolucion || '')}
+                        <span className='font-semibold text-gray-900'>Return date:</span>{' '}
+                        {formatDate(row?.returnDate || '')}
                       </p>
                     </div>
 
@@ -171,9 +171,9 @@ export default function LoansPage() {
                         <button
                           type='button'
                           className='rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-700'
-                          onClick={() => onExtender(row.id_prestamo)}
+                          onClick={() => onExtend(row.loanId)}
                         >
-                          Extender
+                          Extend
                         </button>
                       ) : (
                         <span className='text-xs text-gray-500'>-</span>
@@ -194,37 +194,37 @@ export default function LoansPage() {
                   scope='col'
                   className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                 >
-                  Libro
+                  Book
                 </th>
                 <th
                   scope='col'
                   className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                 >
-                  Fecha de Préstamo
+                  Loan Date
                 </th>
                 <th
                   scope='col'
                   className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                 >
-                  Fecha de Devolución
+                  Return Date
                 </th>
                 <th
                   scope='col'
                   className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                 >
-                  Devolución efectiva
+                  Actual Return
                 </th>
                 <th
                   scope='col'
                   className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                 >
-                  Estado
+                  Status
                 </th>
                 <th
                   scope='col'
                   className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                 >
-                  Acciones
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -240,26 +240,26 @@ export default function LoansPage() {
               {!error && rows.length === 0 && (
                 <tr>
                   <td colSpan={6} className='px-4 sm:px-6 py-4 text-sm text-gray-500'>
-                    No tienes préstamos todavía.
+                    You have no loans yet.
                   </td>
                 </tr>
               )}
 
               {(rows || []).map((row) => {
-                const estado = String(row?.estado || '').toLowerCase()
-                const badgeClass = estado.includes('activo')
+                const status = String(row?.status || '').toLowerCase()
+                const badgeClass = status.includes('active')
                   ? 'bg-green-100 text-green-800'
-                  : estado.includes('venc')
+                  : status.includes('overdue')
                     ? 'bg-red-100 text-red-800'
                     : 'bg-gray-100 text-gray-800'
 
-                const ext = Number(row?.extensiones) || 0
-                const canExtend = estado.includes('activo') && ext < 2
+                const ext = Number(row?.extensions) || 0
+                const canExtend = status.includes('active') && ext < 2
 
-                const imgSrc = getLocalCoverUrl(row?.titulo) || createCoverDataUri(row?.titulo)
+                const imgSrc = getLocalCoverUrl(row?.title) || createCoverDataUri(row?.title)
 
                 return (
-                  <tr key={row.id_prestamo}>
+                  <tr key={row.loanId}>
                     <td className='px-4 sm:px-6 py-4'>
                       <div className='flex items-center min-w-0'>
                         <div className='shrink-0 h-10 w-10'>
@@ -269,41 +269,41 @@ export default function LoansPage() {
                             src={imgSrc}
                             onError={(ev) => {
                               ev.currentTarget.onerror = null
-                              ev.currentTarget.src = createCoverDataUri(row?.titulo)
+                              ev.currentTarget.src = createCoverDataUri(row?.title)
                             }}
                           />
                         </div>
                         <div className='ml-4 min-w-0'>
                           <div
-                            title={String(row?.titulo || 'Sin título')}
+                            title={String(row?.title || 'No title')}
                             className='text-sm font-medium text-gray-900 truncate'
                           >
-                            {row?.titulo || 'Sin título'}
+                            {row?.title || 'No title'}
                           </div>
                           <div
-                            title={String(row?.autor || 'Autor desconocido')}
+                            title={String(row?.author || 'Unknown author')}
                             className='text-sm text-gray-500 truncate'
                           >
-                            {row?.autor || 'Autor desconocido'}
+                            {row?.author || 'Unknown author'}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className='px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                      {formatDate(row?.fecha_prestamo || '')}
+                      {formatDate(row?.loanDate || '')}
                     </td>
                     <td className='px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                      {formatDate(row?.fecha_devolucion || '')}
+                      {formatDate(row?.returnDate || '')}
                     </td>
                     <td className='px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                      {row?.fecha_devolucion_real ? formatDate(row.fecha_devolucion_real) : '-'}
+                      {row?.actualReturnDate ? formatDate(row.actualReturnDate) : '-'}
                     </td>
                     <td className='px-4 sm:px-6 py-4 whitespace-nowrap'>
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${badgeClass}`}
                       >
-                        {(row?.estado || 'Desconocido') +
-                          (estado.includes('activo') ? ` (${ext}/2)` : '')}
+                        {(row?.status || 'Unknown') +
+                          (status.includes('active') ? ` (${ext}/2)` : '')}
                       </span>
                     </td>
                     <td className='px-4 sm:px-6 py-4 whitespace-nowrap'>
@@ -311,9 +311,9 @@ export default function LoansPage() {
                         <button
                           type='button'
                           className='rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-700'
-                          onClick={() => onExtender(row.id_prestamo)}
+                          onClick={() => onExtend(row.loanId)}
                         >
-                          Extender
+                          Extend
                         </button>
                       ) : (
                         <span className='text-xs text-gray-500'>-</span>

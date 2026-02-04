@@ -97,7 +97,7 @@ export class CartStateService {
     }
   }
 
-  async checkout(items: Array<{ id_libro: number; cantidad: number }>): Promise<void> {
+  async checkout(items: Array<{ bookId: number; quantity: number }>): Promise<void> {
     this.state.isLoading = true
     this.state.error = null
     this.notifySubscribers()

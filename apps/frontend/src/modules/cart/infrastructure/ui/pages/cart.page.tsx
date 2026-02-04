@@ -6,11 +6,11 @@ import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
 import { formatCurrency } from '@/shared/application/helpers'
 
 interface CartItemData {
-  id_libro: number
-  titulo?: string
-  autor?: string
-  cantidad?: number
-  valor?: number
+  bookId: number
+  title?: string
+  author?: string
+  quantity?: number
+  price?: number
 }
 
 export default function CartPage() {
@@ -24,25 +24,25 @@ export default function CartPage() {
   const [checkingOut, setCheckingOut] = useState<boolean>(false)
 
   const load = useCallback(async () => {
-    if (!user?.id_usuario) {
+    if (!user?.id) {
       setItems([])
-      showError('Inicia sesión para ver tu carrito.')
+      showError('Sign in to view your cart.')
       return
     }
 
     setLoading(true)
     try {
       const response = await api.get<CartItemData[]>(
-        `/carrito?id_usuario=${encodeURIComponent(user.id_usuario)}`
+        `/cart?userId=${encodeURIComponent(user.id)}`
       )
       setItems(Array.isArray(response.data) ? response.data : [])
     } catch (e: unknown) {
       setItems([])
-      showError((e as { message?: string }).message || 'No se pudo cargar el carrito.')
+      showError((e as { message?: string }).message || 'Could not load cart.')
     } finally {
       setLoading(false)
     }
-  }, [showError, user?.id_usuario])
+  }, [showError, user?.id])
 
   useEffect(() => {
     load()
@@ -51,61 +51,61 @@ export default function CartPage() {
   const total = useMemo(() => {
     let sum = 0
     for (const it of items || []) {
-      const qty = Number(it?.cantidad) || 0
-      const price = Number(it?.valor)
+      const qty = Number(it?.quantity) || 0
+      const price = Number(it?.price)
       if (qty > 0 && Number.isFinite(price)) sum += qty * price
     }
     return sum
   }, [items])
 
-  const onRemove = async (id_libro: number) => {
-    if (!user?.id_usuario) return
+  const onRemove = async (bookId: number) => {
+    if (!user?.id) return
 
     try {
       const response = await api.delete(
-        `/carrito/${encodeURIComponent(id_libro)}?id_usuario=${encodeURIComponent(user.id_usuario)}`
+        `/cart/${encodeURIComponent(bookId)}?userId=${encodeURIComponent(user.id)}`
       )
 
       if (response.error) {
-        showError(response.error.message || 'No se pudo eliminar.')
+        showError(response.error.message || 'Could not remove item.')
         return
       }
 
-      showSuccess('Producto eliminado del carrito.')
+      showSuccess('Item removed from cart.')
       window.dispatchEvent(new Event('tga_cart_updated'))
       await load()
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'No se pudo eliminar.')
+      showError((e as { message?: string }).message || 'Could not remove item.')
     }
   }
 
   const onCheckout = async () => {
-    if (!user?.id_usuario) return
+    if (!user?.id) return
 
     const totalLabel = formatCurrency(total)
 
     setCheckingOut(true)
     try {
-      const response = await api.post('/carrito/checkout', {
-        id_usuario: user.id_usuario,
+      const response = await api.post('/cart/checkout', {
+        userId: user.id,
       })
 
       if (response.error) {
-        showError(response.error.message || 'No se pudo completar la compra.')
+        showError(response.error.message || 'Could not complete purchase.')
         return
       }
 
-      showSuccess('Compra realizada.')
+      showSuccess('Purchase completed.')
       window.dispatchEvent(new Event('tga_cart_updated'))
       window.dispatchEvent(new Event('tga_catalog_updated'))
       window.dispatchEvent(
         new CustomEvent('tga_toast', {
-          detail: { message: `¡Compra exitosa! Total: ${totalLabel}. Gracias por tu compra.` },
+          detail: { message: `Purchase successful! Total: ${totalLabel}. Thank you for your purchase.` },
         })
       )
       await load()
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'No se pudo completar la compra.')
+      showError((e as { message?: string }).message || 'Could not complete purchase.')
     } finally {
       setCheckingOut(false)
     }
@@ -114,57 +114,57 @@ export default function CartPage() {
   return (
     <div>
       <div className='mb-6'>
-        <h1 className='text-3xl font-bold text-gray-900'>Carrito</h1>
-        <p className='text-gray-600 mt-1'>Revisa tus libros antes de comprar.</p>
+        <h1 className='text-3xl font-bold text-gray-900'>Cart</h1>
+        <p className='text-gray-600 mt-1'>Review your books before purchasing.</p>
       </div>
 
       <div className='bg-white shadow rounded-lg overflow-hidden'>
         <div className='px-4 sm:px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between'>
-          <h2 className='text-lg font-semibold text-gray-900'>Mis productos</h2>
+          <h2 className='text-lg font-semibold text-gray-900'>My items</h2>
           <button
             type='button'
             className='rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 active:translate-y-px disabled:opacity-50 w-full sm:w-auto'
             disabled={checkingOut || loading || (items || []).length === 0}
             onClick={onCheckout}
           >
-            Comprar ({formatCurrency(total)})
+            Buy ({formatCurrency(total)})
           </button>
         </div>
 
         <div className='lg:hidden'>
-          {loading && <p className='px-4 py-4 text-sm text-gray-500'>Cargando...</p>}
+          {loading && <p className='px-4 py-4 text-sm text-gray-500'>Loading...</p>}
 
           {!loading && (!items || items.length === 0) && (
-            <p className='px-4 py-4 text-sm text-gray-500'>Tu carrito está vacío.</p>
+            <p className='px-4 py-4 text-sm text-gray-500'>Your cart is empty.</p>
           )}
 
           {(items || []).map((it) => {
-            const qty = Number(it?.cantidad) || 0
-            const price = Number(it?.valor)
+            const qty = Number(it?.quantity) || 0
+            const price = Number(it?.price)
             const subtotal = Number.isFinite(price) ? qty * price : null
 
             return (
-              <div key={it.id_libro} className='border-t border-gray-200 p-4'>
+              <div key={it.bookId} className='border-t border-gray-200 p-4'>
                 <div className='min-w-0'>
                   <p
-                    title={String(it?.titulo || '-')}
+                    title={String(it?.title || '-')}
                     className='text-sm font-semibold text-gray-900 truncate'
                   >
-                    {it?.titulo || '-'}
+                    {it?.title || '-'}
                   </p>
                   <p
-                    title={String(it?.autor || '-')}
+                    title={String(it?.author || '-')}
                     className='mt-1 text-xs text-gray-500 truncate'
                   >
-                    {it?.autor || '-'}
+                    {it?.author || '-'}
                   </p>
 
                   <div className='mt-3 grid grid-cols-2 gap-2 text-sm'>
                     <p className='text-gray-600'>
-                      <span className='font-semibold text-gray-900'>Cantidad:</span> {qty}
+                      <span className='font-semibold text-gray-900'>Quantity:</span> {qty}
                     </p>
                     <p className='text-gray-600'>
-                      <span className='font-semibold text-gray-900'>Precio:</span>{' '}
+                      <span className='font-semibold text-gray-900'>Price:</span>{' '}
                       {Number.isFinite(price) ? formatCurrency(price) : '-'}
                     </p>
                     <p className='col-span-2 text-gray-600'>
@@ -177,9 +177,9 @@ export default function CartPage() {
                     <button
                       type='button'
                       className='rounded-lg bg-gray-200 px-3 py-2 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-300 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 active:translate-y-px'
-                      onClick={() => onRemove(it.id_libro)}
+                      onClick={() => onRemove(it.bookId)}
                     >
-                      Quitar
+                      Remove
                     </button>
                   </div>
                 </div>
@@ -193,13 +193,13 @@ export default function CartPage() {
             <thead className='bg-gray-50'>
               <tr>
                 <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Libro
+                  Book
                 </th>
                 <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Cantidad
+                  Quantity
                 </th>
                 <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Precio
+                  Price
                 </th>
                 <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                   Subtotal
@@ -211,7 +211,7 @@ export default function CartPage() {
               {loading && (
                 <tr>
                   <td colSpan={5} className='px-4 sm:px-6 py-4 text-sm text-gray-500'>
-                    Cargando...
+                    Loading...
                   </td>
                 </tr>
               )}
@@ -219,30 +219,30 @@ export default function CartPage() {
               {!loading && (!items || items.length === 0) && (
                 <tr>
                   <td colSpan={5} className='px-4 sm:px-6 py-4 text-sm text-gray-500'>
-                    Tu carrito está vacío.
+                    Your cart is empty.
                   </td>
                 </tr>
               )}
 
               {(items || []).map((it) => {
-                const qty = Number(it?.cantidad) || 0
-                const price = Number(it?.valor)
+                const qty = Number(it?.quantity) || 0
+                const price = Number(it?.price)
                 const subtotal = Number.isFinite(price) ? qty * price : null
 
                 return (
-                  <tr key={it.id_libro}>
+                  <tr key={it.bookId}>
                     <td className='px-4 sm:px-6 py-4'>
                       <div
-                        title={String(it?.titulo || '-')}
+                        title={String(it?.title || '-')}
                         className='text-sm font-medium text-gray-900 truncate'
                       >
-                        {it?.titulo || '-'}
+                        {it?.title || '-'}
                       </div>
                       <div
-                        title={String(it?.autor || '-')}
+                        title={String(it?.author || '-')}
                         className='text-sm text-gray-500 truncate'
                       >
-                        {it?.autor || '-'}
+                        {it?.author || '-'}
                       </div>
                     </td>
                     <td className='px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
@@ -258,9 +258,9 @@ export default function CartPage() {
                       <button
                         type='button'
                         className='rounded-lg bg-gray-200 px-3 py-2 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-300 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 active:translate-y-px'
-                        onClick={() => onRemove(it.id_libro)}
+                        onClick={() => onRemove(it.bookId)}
                       >
-                        Quitar
+                        Remove
                       </button>
                     </td>
                   </tr>

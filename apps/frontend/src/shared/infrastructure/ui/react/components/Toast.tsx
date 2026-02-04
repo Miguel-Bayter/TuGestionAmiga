@@ -51,7 +51,7 @@ export function Toast() {
               type='button'
               onClick={() => remove(toast.id)}
               className='flex-shrink-0 text-white/70 hover:text-white'
-              aria-label='Cerrar notificación'
+              aria-label='Close notification'
             >
               <svg
                 className='h-4 w-4'

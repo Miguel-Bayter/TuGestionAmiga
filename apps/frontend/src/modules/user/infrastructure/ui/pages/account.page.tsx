@@ -6,15 +6,15 @@ import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state
 import { formatCurrency, getInitials } from '@/shared/application/helpers'
 import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
 
-interface CompraRow {
-  id_compra: number
-  titulo?: string
-  autor?: string
-  fecha_compra?: string
-  precio?: number
+interface PurchaseRow {
+  purchaseId: number
+  title?: string
+  author?: string
+  purchaseDate?: string
+  price?: number
 }
 
-type TabType = 'info' | 'seguridad' | 'notificaciones'
+type TabType = 'info' | 'security' | 'notifications'
 
 export default function AccountPage() {
   const navigate = useNavigate()
@@ -28,146 +28,146 @@ export default function AccountPage() {
   const [currentPassword, setCurrentPassword] = useState<string>('')
   const [newPassword, setNewPassword] = useState<string>('')
   const [confirmPassword, setConfirmPassword] = useState<string>('')
-  const [compras, setCompras] = useState<CompraRow[]>([])
-  const [prestamosActivos, setPrestamosActivos] = useState<number>(0)
+  const [purchases, setPurchases] = useState<PurchaseRow[]>([])
+  const [activeLoans, setActiveLoans] = useState<number>(0)
 
   const [editingProfile, setEditingProfile] = useState<boolean>(false)
-  const [profileForm, setProfileForm] = useState({ nombre: '', correo: '' })
+  const [profileForm, setProfileForm] = useState({ name: '', email: '' })
   const [savingProfile, setSavingProfile] = useState<boolean>(false)
 
   useEffect(() => {
-    const uid = Number(user?.id_usuario)
+    const uid = Number(user?.id)
     if (!Number.isFinite(uid)) return
     ;(async () => {
       try {
-        await api.get(`/usuarios/${uid}`)
+        await api.get(`/users/${uid}`)
         // Profile refreshed successfully
       } catch {
         // ignore
       }
     })()
-  }, [user?.id_usuario])
+  }, [user?.id])
 
   useEffect(() => {
-    const uid = Number(user?.id_usuario)
+    const uid = Number(user?.id)
     if (!Number.isFinite(uid)) return
     ;(async () => {
       try {
-        const response = await api.get<CompraRow[]>(
-          `/compras?id_usuario=${encodeURIComponent(uid)}`
+        const response = await api.get<PurchaseRow[]>(
+          `/purchases?userId=${encodeURIComponent(uid)}`
         )
-        setCompras(Array.isArray(response.data) ? response.data : [])
+        setPurchases(Array.isArray(response.data) ? response.data : [])
       } catch {
-        setCompras([])
+        setPurchases([])
       }
     })()
-  }, [user?.id_usuario])
+  }, [user?.id])
 
   useEffect(() => {
-    const uid = Number(user?.id_usuario)
+    const uid = Number(user?.id)
     if (!Number.isFinite(uid)) return
     ;(async () => {
       try {
-        const response = await api.get(`/prestamos?id_usuario=${encodeURIComponent(uid)}`)
+        const response = await api.get(`/loans?userId=${encodeURIComponent(uid)}`)
         const list = Array.isArray(response.data) ? response.data : []
         const active = list.filter((r) => {
-          const st = String(r?.estado || '').toLowerCase()
-          return !st.includes('devuel')
+          const st = String(r?.status || '').toLowerCase()
+          return !st.includes('return')
         })
-        setPrestamosActivos(active.length)
+        setActiveLoans(active.length)
       } catch {
-        setPrestamosActivos(0)
+        setActiveLoans(0)
       }
     })()
-  }, [user?.id_usuario])
+  }, [user?.id])
 
-  const formatCompraDate = (value: string | undefined): string => {
+  const formatPurchaseDate = (value: string | undefined): string => {
     if (!value) return '-'
     const d = new Date(value)
     if (Number.isNaN(d.getTime())) return String(value)
-    return d.toLocaleDateString('es-CO', { year: 'numeric', month: '2-digit', day: '2-digit' })
+    return d.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })
   }
 
   const openProfileEditor = () => {
     setProfileForm({
-      nombre: String(user?.nombre || ''),
-      correo: String(user?.correo || ''),
+      name: String(user?.name || ''),
+      email: String(user?.email || ''),
     })
     setEditingProfile(true)
   }
 
   const cancelProfileEditor = () => {
     setEditingProfile(false)
-    setProfileForm({ nombre: '', correo: '' })
+    setProfileForm({ name: '', email: '' })
   }
 
   const onSaveProfile = async () => {
-    const uid = Number(user?.id_usuario)
+    const uid = Number(user?.id)
     if (!Number.isFinite(uid)) return
 
     const payload = {
-      nombre: String(profileForm.nombre || '').trim(),
-      correo: String(profileForm.correo || '').trim(),
+      name: String(profileForm.name || '').trim(),
+      email: String(profileForm.email || '').trim(),
     }
 
-    if (!payload.nombre || !payload.correo) {
-      showError('Nombre y correo son obligatorios.')
+    if (!payload.name || !payload.email) {
+      showError('Name and email are required.')
       return
     }
 
     setSavingProfile(true)
     try {
-      const response = await api.patch(`/usuarios/${encodeURIComponent(uid)}`, payload)
+      const response = await api.patch(`/users/${encodeURIComponent(uid)}`, payload)
 
       if (response.error) {
-        showError(response.error.message || 'No se pudo actualizar el perfil.')
+        showError(response.error.message || 'Could not update profile.')
         return
       }
 
       // Profile refreshed successfully
 
-      showSuccess('Perfil actualizado.')
+      showSuccess('Profile updated.')
       setEditingProfile(false)
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'No se pudo actualizar el perfil.')
+      showError((e as { message?: string }).message || 'Could not update profile.')
     } finally {
       setSavingProfile(false)
     }
   }
 
   const onSave = async () => {
-    const uid = Number(user?.id_usuario)
+    const uid = Number(user?.id)
     if (!Number.isFinite(uid)) return
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      showError('Completa todos los campos')
+      showError('Complete all fields')
       return
     }
 
     if (newPassword !== confirmPassword) {
-      showError('La confirmación no coincide')
+      showError('Confirmation does not match')
       return
     }
 
     try {
-      const response = await api.post(`/usuarios/${uid}/password`, {
-        id_usuario: uid,
-        current_password: currentPassword,
-        new_password: newPassword,
+      const response = await api.post(`/users/${uid}/password`, {
+        userId: uid,
+        currentPassword: currentPassword,
+        newPassword: newPassword,
       })
 
       if (response.error) {
-        showError(response.error.message || 'No se pudo cambiar la contraseña')
+        showError(response.error.message || 'Could not change password')
         return
       }
 
-      showSuccess('Contraseña actualizada')
+      showSuccess('Password updated')
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
       setPanelOpen(false)
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'No se pudo cambiar la contraseña')
+      showError((e as { message?: string }).message || 'Could not change password')
     }
   }
 
@@ -176,15 +176,15 @@ export default function AccountPage() {
     navigate('/login')
   }
 
-  const isAdmin = user?.id_rol === 1
-  const roleLabel = isAdmin ? 'Administrador' : 'Usuario'
-  const initials = getInitials(user?.nombre || '')
+  const isAdmin = user?.roleId === 1
+  const roleLabel = isAdmin ? 'Administrator' : 'User'
+  const initials = getInitials(user?.name || '')
 
   return (
     <div className='max-w-7xl mx-auto px-3 sm:px-0'>
       <div className='mb-4'>
-        <h1 className='text-2xl sm:text-3xl font-bold text-gray-900'>Mi Perfil</h1>
-        <p className='text-sm text-gray-500'>Gestiona tu información personal y preferencias</p>
+        <h1 className='text-2xl sm:text-3xl font-bold text-gray-900'>My Profile</h1>
+        <p className='text-sm text-gray-500'>Manage your personal information and preferences</p>
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-[360px_minmax(0,1fr)] gap-6 items-start'>
@@ -215,19 +215,19 @@ export default function AccountPage() {
 
               <div className='mt-4 min-w-0'>
                 <div className='text-base font-bold text-gray-900 truncate'>
-                  {user?.nombre || 'Usuario'}
+                  {user?.name || 'User'}
                 </div>
                 <div className='text-xs text-gray-500 truncate'>{roleLabel}</div>
               </div>
 
               <div className='mt-5 w-full border-t border-gray-200/70 pt-4 space-y-3 text-sm'>
                 <div className='flex items-center justify-between text-gray-600'>
-                  <span>Préstamos activos</span>
-                  <span className='font-semibold text-rose-600'>{prestamosActivos}</span>
+                  <span>Active loans</span>
+                  <span className='font-semibold text-rose-600'>{activeLoans}</span>
                 </div>
                 <div className='flex items-center justify-between text-gray-600'>
-                  <span>Libros comprados</span>
-                  <span className='font-semibold text-emerald-600'>{compras.length}</span>
+                  <span>Books purchased</span>
+                  <span className='font-semibold text-emerald-600'>{purchases.length}</span>
                 </div>
               </div>
 
@@ -256,7 +256,7 @@ export default function AccountPage() {
                     d='M16 19a2 2 0 002-2V7a2 2 0 00-2-2H9a2 2 0 00-2 2v2'
                   />
                 </svg>
-                Cerrar Sesión
+                Sign Out
               </button>
             </div>
           </div>
@@ -294,14 +294,14 @@ export default function AccountPage() {
                     d='M15 7a3 3 0 11-6 0 3 3 0 016 0z'
                   />
                 </svg>
-                Información Personal
+                Personal Information
               </button>
 
               <button
                 type='button'
-                onClick={() => setTab('seguridad')}
+                onClick={() => setTab('security')}
                 className={
-                  tab === 'seguridad'
+                  tab === 'security'
                     ? 'inline-flex items-center gap-2 rounded-xl bg-white px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold text-blue-700 ring-1 ring-inset ring-blue-200'
                     : 'inline-flex items-center gap-2 rounded-xl bg-white px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold text-gray-600 ring-1 ring-inset ring-gray-200 hover:bg-gray-50'
                 }
@@ -326,14 +326,14 @@ export default function AccountPage() {
                     d='M7 11V8a5 5 0 0110 0v3'
                   />
                 </svg>
-                Seguridad
+                Security
               </button>
 
               <button
                 type='button'
-                onClick={() => setTab('notificaciones')}
+                onClick={() => setTab('notifications')}
                 className={
-                  tab === 'notificaciones'
+                  tab === 'notifications'
                     ? 'inline-flex items-center gap-2 rounded-xl bg-white px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold text-blue-700 ring-1 ring-inset ring-blue-200'
                     : 'inline-flex items-center gap-2 rounded-xl bg-white px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold text-gray-600 ring-1 ring-inset ring-gray-200 hover:bg-gray-50'
                 }
@@ -358,7 +358,7 @@ export default function AccountPage() {
                     d='M9 17a3 3 0 006 0'
                   />
                 </svg>
-                Notificaciones
+                Notifications
               </button>
             </div>
           </div>
@@ -366,7 +366,7 @@ export default function AccountPage() {
           {tab === 'info' && (
             <div className='rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 overflow-hidden'>
               <div className='flex items-center justify-between gap-3 px-5 py-4 border-b border-gray-200/70'>
-                <h2 className='text-sm font-bold text-gray-900'>Información Personal</h2>
+                <h2 className='text-sm font-bold text-gray-900'>Personal Information</h2>
                 <button
                   type='button'
                   className='inline-flex items-center gap-2 text-sm font-semibold text-blue-600'
@@ -388,7 +388,7 @@ export default function AccountPage() {
                       d='M16.5 3.5l4 4L8 20H4v-4L16.5 3.5z'
                     />
                   </svg>
-                  Editar
+                  Edit
                 </button>
               </div>
 
@@ -397,25 +397,25 @@ export default function AccountPage() {
                   <div className='rounded-2xl bg-gray-50 ring-1 ring-gray-200/60 p-4 space-y-4'>
                     <div>
                       <label className='block text-sm font-medium text-gray-700'>
-                        Nombre Completo
+                        Full Name
                       </label>
                       <input
                         type='text'
                         className='mt-1 block w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200'
-                        value={profileForm.nombre}
-                        onChange={(e) => setProfileForm((v) => ({ ...v, nombre: e.target.value }))}
+                        value={profileForm.name}
+                        onChange={(e) => setProfileForm((v) => ({ ...v, name: e.target.value }))}
                       />
                     </div>
 
                     <div>
                       <label className='block text-sm font-medium text-gray-700'>
-                        Correo Electrónico
+                        Email
                       </label>
                       <input
                         type='email'
                         className='mt-1 block w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200'
-                        value={profileForm.correo}
-                        onChange={(e) => setProfileForm((v) => ({ ...v, correo: e.target.value }))}
+                        value={profileForm.email}
+                        onChange={(e) => setProfileForm((v) => ({ ...v, email: e.target.value }))}
                       />
                     </div>
 
@@ -425,7 +425,7 @@ export default function AccountPage() {
                         className='rounded-xl bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-300 w-full sm:w-auto'
                         onClick={cancelProfileEditor}
                       >
-                        Cancelar
+                        Cancel
                       </button>
                       <button
                         type='button'
@@ -433,23 +433,23 @@ export default function AccountPage() {
                         className='rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 w-full sm:w-auto'
                         onClick={onSaveProfile}
                       >
-                        Guardar
+                        Save
                       </button>
                     </div>
                   </div>
                 ) : (
                   <>
                     <div>
-                      <div className='text-xs font-semibold text-gray-500'>Nombre Completo</div>
+                      <div className='text-xs font-semibold text-gray-500'>Full Name</div>
                       <div className='mt-2 rounded-xl bg-gray-50 ring-1 ring-gray-200/60 px-3 py-2 text-sm text-gray-900'>
-                        {user?.nombre || '-'}
+                        {user?.name || '-'}
                       </div>
                     </div>
 
                     <div>
-                      <div className='text-xs font-semibold text-gray-500'>Correo Electrónico</div>
+                      <div className='text-xs font-semibold text-gray-500'>Email</div>
                       <div className='mt-2 rounded-xl bg-gray-50 ring-1 ring-gray-200/60 px-3 py-2 text-sm text-gray-900'>
-                        {user?.correo || '-'}
+                        {user?.email || '-'}
                       </div>
                     </div>
                   </>
@@ -457,8 +457,8 @@ export default function AccountPage() {
 
                 <div className='pt-2'>
                   <div className='flex items-center justify-between gap-3'>
-                    <h3 className='text-sm font-bold text-gray-900'>Libros comprados</h3>
-                    <span className='text-xs font-semibold text-gray-500'>{compras.length}</span>
+                    <h3 className='text-sm font-bold text-gray-900'>Books purchased</h3>
+                    <span className='text-xs font-semibold text-gray-500'>{purchases.length}</span>
                   </div>
 
                   <div className='mt-3 rounded-2xl bg-white ring-1 ring-gray-200/60 overflow-hidden'>
@@ -467,45 +467,45 @@ export default function AccountPage() {
                         <thead className='bg-gray-50 sticky top-0 z-10'>
                           <tr>
                             <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                              Libro
+                              Book
                             </th>
                             <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40'>
-                              Fecha
+                              Date
                             </th>
                             <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32'>
-                              Precio
+                              Price
                             </th>
                           </tr>
                         </thead>
                         <tbody className='bg-white divide-y divide-gray-200'>
-                          {compras.length === 0 ? (
+                          {purchases.length === 0 ? (
                             <tr>
                               <td colSpan={3} className='px-4 sm:px-6 py-4 text-sm text-gray-500'>
-                                No tienes compras todavía.
+                                You have no purchases yet.
                               </td>
                             </tr>
                           ) : (
-                            compras.map((c) => (
-                              <tr key={c.id_compra}>
+                            purchases.map((c) => (
+                              <tr key={c.purchaseId}>
                                 <td className='px-4 sm:px-6 py-4 min-w-0'>
                                   <div
-                                    title={String(c?.titulo || '-')}
+                                    title={String(c?.title || '-')}
                                     className='text-sm font-medium text-gray-900 truncate max-w-[420px]'
                                   >
-                                    {c?.titulo || '-'}
+                                    {c?.title || '-'}
                                   </div>
                                   <div
-                                    title={String(c?.autor || '-')}
+                                    title={String(c?.author || '-')}
                                     className='text-sm text-gray-500 truncate max-w-[420px]'
                                   >
-                                    {c?.autor || '-'}
+                                    {c?.author || '-'}
                                   </div>
                                 </td>
                                 <td className='px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                                  {formatCompraDate(c?.fecha_compra || '')}
+                                  {formatPurchaseDate(c?.purchaseDate || '')}
                                 </td>
                                 <td className='px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                                  {formatCurrency(c?.precio || 0)}
+                                  {formatCurrency(c?.price || 0)}
                                 </td>
                               </tr>
                             ))
@@ -519,10 +519,10 @@ export default function AccountPage() {
             </div>
           )}
 
-          {tab === 'seguridad' && (
+          {tab === 'security' && (
             <div className='rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 overflow-hidden'>
               <div className='flex items-center justify-between gap-3 px-5 py-4 border-b border-gray-200/70'>
-                <h2 className='text-sm font-bold text-gray-900'>Seguridad</h2>
+                <h2 className='text-sm font-bold text-gray-900'>Security</h2>
                 <button
                   type='button'
                   className={
@@ -532,7 +532,7 @@ export default function AccountPage() {
                   }
                   onClick={() => setPanelOpen((v) => !v)}
                 >
-                  {panelOpen ? 'Cerrar' : 'Cambiar Contraseña'}
+                  {panelOpen ? 'Close' : 'Change Password'}
                 </button>
               </div>
 
@@ -540,13 +540,13 @@ export default function AccountPage() {
                 {panelOpen ? (
                   <div className='rounded-2xl border border-gray-200 bg-gray-50 p-4'>
                     <p className='text-sm text-gray-600'>
-                      Por seguridad, primero escribe tu contraseña actual y luego la nueva.
+                      For security, first enter your current password and then the new one.
                     </p>
 
                     <div className='mt-4 grid grid-cols-1 gap-4'>
                       <div>
                         <label className='block text-sm font-medium text-gray-700'>
-                          Contraseña actual
+                          Current password
                         </label>
                         <input
                           type='password'
@@ -558,7 +558,7 @@ export default function AccountPage() {
 
                       <div>
                         <label className='block text-sm font-medium text-gray-700'>
-                          Nueva contraseña
+                          New password
                         </label>
                         <input
                           type='password'
@@ -570,7 +570,7 @@ export default function AccountPage() {
 
                       <div>
                         <label className='block text-sm font-medium text-gray-700'>
-                          Confirmar nueva contraseña
+                          Confirm new password
                         </label>
                         <input
                           type='password'
@@ -592,30 +592,30 @@ export default function AccountPage() {
                           setConfirmPassword('')
                         }}
                       >
-                        Cancelar
+                        Cancel
                       </button>
                       <button
                         type='button'
                         className='rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700'
                         onClick={onSave}
                       >
-                        Guardar
+                        Save
                       </button>
                     </div>
                   </div>
                 ) : (
                   <p className='text-sm text-gray-500'>
-                    Selecciona &quot;Cambiar Contraseña&quot; para actualizarla.
+                    Select &quot;Change Password&quot; to update it.
                   </p>
                 )}
               </div>
             </div>
           )}
 
-          {tab === 'notificaciones' && (
+          {tab === 'notifications' && (
             <div className='rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 overflow-hidden'>
               <div className='px-5 py-4 border-b border-gray-200/70'>
-                <h2 className='text-sm font-bold text-gray-900'>Notificaciones</h2>
+                <h2 className='text-sm font-bold text-gray-900'>Notifications</h2>
               </div>
               <div className='p-5'>
                 <div className='flex items-start rounded-2xl bg-gray-50 ring-1 ring-gray-200/60 p-4'>
@@ -630,10 +630,10 @@ export default function AccountPage() {
                   </div>
                   <div className='ml-3 text-sm'>
                     <label htmlFor='notifications' className='font-medium text-gray-700'>
-                      Recibir notificaciones por correo
+                      Receive email notifications
                     </label>
                     <p className='text-gray-500'>
-                      Recibe un correo cuando un libro esté disponible.
+                      Get an email when a book becomes available.
                     </p>
                   </div>
                 </div>

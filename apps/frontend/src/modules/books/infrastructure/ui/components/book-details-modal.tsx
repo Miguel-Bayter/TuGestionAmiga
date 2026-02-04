@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { Book } from '@/shared/domain/types'
-import { api } from '@/data/Repository'
 import { useContainer } from '@/shared/infrastructure/hooks'
 import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
@@ -13,31 +12,27 @@ interface BookDetailsModalProps {
   open: boolean
   onClose?: () => void
   book: Book | null
-  mode?: 'todos' | 'comprar' | 'rentable'
+  mode?: 'all' | 'buy' | 'rental'
 }
 
 interface LoanHistoryRow {
-  id_prestamo: number
-  nombre?: string
-  correo?: string
-  usuario?: string
-  nombre_usuario?: string
-  nombreCliente?: string
-  cliente?: string
-  fecha_prestamo: string
-  fecha_devolucion?: string
-  fechaDevolucion?: string
-  fecha_devolución?: string
-  fecha_vencimiento?: string
-  fechaVencimiento?: string
-  fecha_fin?: string
-  fechaFin?: string
-  estado?: string
+  id: number
+  name?: string
+  email?: string
+  user?: string
+  userName?: string
+  clientName?: string
+  client?: string
+  loanDate: string
+  returnDate?: string
+  dueDate?: string
+  endDate?: string
+  status?: string
 }
 
 // Temporary placeholder functions until covers lib is migrated
 const createCoverDataUri = (title?: string): string => {
-  const text = (title || 'Libro').substring(0, 2).toUpperCase()
+  const text = (title || 'Book').substring(0, 2).toUpperCase()
   const colors = ['#3B82F6', '#8B5CF6', '#EC4899', '#10B981', '#F59E0B']
   const color = colors[Math.floor(Math.random() * colors.length)]
 
@@ -58,7 +53,7 @@ export default function BookDetailsModal({
   open,
   onClose,
   book,
-  mode = 'todos',
+  mode = 'all',
 }: BookDetailsModalProps) {
   const navigate = useNavigate()
   const container = useContainer()
@@ -75,8 +70,8 @@ export default function BookDetailsModal({
   const [buyQty, setBuyQty] = useState<number>(1)
   const [cartRev, setCartRev] = useState<number>(0)
 
-  const isAdmin = user?.id_rol === 1
-  const idLibro = Number(book?.id_libro)
+  const isAdmin = user?.id === 1
+  const bookId = Number(book?.id)
 
   useEffect(() => {
     if (!open) return
@@ -138,13 +133,13 @@ export default function BookDetailsModal({
 
   useEffect(() => {
     if (!open) return
-    if (!Number.isFinite(idLibro)) return
+    if (!Number.isFinite(bookId)) return
 
     let cancelled = false
 
     ;(async () => {
       try {
-        const response = await api.get<Book>(`/libros/${idLibro}`)
+        const response = await api.get<Book>(`/libros/${bookId}`)
         if (!cancelled) {
           setDetail(response.data || book || null)
         }
@@ -156,16 +151,16 @@ export default function BookDetailsModal({
     return () => {
       cancelled = true
     }
-  }, [open, idLibro, book])
+  }, [open, bookId, book])
 
   useEffect(() => {
     if (!open) return
     setBuyQty(1)
-  }, [open, idLibro])
+  }, [open, bookId])
 
   useEffect(() => {
     if (!open) return
-    if (!Number.isFinite(idLibro)) return
+    if (!Number.isFinite(bookId)) return
 
     if (!isAdmin) {
       setHistory([])
@@ -178,14 +173,14 @@ export default function BookDetailsModal({
     ;(async () => {
       setHistoryError('')
       try {
-        const response = await api.get<LoanHistoryRow[]>(`/libros/${idLibro}/historial`)
+        const response = await api.get<LoanHistoryRow[]>(`/libros/${bookId}/historial`)
         if (!cancelled) {
           setHistory(Array.isArray(response.data) ? response.data : [])
         }
       } catch {
         if (!cancelled) {
           setHistory([])
-          setHistoryError('No se pudo cargar el historial.')
+          setHistoryError('Could not load history.')
         }
       }
     })()
@@ -193,24 +188,22 @@ export default function BookDetailsModal({
     return () => {
       cancelled = true
     }
-  }, [open, idLibro, isAdmin])
+  }, [open, bookId, isAdmin])
 
   const effective = detail || book || null
 
-  const stockCompra = Number(effective?.stock_compra)
-  const stockRenta = Number(effective?.stock_renta)
-  const hasSplitStock = Number.isFinite(stockCompra) || Number.isFinite(stockRenta)
+  const purchaseStock = Number(effective?.stock)
+  const rentalStock = Number(effective?.rentalStock)
+  const hasSplitStock = Number.isFinite(purchaseStock) || Number.isFinite(rentalStock)
 
   const getInCartQty = (): number => {
     try {
       const list = (window as unknown as { __tga_cart_items?: unknown }).__tga_cart_items
       const items = Array.isArray(list) ? list : []
-      const id = Number(effective?.id_libro)
+      const id = Number(effective?.id)
       if (!Number.isFinite(id)) return 0
-      const found = items.find(
-        (it: unknown) => Number((it as { id_libro?: unknown })?.id_libro) === id
-      )
-      const n = Number((found as { cantidad?: unknown })?.cantidad)
+      const found = items.find((it: unknown) => Number((it as { id?: unknown })?.id) === id)
+      const n = Number((found as { quantity?: unknown })?.quantity)
       return Number.isFinite(n) && n > 0 ? Math.trunc(n) : 0
     } catch {
       return 0
@@ -218,29 +211,29 @@ export default function BookDetailsModal({
   }
 
   const inCartQty = cartRev >= 0 ? getInCartQty() : 0
-  const buyRemaining = Number.isFinite(stockCompra)
-    ? Math.max(Math.trunc(stockCompra) - inCartQty, 0)
+  const buyRemaining = Number.isFinite(purchaseStock)
+    ? Math.max(Math.trunc(purchaseStock) - inCartQty, 0)
     : undefined
 
-  const buyAvailable = Number.isFinite(stockCompra)
+  const buyAvailable = Number.isFinite(purchaseStock)
     ? (buyRemaining ?? 0) > 0
-    : effective?.disponibilidad === 1
-  const rentAvailable = Number.isFinite(stockRenta)
-    ? stockRenta > 0
-    : effective?.disponibilidad === 1
+    : effective?.availability === true
+  const rentAvailable = Number.isFinite(rentalStock)
+    ? rentalStock > 0
+    : effective?.availability === true
   const isAvailable = hasSplitStock
     ? buyAvailable || rentAvailable
-    : effective?.disponibilidad === 1
+    : effective?.availability === true
 
   const coverSrc = useMemo(() => {
     return (
-      (coversRev >= 0 ? getLocalCoverUrl(effective?.titulo) : null) ||
-      createCoverDataUri(effective?.titulo)
+      (coversRev >= 0 ? getLocalCoverUrl(effective?.title) : null) ||
+      createCoverDataUri(effective?.title)
     )
-  }, [effective?.titulo, coversRev])
+  }, [effective?.title, coversRev])
 
   const ensureUserOrRedirect = () => {
-    if (!user?.id_usuario) {
+    if (!user?.id) {
       navigate('/login')
       return null
     }
@@ -248,7 +241,7 @@ export default function BookDetailsModal({
   }
 
   const handleUserError = (msg: string) => {
-    if (msg.toLowerCase().includes('usuario no encontrado')) {
+    if (msg.toLowerCase().includes('user not found')) {
       authService.logout()
       showError(msg)
       navigate('/login')
@@ -260,81 +253,81 @@ export default function BookDetailsModal({
   const onBuy = async () => {
     const currentUser = ensureUserOrRedirect()
     if (!currentUser) return
-    if (!effective?.id_libro) return
+    if (!effective?.id) return
 
-    const cantidad = Number(buyQty)
-    if (!Number.isFinite(cantidad) || cantidad <= 0) {
-      showError('Cantidad inválida')
+    const quantity = Number(buyQty)
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      showError('Invalid quantity')
       return
     }
 
     const cartQty = getInCartQty()
-    const remaining = Number.isFinite(stockCompra)
-      ? Math.max(Math.trunc(stockCompra) - cartQty, 0)
+    const remaining = Number.isFinite(purchaseStock)
+      ? Math.max(Math.trunc(purchaseStock) - cartQty, 0)
       : undefined
 
-    if (Number.isFinite(remaining) && cantidad > remaining!) {
+    if (Number.isFinite(remaining) && quantity > remaining!) {
       showError(
         remaining! <= 0
-          ? 'Ya tienes el stock máximo de este libro en tu carrito.'
-          : 'No hay stock suficiente para esa cantidad'
+          ? 'You already have the maximum stock of this book in your cart'
+          : 'Not enough stock for that quantity'
       )
       return
     }
 
     try {
-      const response = await api.post('/carrito', {
-        id_usuario: currentUser.id_usuario,
-        id_libro: effective.id_libro,
-        cantidad,
+      const response = await api.post('/cart', {
+        userId: currentUser.id,
+        bookId: effective.id,
+        quantity,
       })
 
       if (response.error) {
-        handleUserError(response.error.message || 'No se pudo registrar la compra')
+        handleUserError(response.error.message || 'Could not register purchase')
         return
       }
 
       window.dispatchEvent(new Event('tga_cart_updated'))
       window.dispatchEvent(new Event('tga_catalog_updated'))
-      success('Agregado al carrito')
+      success('Added to cart')
     } catch (e: unknown) {
-      handleUserError((e as { message?: string }).message || 'No se pudo registrar la compra')
+      handleUserError((e as { message?: string }).message || 'Could not register purchase')
     }
   }
 
   const onRent = async () => {
     const currentUser = ensureUserOrRedirect()
     if (!currentUser) return
-    if (!effective?.id_libro) return
+    if (!effective?.id) return
 
-    const cantidad = Number(buyQty)
-    if (!Number.isFinite(cantidad) || cantidad <= 0) {
-      showError('Cantidad inválida')
+    const quantity = Number(buyQty)
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      showError('Invalid quantity')
       return
     }
 
-    if (Number.isFinite(stockRenta) && cantidad > stockRenta) {
-      showError('No hay stock suficiente para esa cantidad')
+    if (Number.isFinite(rentalStock) && quantity > rentalStock) {
+      showError('Not enough stock for that quantity')
       return
     }
 
     try {
-      const response = await api.post('/prestamos', {
-        id_usuario: currentUser.id_usuario,
-        id_libro: effective.id_libro,
-        cantidad,
+      const response = await api.post('/loans', {
+        userId: currentUser.id,
+        bookId: effective.id,
+        quantity,
       })
 
       if (response.error) {
-        handleUserError(response.error.message || 'No se pudo registrar el préstamo')
+        handleUserError(response.error.message || 'Could not register loan')
         return
       }
 
       window.dispatchEvent(new Event('tga_catalog_updated'))
       window.dispatchEvent(new Event('tga_loans_updated'))
-      success('Agregado a su lista de renta')
+      success('Added to your rental list')
     } catch (e: unknown) {
-      handleUserError((e as { message?: string }).message || 'No se pudo registrar el préstamo')
+      handleUserError((e as { message?: string }).message || 'Could not register loan')
     }
   }
 
@@ -342,31 +335,31 @@ export default function BookDetailsModal({
     if (!value) return '-'
     const d = new Date(value)
     if (Number.isNaN(d.getTime())) return String(value)
-    return d.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    return d.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' })
   }
 
   if (!open) return null
 
-  const showRent = mode !== 'comprar'
-  const showBuy = mode !== 'rentable'
+  const showRent = mode !== 'buy'
+  const showBuy = mode !== 'rental'
   const showQty = showBuy || showRent
 
   const qtyMax =
-    showBuy && !showRent && Number.isFinite(stockCompra)
+    showBuy && !showRent && Number.isFinite(purchaseStock)
       ? buyRemaining
-      : showRent && !showBuy && Number.isFinite(stockRenta)
-        ? stockRenta
+      : showRent && !showBuy && Number.isFinite(rentalStock)
+        ? rentalStock
         : undefined
 
   const inputMax =
     Number.isFinite(qtyMax) && qtyMax! > 0
       ? qtyMax
-      : Number.isFinite(stockCompra) && Number.isFinite(stockRenta)
-        ? Math.max(buyRemaining ?? 0, stockRenta)
-        : Number.isFinite(stockCompra)
+      : Number.isFinite(purchaseStock) && Number.isFinite(rentalStock)
+        ? Math.max(buyRemaining ?? 0, rentalStock)
+        : Number.isFinite(purchaseStock)
           ? (buyRemaining ?? undefined)
-          : Number.isFinite(stockRenta)
-            ? stockRenta
+          : Number.isFinite(rentalStock)
+            ? rentalStock
             : undefined
 
   const qtyDisabled =
@@ -390,8 +383,8 @@ export default function BookDetailsModal({
       <div className='flex flex-col w-full max-w-4xl max-h-[calc(100vh-2rem)] overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5'>
         <div className='flex items-start justify-between gap-3 p-5 text-white bg-linear-to-r from-indigo-600 to-sky-500'>
           <div className='space-y-1'>
-            <p className='text-xs font-medium text-white/80'>Libros &gt; Detalle del Libro</p>
-            <h3 className='text-xl font-extrabold tracking-tight'>Detalle del Libro</h3>
+            <p className='text-xs font-medium text-white/80'>Books &gt; Book Details</p>
+            <h3 className='text-xl font-extrabold tracking-tight'>Book Details</h3>
           </div>
           <button
             type='button'
@@ -408,51 +401,51 @@ export default function BookDetailsModal({
               <div className='flex flex-col items-center space-y-3 md:items-stretch'>
                 <img
                   src={coverSrc}
-                  alt='Portada del libro'
+                  alt='Book cover'
                   className='w-full max-w-[260px] rounded-2xl border border-gray-100 object-cover shadow-sm md:max-w-none aspect-3/4'
                   onError={(ev) => {
                     ev.currentTarget.onerror = null
-                    ev.currentTarget.src = createCoverDataUri(effective?.titulo)
+                    ev.currentTarget.src = createCoverDataUri(effective?.title)
                   }}
                 />
               </div>
 
               <div className='min-w-0 space-y-3'>
                 <h4 className='text-xl md:text-2xl font-extrabold tracking-tight text-gray-900'>
-                  {effective?.titulo || 'Cargando...'}
+                  {effective?.title || 'Loading...'}
                 </h4>
 
                 <div className='space-y-2'>
                   <div className='flex flex-wrap items-center gap-2 text-sm text-gray-700'>
-                    <span className='font-semibold text-gray-900'>Autor:</span>
-                    <span className='text-gray-700'>{effective?.autor || '-'}</span>
+                    <span className='font-semibold text-gray-900'>Author:</span>
+                    <span className='text-gray-700'>{effective?.author || '-'}</span>
                   </div>
 
                   <div className='flex flex-wrap items-center gap-2 text-sm text-gray-700'>
-                    <span className='font-semibold text-gray-900'>Precio:</span>
+                    <span className='font-semibold text-gray-900'>Price:</span>
                     <span className='text-gray-700'>
-                      {effective?.valor != null && String(effective.valor) !== ''
-                        ? formatCurrency(effective.valor)
+                      {effective?.price != null && String(effective.price) !== ''
+                        ? formatCurrency(effective.price)
                         : '-'}
                     </span>
                   </div>
 
                   <div className='flex flex-wrap items-center gap-2 text-sm text-gray-700'>
-                    <span className='font-semibold text-gray-900'>Stock compra:</span>
+                    <span className='font-semibold text-gray-900'>Purchase stock:</span>
                     <span className='text-gray-700'>
-                      {Number.isFinite(stockCompra) ? stockCompra : '-'}
+                      {Number.isFinite(purchaseStock) ? purchaseStock : '-'}
                     </span>
                   </div>
 
                   <div className='flex flex-wrap items-center gap-2 text-sm text-gray-700'>
-                    <span className='font-semibold text-gray-900'>Stock préstamo:</span>
+                    <span className='font-semibold text-gray-900'>Rental stock:</span>
                     <span className='text-gray-700'>
-                      {Number.isFinite(stockRenta) ? stockRenta : '-'}
+                      {Number.isFinite(rentalStock) ? rentalStock : '-'}
                     </span>
                   </div>
 
                   <div className='flex flex-wrap items-center gap-2 text-sm text-gray-700'>
-                    <span className='font-semibold text-gray-900'>Cantidad:</span>
+                    <span className='font-semibold text-gray-900'>Quantity:</span>
                     {showQty ? (
                       <input
                         type='number'
@@ -482,10 +475,10 @@ export default function BookDetailsModal({
                   </div>
 
                   <div className='flex flex-wrap items-center gap-2 text-sm text-gray-700'>
-                    <span className='font-semibold text-gray-900'>Categoría:</span>
-                    {effective?.nombre_categoria ? (
+                    <span className='font-semibold text-gray-900'>Category:</span>
+                    {effective?.categoryName ? (
                       <span className='inline-flex items-center rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700 ring-1 ring-sky-200'>
-                        {String(effective.nombre_categoria)}
+                        {String(effective.categoryName)}
                       </span>
                     ) : (
                       <span className='text-gray-700'>-</span>
@@ -493,29 +486,29 @@ export default function BookDetailsModal({
                   </div>
 
                   <div className='flex flex-wrap items-center gap-2 text-sm text-gray-700'>
-                    <span className='font-semibold text-gray-900'>Disponibilidad:</span>
+                    <span className='font-semibold text-gray-900'>Availability:</span>
                     <span
                       className={
-                        Number.isFinite(Number(effective?.disponibilidad))
+                        typeof effective?.availability === 'boolean'
                           ? isAvailable
                             ? 'inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200'
                             : 'inline-flex items-center rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700 ring-1 ring-rose-200'
                           : 'inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700 ring-1 ring-gray-200'
                       }
                     >
-                      {Number.isFinite(Number(effective?.disponibilidad))
+                      {typeof effective?.availability === 'boolean'
                         ? isAvailable
-                          ? 'Disponible'
-                          : 'No disponible'
+                          ? 'Available'
+                          : 'Not available'
                         : '-'}
                     </span>
                   </div>
                 </div>
 
                 <div className='rounded-xl border border-gray-200 bg-white p-4'>
-                  <p className='text-sm font-bold text-gray-900'>Descripción</p>
+                  <p className='text-sm font-bold text-gray-900'>Description</p>
                   <p className='text-sm leading-relaxed text-gray-700 whitespace-pre-line'>
-                    {effective?.descripcion || 'Sin descripción.'}
+                    {effective?.description || 'No description available.'}
                   </p>
                 </div>
 
@@ -527,7 +520,7 @@ export default function BookDetailsModal({
                       disabled={!buyAvailable}
                       onClick={onBuy}
                     >
-                      Comprar
+                      Buy
                     </button>
                   ) : (
                     <span />
@@ -540,7 +533,7 @@ export default function BookDetailsModal({
                       disabled={!rentAvailable}
                       onClick={onRent}
                     >
-                      Prestar
+                      Rent
                     </button>
                   ) : (
                     <span />
@@ -551,7 +544,7 @@ export default function BookDetailsModal({
                     className='w-full px-4 py-2 text-sm font-semibold rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:translate-y-px bg-gray-200 text-gray-800 hover:bg-gray-300 focus-visible:ring-gray-400'
                     onClick={onClose}
                   >
-                    Regresar
+                    Back
                   </button>
                 </div>
               </div>
@@ -562,7 +555,7 @@ export default function BookDetailsModal({
             <div className='mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm'>
               <div className='border-b border-gray-200 px-5 py-4'>
                 <h5 className='text-base font-extrabold tracking-tight text-gray-900'>
-                  Préstamos anteriores
+                  Previous loans
                 </h5>
               </div>
               <div className='p-5'>
@@ -570,7 +563,7 @@ export default function BookDetailsModal({
 
                 {!historyError && (!Array.isArray(history) || history.length === 0) && (
                   <p className='text-sm text-gray-500'>
-                    Este libro todavía no tiene préstamos registrados.
+                    This book has no registered loans yet.
                   </p>
                 )}
 
@@ -579,25 +572,23 @@ export default function BookDetailsModal({
                     <div className='space-y-3 sm:hidden'>
                       {history.map((row) => (
                         <div
-                          key={row.id_prestamo}
+                          key={row.id}
                           className='rounded-xl border border-gray-200 bg-white p-4'
                         >
                           <p className='text-sm font-semibold text-gray-900'>
-                            {row.nombre || row.correo || 'Usuario'}
+                            {row.name || row.email || 'User'}
                           </p>
                           <div className='mt-2 grid grid-cols-1 gap-2 text-sm text-gray-700'>
                             <p>
-                              <span className='font-semibold text-gray-900'>Préstamo:</span>{' '}
-                              {formatHistoryDate(row.fecha_prestamo)}
+                              <span className='font-semibold text-gray-900'>Loan:</span>{' '}
+                              {formatHistoryDate(row.loanDate)}
                             </p>
                             <p>
-                              <span className='font-semibold text-gray-900'>Devolución:</span>{' '}
+                              <span className='font-semibold text-gray-900'>Return:</span>{' '}
                               {formatHistoryDate(
-                                row.fecha_devolucion ||
-                                  row.fechaDevolucion ||
-                                  row.fecha_devolución ||
-                                  row.fecha_vencimiento ||
-                                  row.fechaVencimiento ||
+                                row.returnDate ||
+                                  row.dueDate ||
+                                  row.endDate ||
                                   row.fecha_fin ||
                                   row.fechaFin
                               )}
@@ -612,37 +603,34 @@ export default function BookDetailsModal({
                         <thead className='bg-gray-50'>
                           <tr>
                             <th className='px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600'>
-                              Usuario
+                              User
                             </th>
                             <th className='px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600'>
-                              Fecha de préstamo
+                              Loan date
                             </th>
                             <th className='px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600'>
-                              Fecha de devolución
+                              Return date
                             </th>
                           </tr>
                         </thead>
                         <tbody className='divide-y divide-gray-200 bg-white'>
                           {history.map((row) => (
-                            <tr key={row.id_prestamo}>
+                            <tr key={row.id}>
                               <td
-                                title={String(row.nombre || row.correo || 'Usuario')}
+                                title={String(row.name || row.email || 'User')}
                                 className='px-6 py-4 text-sm text-gray-800 truncate'
                               >
-                                {row.nombre || row.correo || 'Usuario'}
+                                {row.name || row.email || 'User'}
                               </td>
                               <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
-                                {formatHistoryDate(row.fecha_prestamo)}
+                                {formatHistoryDate(row.loanDate)}
                               </td>
                               <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-600'>
                                 {formatHistoryDate(
-                                  row.fecha_devolucion ||
-                                    row.fechaDevolucion ||
-                                    row.fecha_devolución ||
-                                    row.fecha_vencimiento ||
-                                    row.fechaVencimiento ||
-                                    row.fecha_fin ||
-                                    row.fechaFin
+                                  row.returnDate ||
+                                    row.dueDate ||
+                                    row.endDate ||
+                                    ''
                                 )}
                               </td>
                             </tr>

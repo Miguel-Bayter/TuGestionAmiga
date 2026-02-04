@@ -40,12 +40,12 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
     <aside
       id='sidebar'
       className={cn(
-        'relative z-50 bg-white w-64 p-4 inset-y-0 left-0 transform shadow-lg',
-        'md:fixed md:top-24 md:left-4 md:inset-y-auto md:transform-none md:rounded-2xl md:ring-1 md:ring-gray-200/60 md:shadow-sm',
-        'transition duration-200 ease-in-out',
+        'fixed z-50 bg-white w-64 p-4 shadow-lg',
+        'md:rounded-2xl md:ring-1 md:ring-gray-200/60 md:shadow-sm',
+        'transition-transform duration-200 ease-in-out',
         {
           'translate-x-0': isOpen,
-          '-translate-x-full': !isOpen,
+          '-translate-x-full md:translate-x-0': !isOpen,
           'md:w-20 md:p-3': isCollapsed,
         }
       )}
@@ -58,14 +58,14 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
         })}
       >
         <div className='h-10 w-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-semibold select-none'>
-          T
+          Y
         </div>
         {!isCollapsed && (
           <div className='min-w-0'>
             <div className='text-sm font-semibold text-gray-900 leading-5 truncate'>
-              Tu Gestión Amiga
+              Your Library Manager
             </div>
-            <div className='text-xs text-gray-500 truncate'>Menú</div>
+            <div className='text-xs text-gray-500 truncate'>Menu</div>
           </div>
         )}
       </div>
@@ -73,7 +73,7 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
       {/* Collapse/Expand button (desktop only) */}
       <button
         type='button'
-        aria-label={isCollapsed ? 'Expandir menú' : 'Colapsar menú'}
+        aria-label={isCollapsed ? 'Expand menu' : 'Collapse menu'}
         className='hidden md:inline-flex absolute -right-3 top-8 h-8 w-8 items-center justify-center rounded-full bg-white text-gray-600 ring-1 ring-gray-200 shadow-sm hover:bg-gray-50'
         onClick={onToggleCollapse}
       >
@@ -110,7 +110,7 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
         <ul className='flex flex-col'>
           {/* Home */}
           <li className='mt-1'>
-            <NavLink to={ROUTES.HOME} className={linkClass} end title='Inicio'>
+            <NavLink to={ROUTES.HOME} className={linkClass} end title='Home'>
               <svg
                 className='w-6 h-6'
                 xmlns='http://www.w3.org/2000/svg'
@@ -125,13 +125,13 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
                   d='M3 10.5l9-7 9 7V21a1 1 0 01-1 1h-5v-7H9v7H4a1 1 0 01-1-1V10.5z'
                 />
               </svg>
-              <span className={cn({ 'md:hidden': isCollapsed })}>Inicio</span>
+              <span className={cn({ 'md:hidden': isCollapsed })}>Home</span>
             </NavLink>
           </li>
 
           {/* Search */}
           <li className='mt-1'>
-            <NavLink to={ROUTES.BOOKS} className={linkClass} title='Buscar'>
+            <NavLink to={ROUTES.BOOKS} className={linkClass} title='Search'>
               <svg
                 className='w-6 h-6'
                 xmlns='http://www.w3.org/2000/svg'
@@ -146,13 +146,13 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
                   d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
                 />
               </svg>
-              <span className={cn({ 'md:hidden': isCollapsed })}>Buscar</span>
+              <span className={cn({ 'md:hidden': isCollapsed })}>Search</span>
             </NavLink>
           </li>
 
           {/* Loans */}
           <li className='mt-1'>
-            <NavLink to={ROUTES.LOANS} className={linkClass} title='Préstamos'>
+            <NavLink to={ROUTES.LOANS} className={linkClass} title='Loans'>
               <svg
                 className='w-6 h-6'
                 xmlns='http://www.w3.org/2000/svg'
@@ -167,13 +167,13 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
                   d='M9 5h6a2 2 0 012 2v1m-10-3a2 2 0 00-2 2v1m12 0H7m10 0v10a2 2 0 01-2 2H9a2 2 0 01-2-2V8m3 4h4m-4 4h4'
                 />
               </svg>
-              <span className={cn({ 'md:hidden': isCollapsed })}>Préstamos</span>
+              <span className={cn({ 'md:hidden': isCollapsed })}>Loans</span>
             </NavLink>
           </li>
 
           {/* Cart */}
           <li className='mt-1'>
-            <NavLink to={ROUTES.CART} className={linkClass} title='Carrito'>
+            <NavLink to={ROUTES.CART} className={linkClass} title='Cart'>
               <span className='relative inline-flex'>
                 <svg
                   className='w-6 h-6'
@@ -198,20 +198,20 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
                 {cartCount > 0 && (
                   <span
                     className='absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[11px] font-bold leading-[18px] text-center ring-2 ring-white'
-                    aria-label={`Carrito con ${cartCount} items`}
-                    title={`Carrito: ${cartCount}`}
+                    aria-label={`Cart with ${cartCount} items`}
+                    title={`Cart: ${cartCount}`}
                   >
                     {cartCount > 99 ? '99+' : cartCount}
                   </span>
                 )}
               </span>
-              <span className={cn({ 'md:hidden': isCollapsed })}>Carrito</span>
+              <span className={cn({ 'md:hidden': isCollapsed })}>Cart</span>
             </NavLink>
           </li>
 
           {/* Account */}
           <li className='mt-1'>
-            <NavLink to={ROUTES.ACCOUNT} className={linkClass} title='Mi Cuenta'>
+            <NavLink to={ROUTES.ACCOUNT} className={linkClass} title='My Account'>
               <svg
                 className='w-6 h-6'
                 xmlns='http://www.w3.org/2000/svg'
@@ -232,14 +232,14 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
                   d='M4.5 20.25a7.5 7.5 0 0115 0'
                 />
               </svg>
-              <span className={cn({ 'md:hidden': isCollapsed })}>Mi Cuenta</span>
+              <span className={cn({ 'md:hidden': isCollapsed })}>My Account</span>
             </NavLink>
           </li>
 
           {/* Admin (only for admins) */}
           {isAdmin && (
             <li className='mt-1'>
-              <NavLink to={ROUTES.ADMIN} className={linkClass} title='Administrador'>
+              <NavLink to={ROUTES.ADMIN} className={linkClass} title='Admin'>
                 <svg
                   className='w-6 h-6'
                   xmlns='http://www.w3.org/2000/svg'
@@ -260,14 +260,14 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
                     d='M9.5 12.5l1.5 1.5 3.5-3.5'
                   />
                 </svg>
-                <span className={cn({ 'md:hidden': isCollapsed })}>Administrador</span>
+                <span className={cn({ 'md:hidden': isCollapsed })}>Admin</span>
               </NavLink>
             </li>
           )}
 
           {/* Help */}
           <li className='mt-4 border-t border-gray-200/60 pt-4'>
-            <NavLink to={ROUTES.HELP} className={linkClass} title='Ayuda'>
+            <NavLink to={ROUTES.HELP} className={linkClass} title='Help'>
               <svg
                 className='w-6 h-6'
                 xmlns='http://www.w3.org/2000/svg'
@@ -294,7 +294,7 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
                   d='M12 17.25h.01'
                 />
               </svg>
-              <span className={cn({ 'md:hidden': isCollapsed })}>Ayuda</span>
+              <span className={cn({ 'md:hidden': isCollapsed })}>Help</span>
             </NavLink>
           </li>
         </ul>

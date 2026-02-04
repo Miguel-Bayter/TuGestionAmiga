@@ -1,15 +1,16 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Book } from '@/shared/domain/types'
+import { api } from '@/data/Repository'
+import { Book, User } from '@/shared/domain/types'
 import { useContainer, useUseCase } from '@/shared/infrastructure/hooks'
 import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
-import BookCard from '@/presentation/features/books/components/book-card'
-import BookDetailsModal from '@/presentation/features/books/components/book-details-modal'
+import BookCard from '@/modules/books/infrastructure/ui/components/book-card'
+import BookDetailsModal from '@/modules/books/infrastructure/ui/components/book-details-modal'
 
 // Temporary placeholder functions until covers lib is migrated
 const createCoverDataUri = (title?: string): string => {
-  const text = (title || 'Libro').substring(0, 2).toUpperCase()
+  const text = (title || 'Book').substring(0, 2).toUpperCase()
   const colors = ['#3B82F6', '#8B5CF6', '#EC4899', '#10B981', '#F59E0B']
   const color = colors[Math.floor(Math.random() * colors.length)]
 
@@ -26,27 +27,23 @@ const getLocalCoverUrl = (_title?: string): string | null => {
 }
 
 interface AdminLoan {
-  id_prestamo?: number
-  nombre_usuario?: string
-  usuario?: string
-  nombre?: string
-  nombreCliente?: string
-  cliente?: string
-  titulo?: string
-  libro?: string
-  nombre_libro?: string
-  nombreLibro?: string
-  fecha_devolucion?: string
-  fechaDevolucion?: string
-  fecha_devolución?: string
-  fecha_vencimiento?: string
-  fechaVencimiento?: string
-  fecha_fin?: string
-  fechaFin?: string
-  estado?: string
+  id?: number
+  userName?: string
+  user?: string
+  name?: string
+  clientName?: string
+  client?: string
+  title?: string
+  book?: string
+  bookName?: string
+  returnDate?: string
+  returnedDate?: string
+  dueDate?: string
+  endDate?: string
+  status?: string
 }
 
-type DashboardMode = 'todos' | 'comprar' | 'rentable'
+type DashboardMode = 'all' | 'buy' | 'rental'
 
 const formatDateOnly = (value: string | undefined): string => {
   if (!value) return '-'
@@ -59,27 +56,27 @@ const formatDateOnly = (value: string | undefined): string => {
 }
 
 const isBookAvailable = (b: Book): boolean => {
-  const stockCompra = Number(b?.stock_compra)
-  const stockRenta = Number(b?.stock_renta)
-  const hasSplitStock = Number.isFinite(stockCompra) || Number.isFinite(stockRenta)
+  const purchaseStock = Number(b?.purchaseStock)
+  const rentalStock = Number(b?.rentalStock)
+  const hasSplitStock = Number.isFinite(purchaseStock) || Number.isFinite(rentalStock)
   if (hasSplitStock) {
-    const buy = Number.isFinite(stockCompra) ? stockCompra : 0
-    const rent = Number.isFinite(stockRenta) ? stockRenta : 0
+    const buy = Number.isFinite(purchaseStock) ? purchaseStock : 0
+    const rent = Number.isFinite(rentalStock) ? rentalStock : 0
     return buy > 0 || rent > 0
   }
-  return Number(b?.disponibilidad) === 1
+  return b?.availability === true
 }
 
 const isBookRentable = (b: Book): boolean => {
-  const stockRenta = Number(b?.stock_renta)
-  if (Number.isFinite(stockRenta)) return stockRenta > 0
-  return Number(b?.disponibilidad) === 1
+  const rentalStock = Number(b?.rentalStock)
+  if (Number.isFinite(rentalStock)) return rentalStock > 0
+  return b?.availability === true
 }
 
 const isBookPurchasable = (b: Book): boolean => {
-  const stockCompra = Number(b?.stock_compra)
-  if (Number.isFinite(stockCompra)) return stockCompra > 0
-  return Number(b?.disponibilidad) === 1
+  const purchaseStock = Number(b?.purchaseStock)
+  if (Number.isFinite(purchaseStock)) return purchaseStock > 0
+  return b?.availability === true
 }
 
 export default function DashboardPage() {
@@ -96,19 +93,19 @@ export default function DashboardPage() {
 
   const [books, setBooks] = useState<Book[]>([])
   const [query, setQuery] = useState<string>('')
-  const [mode, setMode] = useState<DashboardMode>('todos')
+  const [mode, setMode] = useState<DashboardMode>('all')
   const [viewGrid, setViewGrid] = useState<boolean>(false)
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false)
   const [detailsBook, setDetailsBook] = useState<Book | null>(null)
 
-  const isAdmin = user?.id_rol === 1
+  const isAdmin = user?.roleId === 1
   const [usersCount, setUsersCount] = useState<number>(0)
   const [adminLoans, setAdminLoans] = useState<AdminLoan[]>([])
   const [myLoansCount, setMyLoansCount] = useState<number>(0)
 
   useEffect(() => {
     if (location.pathname === '/rentable') {
-      setMode('rentable')
+      setMode('rental')
     }
   }, [location.pathname])
 
@@ -141,7 +138,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const onCatalogUpdated = () => load()
     const onLoansUpdated = () => {
-      const uid = user?.id_usuario
+      const uid = user?.id
       if (!uid) return
 
       getLoansUseCase
@@ -149,8 +146,8 @@ export default function DashboardPage() {
         .then((list: any) => {
           const loans = Array.isArray(list) ? list : []
           const active = loans.filter((r: any) => {
-            const st = String(r?.estado || '').toLowerCase()
-            return !st.includes('devuel')
+            const st = String(r?.status || '').toLowerCase()
+            return !st.includes('return')
           })
           setMyLoansCount(active.length)
         })
@@ -163,7 +160,7 @@ export default function DashboardPage() {
       window.removeEventListener('tga_catalog_updated', onCatalogUpdated)
       window.removeEventListener('tga_loans_updated', onLoansUpdated)
     }
-  }, [user?.id_usuario])
+  }, [user?.id])
 
   useEffect(() => {
     if (!showBuscar) return
@@ -189,18 +186,18 @@ export default function DashboardPage() {
       }
 
       try {
-        const users = await getLoansUseCase.execute()
-        if (alive && users) {
-          setUsersCount(Array.isArray(users) ? users.length : 0)
+        const usersResponse = await api.get<User[]>('/admin/users')
+        if (alive && usersResponse?.data) {
+          setUsersCount(Array.isArray(usersResponse.data) ? usersResponse.data.length : 0)
         }
       } catch {
         if (alive) setUsersCount(0)
       }
 
       try {
-        const loans = await getLoansUseCase.execute()
-        if (alive && loans) {
-          setAdminLoans(Array.isArray(loans) ? loans : [])
+        const loansResponse = await api.get<AdminLoan[]>('/admin/loans')
+        if (alive && loansResponse?.data) {
+          setAdminLoans(Array.isArray(loansResponse.data) ? loansResponse.data : [])
         }
       } catch {
         if (alive) setAdminLoans([])
@@ -217,7 +214,7 @@ export default function DashboardPage() {
     let alive = true
 
     const loadMyLoans = async () => {
-      const uid = user?.id_usuario
+      const uid = user?.id
       if (!uid) {
         if (alive) setMyLoansCount(0)
         return
@@ -227,8 +224,8 @@ export default function DashboardPage() {
         const loans = await getLoansUseCase.execute()
         const list = Array.isArray(loans) ? loans : []
         const active = list.filter((r: any) => {
-          const st = String(r?.estado || '').toLowerCase()
-          return !st.includes('devuel')
+          const st = String(r?.status || '').toLowerCase()
+          return !st.includes('return')
         })
         if (alive) setMyLoansCount(active.length)
       } catch {
@@ -240,7 +237,7 @@ export default function DashboardPage() {
     return () => {
       alive = false
     }
-  }, [user?.id_usuario])
+  }, [user?.id])
 
   useEffect(() => {
     if (!detailsOpen) return
@@ -257,16 +254,16 @@ export default function DashboardPage() {
     const byQuery = !q
       ? books
       : books.filter((b) => {
-          const t = String(b?.titulo || '').toLowerCase()
-          const a = String(b?.autor || '').toLowerCase()
+          const t = String(b?.title || '').toLowerCase()
+          const a = String(b?.author || '').toLowerCase()
           return t.includes(q) || a.includes(q)
         })
 
-    if (mode === 'rentable') {
+    if (mode === 'rental') {
       return byQuery.filter((b) => isBookRentable(b))
     }
 
-    if (mode === 'comprar') {
+    if (mode === 'buy') {
       return byQuery.filter((b) => isBookPurchasable(b))
     }
 
@@ -281,8 +278,8 @@ export default function DashboardPage() {
     if (!isAdmin) return []
     const list = Array.isArray(adminLoans) ? adminLoans : []
     return list.filter((r) => {
-      const st = String(r?.estado || '').toLowerCase()
-      return st.includes('activo') || st.includes('venc')
+      const st = String(r?.status || '').toLowerCase()
+      return st.includes('active') || st.includes('overdue')
     })
   }, [adminLoans, isAdmin])
 
@@ -295,9 +292,9 @@ export default function DashboardPage() {
         <section className='rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 p-5 sm:p-6'>
           <div className='flex flex-col gap-1'>
             <h1 className='text-xl sm:text-2xl font-bold text-gray-900'>
-              Bienvenido, {user?.nombre || 'Usuario'}
+              Welcome, {user?.name || 'User'}
             </h1>
-            <p className='text-sm text-gray-500'>Gestiona tu biblioteca de manera eficiente</p>
+            <p className='text-sm text-gray-500'>Manage your library efficiently</p>
           </div>
 
           <div className='mt-5'>
@@ -322,7 +319,7 @@ export default function DashboardPage() {
                 <input
                   id='quick-search'
                   type='text'
-                  placeholder='Búsqueda rápida de libros...'
+                  placeholder='Quick search for books...'
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   className='w-full h-11 pl-10 pr-3 text-sm text-gray-900 border border-gray-200 rounded-xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500'
@@ -338,7 +335,7 @@ export default function DashboardPage() {
                 }}
                 className='h-11 text-gray-700 bg-gray-100 hover:bg-gray-200 font-semibold rounded-xl text-sm px-4 w-full sm:w-auto'
               >
-                Click para buscar
+                Click to search
               </button>
             </div>
           </div>
@@ -347,7 +344,7 @@ export default function DashboardPage() {
             <div className='rounded-2xl bg-white ring-1 ring-gray-200/60 shadow-sm p-4 border-l-4 border-blue-600'>
               <div className='flex items-start justify-between gap-3'>
                 <div className='min-w-0'>
-                  <div className='text-xs font-semibold text-gray-500'>Total Libros</div>
+                  <div className='text-xs font-semibold text-gray-500'>Total Books</div>
                   <div className='text-2xl font-bold text-gray-900'>{totalBooks}</div>
                 </div>
                 <div className='h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center'>
@@ -373,7 +370,7 @@ export default function DashboardPage() {
               <div className='flex items-start justify-between gap-3'>
                 <div className='min-w-0'>
                   <div className='text-xs font-semibold text-gray-500'>
-                    {isAdmin ? 'Préstamos Activos' : 'Mis Préstamos'}
+                    {isAdmin ? 'Active Loans' : 'My Loans'}
                   </div>
                   <div className='text-2xl font-bold text-gray-900'>
                     {isAdmin ? activeAdminLoans.length : myLoansCount}
@@ -408,7 +405,7 @@ export default function DashboardPage() {
               <div className='rounded-2xl bg-white ring-1 ring-gray-200/60 shadow-sm p-4 border-l-4 border-emerald-500'>
                 <div className='flex items-start justify-between gap-3'>
                   <div className='min-w-0'>
-                    <div className='text-xs font-semibold text-gray-500'>Usuarios Registrados</div>
+                    <div className='text-xs font-semibold text-gray-500'>Registered Users</div>
                     <div className='text-2xl font-bold text-gray-900'>{usersCount}</div>
                   </div>
                   <div className='h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center'>
@@ -445,7 +442,7 @@ export default function DashboardPage() {
               <div className='rounded-2xl bg-white ring-1 ring-gray-200/60 shadow-sm p-4 border-l-4 border-emerald-500'>
                 <div className='flex items-start justify-between gap-3'>
                   <div className='min-w-0'>
-                    <div className='text-xs font-semibold text-gray-500'>Libros Rentables</div>
+                    <div className='text-xs font-semibold text-gray-500'>Rentable Books</div>
                     <div className='text-2xl font-bold text-gray-900'>{rentableBooks}</div>
                   </div>
                   <div className='h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center'>
@@ -477,7 +474,7 @@ export default function DashboardPage() {
             <div className='rounded-2xl bg-white ring-1 ring-gray-200/60 shadow-sm p-4 border-l-4 border-purple-500'>
               <div className='flex items-start justify-between gap-3'>
                 <div className='min-w-0'>
-                  <div className='text-xs font-semibold text-gray-500'>Libros Disponibles</div>
+                  <div className='text-xs font-semibold text-gray-500'>Available Books</div>
                   <div className='text-2xl font-bold text-gray-900'>{availableBooks}</div>
                 </div>
                 <div className='h-10 w-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center'>
@@ -510,12 +507,12 @@ export default function DashboardPage() {
             <div className='mt-4 grid grid-cols-1 lg:grid-cols-2 gap-3'>
               <button
                 type='button'
-                onClick={() => navigate('/admin?tab=libros')}
+                onClick={() => navigate('/admin?tab=books')}
                 className='w-full rounded-2xl bg-blue-700 hover:bg-blue-800 text-white shadow-sm ring-1 ring-blue-700/30 p-4 text-left flex items-center justify-between gap-3'
               >
                 <div className='min-w-0'>
-                  <div className='text-sm font-bold'>Gestionar Libros</div>
-                  <div className='text-xs text-blue-100'>Administra el catálogo</div>
+                  <div className='text-sm font-bold'>Manage Books</div>
+                  <div className='text-xs text-blue-100'>Manage the catalog</div>
                 </div>
                 <svg
                   className='h-6 w-6 text-blue-100'
@@ -535,12 +532,12 @@ export default function DashboardPage() {
 
               <button
                 type='button'
-                onClick={() => navigate('/admin?tab=usuarios')}
+                onClick={() => navigate('/admin?tab=users')}
                 className='w-full rounded-2xl bg-white hover:bg-gray-50 shadow-sm ring-1 ring-gray-200/60 p-4 text-left flex items-center justify-between gap-3'
               >
                 <div className='min-w-0'>
-                  <div className='text-sm font-bold text-gray-900'>Gestionar Usuarios</div>
-                  <div className='text-xs text-gray-500'>Administra usuarios del sistema</div>
+                  <div className='text-sm font-bold text-gray-900'>Manage Users</div>
+                  <div className='text-xs text-gray-500'>Manage system users</div>
                 </div>
                 <svg
                   className='h-6 w-6 text-blue-600'
@@ -569,9 +566,9 @@ export default function DashboardPage() {
               <div className='rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 p-4 sm:p-5'>
                 <div className='flex items-center justify-between gap-3'>
                   <div className='min-w-0'>
-                    <div className='text-sm font-bold text-gray-900'>Espacio publicitario</div>
+                    <div className='text-sm font-bold text-gray-900'>Ad space</div>
                     <div className='text-xs text-gray-500'>
-                      Reservado para integrar Google AdSense
+                      Reserved for Google AdSense integration
                     </div>
                   </div>
                   <div className='h-10 w-10 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center'>
@@ -597,15 +594,15 @@ export default function DashboardPage() {
           )}
 
           <div className='mt-6'>
-            <h2 className='text-base font-bold text-gray-900'>Últimos Libros Añadidos</h2>
+            <h2 className='text-base font-bold text-gray-900'>Latest Books Added</h2>
             <div className='mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3'>
               {latestBooks.map((b) => {
-                const title = String(b?.titulo || 'Libro')
-                const author = String(b?.autor || '')
+                const title = String(b?.title || 'Book')
+                const author = String(b?.author || '')
                 const img = getLocalCoverUrl(title) || createCoverDataUri(title)
                 return (
                   <button
-                    key={b.id_libro}
+                    key={b.id}
                     type='button'
                     onClick={() => openDetails(b)}
                     className='text-left rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 overflow-hidden hover:bg-gray-50'
@@ -627,59 +624,40 @@ export default function DashboardPage() {
 
       {showInicio && isAdmin && (
         <section className='rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 p-5 sm:p-6'>
-          <h2 className='text-base font-bold text-gray-900'>Préstamos Activos</h2>
+          <h2 className='text-base font-bold text-gray-900'>Active Loans</h2>
           <div className='mt-4 overflow-x-auto'>
             <table className='min-w-full text-sm'>
               <thead>
                 <tr className='text-left text-gray-500'>
-                  <th className='py-2 pr-4 font-semibold'>Usuario</th>
-                  <th className='py-2 pr-4 font-semibold'>Libro</th>
-                  <th className='py-2 pr-4 font-semibold'>Fecha de Vencimiento</th>
-                  <th className='py-2 pr-4 font-semibold'>Estado</th>
-                  <th className='py-2 pr-4 font-semibold'>Acciones</th>
+                  <th className='py-2 pr-4 font-semibold'>User</th>
+                  <th className='py-2 pr-4 font-semibold'>Book</th>
+                  <th className='py-2 pr-4 font-semibold'>Due Date</th>
+                  <th className='py-2 pr-4 font-semibold'>Status</th>
+                  <th className='py-2 pr-4 font-semibold'>Actions</th>
                 </tr>
               </thead>
               <tbody className='divide-y divide-gray-200/70'>
                 {activeAdminLoansPreview.length === 0 && (
                   <tr>
                     <td className='py-4 text-gray-500' colSpan={5}>
-                      No hay préstamos activos.
+                      No active loans.
                     </td>
                   </tr>
                 )}
 
                 {activeAdminLoansPreview.map((r, idx) => {
                   const usuario =
-                    String(
-                      r?.nombre_usuario ||
-                        r?.usuario ||
-                        r?.nombre ||
-                        r?.nombreCliente ||
-                        r?.cliente ||
-                        ''
-                    ) || `Usuario ${idx + 1}`
+                    String(r?.userName || r?.user || r?.name || r?.clientName || r?.client || '') ||
+                    `User ${idx + 1}`
 
-                  const libro =
-                    String(r?.titulo || r?.libro || r?.nombre_libro || r?.nombreLibro || '') ||
-                    'Libro'
-                  const venc =
-                    r?.fecha_devolucion ||
-                    r?.fechaDevolucion ||
-                    r?.fecha_devolución ||
-                    r?.fecha_vencimiento ||
-                    r?.fechaVencimiento ||
-                    r?.fecha_fin ||
-                    r?.fechaFin ||
-                    ''
-                  const estado = String(r?.estado || '').trim() || 'Activo'
+                  const libro = String(r?.title || r?.book || r?.bookName || '') || 'Book'
+                  const venc = r?.returnDate || r?.returnedDate || r?.dueDate || r?.endDate || ''
+                  const estado = String(r?.status || '').trim() || 'Active'
                   const estadoLower = estado.toLowerCase()
-                  const isLate = estadoLower.includes('venc')
+                  const isLate = estadoLower.includes('overdue')
 
                   return (
-                    <tr
-                      key={r?.id_prestamo ?? `${usuario}-${libro}-${idx}`}
-                      className='text-gray-700'
-                    >
+                    <tr key={r?.id ?? `${usuario}-${libro}-${idx}`} className='text-gray-700'>
                       <td className='py-3 pr-4 whitespace-nowrap'>{usuario}</td>
                       <td className='py-3 pr-4 whitespace-nowrap'>{libro}</td>
                       <td className='py-3 pr-4 whitespace-nowrap'>
@@ -699,10 +677,10 @@ export default function DashboardPage() {
                       <td className='py-3 pr-4 whitespace-nowrap'>
                         <button
                           type='button'
-                          onClick={() => navigate('/admin?tab=prestamos')}
+                          onClick={() => navigate('/admin?tab=loans')}
                           className='text-sm font-semibold text-blue-600 hover:text-blue-700'
                         >
-                          Ver detalles
+                          View details
                         </button>
                       </td>
                     </tr>
@@ -719,7 +697,7 @@ export default function DashboardPage() {
           <div className='flex flex-col sm:flex-row gap-2'>
             <input
               type='text'
-              placeholder='Buscar libros (ej. Java)'
+              placeholder='Search books (e.g. Java)'
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className='w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500'
@@ -729,7 +707,7 @@ export default function DashboardPage() {
               onClick={() => load()}
               className='text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-4 py-3 sm:py-2 w-full sm:w-auto'
             >
-              Buscar
+              Search
             </button>
           </div>
 
@@ -737,11 +715,11 @@ export default function DashboardPage() {
             <button
               type='button'
               className={
-                mode === 'todos'
+                mode === 'all'
                   ? 'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg'
                   : 'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-lg transition-colors duration-200'
               }
-              onClick={() => setMode('todos')}
+              onClick={() => setMode('all')}
             >
               <svg
                 className='w-4 h-4'
@@ -757,17 +735,17 @@ export default function DashboardPage() {
                   d='M4 6h16M4 12h16M4 18h16'
                 />
               </svg>
-              <span>Todos</span>
+              <span>All</span>
             </button>
 
             <button
               type='button'
               className={
-                mode === 'comprar'
+                mode === 'buy'
                   ? 'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg'
                   : 'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-lg transition-colors duration-200'
               }
-              onClick={() => setMode('comprar')}
+              onClick={() => setMode('buy')}
             >
               <svg
                 className='w-4 h-4'
@@ -783,17 +761,17 @@ export default function DashboardPage() {
                   d='M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 7H19M7 13l-2-8m2 8h12'
                 />
               </svg>
-              <span>Comprar</span>
+              <span>Buy</span>
             </button>
 
             <button
               type='button'
               className={
-                mode === 'rentable'
+                mode === 'rental'
                   ? 'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg'
                   : 'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-lg transition-colors duration-200'
               }
-              onClick={() => setMode('rentable')}
+              onClick={() => setMode('rental')}
             >
               <svg
                 className='w-4 h-4'
@@ -823,14 +801,14 @@ export default function DashboardPage() {
               type='button'
               className='w-full sm:w-auto sm:ml-auto inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-lg transition-colors duration-200 justify-center'
               onClick={() => setViewGrid((v) => !v)}
-              aria-label='Cambiar vista'
+              aria-label='Toggle view'
             >
-              <span id='view-toggle-label'>Cambiar vista</span>
+              <span id='view-toggle-label'>Toggle view</span>
             </button>
           </div>
 
           <div>
-            <h2 className='text-2xl font-semibold text-gray-800 mb-4'>Resultados</h2>
+            <h2 className='text-2xl font-semibold text-gray-800 mb-4'>Results</h2>
 
             <div
               id='results-container'
@@ -842,12 +820,12 @@ export default function DashboardPage() {
             >
               {filtered.length === 0 && (
                 <div className='text-center text-gray-500 py-10'>
-                  No hay libros cargados todavía. Carga datos de ejemplo en MySQL y recarga.
+                  No books loaded yet. Load sample data in MySQL and reload.
                 </div>
               )}
 
               {filtered.map((b) => (
-                <BookCard key={b.id_libro} book={b} onOpenDetails={openDetails} mode={mode} />
+                <BookCard key={b.id} book={b} onOpenDetails={openDetails} mode={mode} />
               ))}
             </div>
           </div>

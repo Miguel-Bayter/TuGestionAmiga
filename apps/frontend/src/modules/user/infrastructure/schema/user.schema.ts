@@ -23,7 +23,7 @@ export type UserProfileType = z.infer<typeof userProfileSchema>
  * Update user profile request validation schema
  */
 export const updateUserProfileSchema = z.object({
-  nombre: z.string().min(1, 'Name is required').optional(),
+  name: z.string().min(1, 'Name is required').optional(),
   email: z.string().email('Invalid email format').optional(),
 })
 

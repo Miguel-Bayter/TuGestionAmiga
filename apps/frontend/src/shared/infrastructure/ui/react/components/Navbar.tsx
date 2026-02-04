@@ -25,9 +25,9 @@ export function Navbar(_props: NavbarProps) {
     navigate(ROUTES.LOGIN)
   }
 
-  const isAdmin = user?.id_rol === 1
-  const roleLabel = isAdmin ? 'Administrador' : 'Usuario'
-  const initials = getInitials(user?.nombre || 'Usuario')
+  const isAdmin = user?.roleId === 1
+  const roleLabel = isAdmin ? 'Administrator' : 'User'
+  const initials = getInitials(user?.name || 'User')
 
   return (
     <header className='bg-white border-b border-gray-200/70'>
@@ -57,7 +57,7 @@ export function Navbar(_props: NavbarProps) {
                 to={ROUTES.HOME}
                 className='text-lg sm:text-xl font-bold text-gray-900 leading-6 truncate'
               >
-                Tu Gestión Amiga
+                Your Library Manager
               </Link>
             </div>
 
@@ -66,7 +66,7 @@ export function Navbar(_props: NavbarProps) {
               {/* Notifications button */}
               <button
                 type='button'
-                aria-label='Notificaciones'
+                aria-label='Notifications'
                 className='relative inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900'
               >
                 <svg
@@ -96,21 +96,21 @@ export function Navbar(_props: NavbarProps) {
                 type='button'
                 onClick={() => navigate(ROUTES.ACCOUNT)}
                 className='flex items-center gap-3 rounded-2xl bg-gray-50 px-2 py-1 ring-1 ring-gray-200/60 hover:bg-gray-100'
-                aria-label='Ir a Mi Cuenta'
+                aria-label='Go to My Account'
               >
                 <div
                   className={`h-9 w-9 rounded-2xl flex items-center justify-center text-sm font-bold select-none ring-1 ring-black/5 ${
                     isAdmin ? 'bg-blue-600 text-white' : 'bg-gray-900 text-white'
                   }`}
                   aria-label='Avatar'
-                  title={user?.nombre || 'Usuario'}
+                  title={user?.name || 'User'}
                 >
                   {initials}
                 </div>
 
                 <div className='hidden sm:block min-w-0'>
                   <div className='text-sm font-semibold text-gray-900 truncate'>
-                    {user?.nombre || 'Usuario'}
+                    {user?.name || 'User'}
                   </div>
                   <div className='text-xs text-gray-500 truncate'>{roleLabel}</div>
                 </div>
@@ -142,7 +142,7 @@ export function Navbar(_props: NavbarProps) {
                     d='M16 19a2 2 0 002-2V7a2 2 0 00-2-2H9a2 2 0 00-2 2v2'
                   />
                 </svg>
-                <span className='hidden sm:inline'>Cerrar Sesión</span>
+                <span className='hidden sm:inline'>Sign Out</span>
               </button>
             </div>
           </div>

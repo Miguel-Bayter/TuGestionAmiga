@@ -43,22 +43,22 @@ export function Layout({ children }: LayoutProps) {
 
   // Fetch cart on mount and when user changes
   useEffect(() => {
-    if (user?.id_usuario) {
+    if (user?.id) {
       cartService.getCart()
     }
-  }, [user?.id_usuario, cartService])
+  }, [user?.id, cartService])
 
   // Listen for cart updates from events (for backward compatibility)
   useEffect(() => {
     const handleCartUpdate = () => {
-      if (user?.id_usuario) {
+      if (user?.id) {
         cartService.getCart()
       }
     }
 
     window.addEventListener('tga_cart_updated', handleCartUpdate)
     return () => window.removeEventListener('tga_cart_updated', handleCartUpdate)
-  }, [user?.id_usuario, cartService])
+  }, [user?.id, cartService])
 
   return (
     <div className='relative min-h-screen flex flex-col overflow-x-hidden'>
@@ -66,7 +66,7 @@ export function Layout({ children }: LayoutProps) {
       {isSidebarOpen && (
         <button
           type='button'
-          aria-label='Cerrar menú'
+          aria-label='Close menu'
           className='fixed inset-0 z-40 bg-black/30 md:hidden'
           onClick={() => uiService.closeSidebar()}
         />
@@ -76,10 +76,10 @@ export function Layout({ children }: LayoutProps) {
       <div className='md:hidden sticky top-0 z-40 bg-white shadow'>
         <div className='max-w-7xl mx-auto py-4 px-4'>
           <div className='flex items-center justify-between'>
-            <span className='text-2xl font-bold text-blue-600'>Tu Gestión Amiga</span>
+            <span className='text-2xl font-bold text-blue-600'>Your Library Manager</span>
             <button
               id='mobile-menu-button'
-              aria-label='Abrir menú'
+              aria-label='Open menu'
               className='inline-flex items-center justify-center p-2 rounded-md text-gray-400'
               type='button'
               onClick={() => uiService.toggleSidebar()}

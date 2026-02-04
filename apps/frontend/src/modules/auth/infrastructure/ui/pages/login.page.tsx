@@ -43,14 +43,14 @@ export function LoginPage() {
       const success = await authStateService.login({ email, password })
 
       if (success) {
-        toast.success('Bienvenido de nuevo')
+        toast.success('Welcome back')
         const redirectTo = (location.state as { from?: string })?.from || ROUTES.HOME
         navigate(redirectTo, { replace: true })
       } else {
-        toast.error('Credenciales inválidas')
+        toast.error('Invalid credentials')
       }
     } catch (error: unknown) {
-      toast.error((error as { message?: string }).message || 'Error al iniciar sesión')
+      toast.error((error as { message?: string }).message || 'Error signing in')
     } finally {
       setIsSubmitting(false)
     }
@@ -72,7 +72,7 @@ export function LoginPage() {
     setFpSuccess('')
 
     if (!fpEmail) {
-      setFpError('Escribe tu correo')
+      setFpError('Enter your email')
       return
     }
 
@@ -81,16 +81,16 @@ export function LoginPage() {
     try {
       const response = await forgotPasswordUseCase.execute(fpEmail)
 
-      setFpSuccess('Si el correo existe, se generó un código temporal.')
+      setFpSuccess('If the email exists, a temporary code was generated.')
 
       if (response?.demo_code) {
         setFpCode(String(response.demo_code))
-        setFpSuccess(`Código generado (demo): ${response.demo_code}`)
+        setFpSuccess(`Code generated (demo): ${response.demo_code}`)
       }
 
       setFpStep(2)
     } catch (error: unknown) {
-      setFpError((error as { message?: string }).message || 'No se pudo enviar el código')
+      setFpError((error as { message?: string }).message || 'Could not send code')
     } finally {
       setFpLoading(false)
     }
@@ -102,12 +102,12 @@ export function LoginPage() {
     setFpSuccess('')
 
     if (!fpEmail || !fpCode || !fpNewPassword || !fpConfirmPassword) {
-      setFpError('Completa todos los campos')
+      setFpError('Complete all fields')
       return
     }
 
     if (fpNewPassword !== fpConfirmPassword) {
-      setFpError('La confirmación no coincide')
+      setFpError('Passwords do not match')
       return
     }
 
@@ -116,13 +116,13 @@ export function LoginPage() {
     try {
       await verifyPasswordCodeUseCase.execute(fpEmail, fpCode, fpNewPassword)
 
-      setFpSuccess('Contraseña actualizada. Ya puedes iniciar sesión.')
+      setFpSuccess('Password updated. You can now sign in.')
       setFpStep(1)
       setFpCode('')
       setFpNewPassword('')
       setFpConfirmPassword('')
     } catch (error: unknown) {
-      setFpError((error as { message?: string }).message || 'No se pudo restablecer la contraseña')
+      setFpError((error as { message?: string }).message || 'Could not reset password')
     } finally {
       setFpLoading(false)
     }
@@ -133,12 +133,12 @@ export function LoginPage() {
       <div className='bg-white p-8 rounded-lg shadow-lg w-full max-w-md'>
         <div>
           <h2 className='text-center text-3xl font-extrabold text-gray-900'>
-            Inicia sesión en tu cuenta
+            Sign in to your account
           </h2>
           <p className='mt-2 text-center text-sm text-gray-600'>
-            O{' '}
+            Or{' '}
             <Link to={ROUTES.REGISTER} className='font-medium text-blue-600 hover:text-blue-500'>
-              créate una nueva cuenta
+              create a new account
             </Link>
           </p>
         </div>
@@ -147,25 +147,25 @@ export function LoginPage() {
           <div className='rounded-md shadow-sm -space-y-px'>
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-2'>
-                Correo Electrónico
+                Email
               </label>
               <input
                 type='email'
                 required
                 className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                placeholder='ejemplo@correo.com'
+                placeholder='example@email.com'
                 value={email}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                 disabled={isSubmitting}
               />
             </div>
             <div className='pt-4'>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>Contraseña</label>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>Password</label>
               <input
                 type='password'
                 required
                 className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                placeholder='Contraseña'
+                placeholder='Password'
                 value={password}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                 disabled={isSubmitting}
@@ -186,7 +186,7 @@ export function LoginPage() {
                   resetForgotState()
                 }}
               >
-                ¿Olvidaste tu contraseña?
+                Forgot your password?
               </button>
             </div>
           </div>
@@ -195,9 +195,9 @@ export function LoginPage() {
             <div className='rounded-xl border border-gray-200 bg-linear-to-b from-gray-50 to-white p-4 shadow-sm'>
               <div className='flex items-start justify-between gap-3'>
                 <div>
-                  <p className='text-sm font-semibold text-gray-800'>Recuperar acceso</p>
+                  <p className='text-sm font-semibold text-gray-800'>Recover access</p>
                   <p className='mt-1 text-sm text-gray-600'>
-                    Genera un código temporal y úsalo para crear una nueva contraseña.
+                    Generate a temporary code and use it to create a new password.
                   </p>
                 </div>
                 <button
@@ -208,27 +208,27 @@ export function LoginPage() {
                     resetForgotState()
                   }}
                 >
-                  Cerrar
+                  Close
                 </button>
               </div>
 
               {fpStep === 1 ? (
                 <div className='mt-4 rounded-lg border border-gray-200 bg-white p-4'>
                   <p className='text-xs font-semibold uppercase tracking-wide text-gray-500'>
-                    Paso 1
+                    Step 1
                   </p>
                   <p className='mt-1 text-sm text-gray-700'>
-                    Escribe tu correo y presiona &quot;Enviar código&quot;.
+                    Enter your email and press &quot;Send code&quot;.
                   </p>
 
                   <div className='mt-3'>
                     <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Correo Electrónico
+                      Email
                     </label>
                     <input
                       type='email'
                       className='form-input'
-                      placeholder='ejemplo@correo.com'
+                      placeholder='example@email.com'
                       value={fpEmail}
                       onChange={(e) => setFpEmail(e.target.value)}
                       disabled={fpLoading}
@@ -242,25 +242,25 @@ export function LoginPage() {
                       onClick={handleSendCode}
                       disabled={fpLoading}
                     >
-                      {fpLoading ? 'Enviando...' : 'Enviar código'}
+                      {fpLoading ? 'Sending...' : 'Send code'}
                     </button>
                   </div>
                 </div>
               ) : (
                 <div className='mt-4 rounded-lg border border-gray-200 bg-white p-4'>
                   <p className='text-xs font-semibold uppercase tracking-wide text-gray-500'>
-                    Paso 2
+                    Step 2
                   </p>
                   <p className='mt-1 text-sm text-gray-700'>
-                    Ingresa el código y tu nueva contraseña.
+                    Enter the code and your new password.
                   </p>
 
                   <div className='mt-3'>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>Código</label>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>Code</label>
                     <input
                       type='text'
                       className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                      placeholder='Ej: 123456'
+                      placeholder='e.g. 123456'
                       value={fpCode}
                       onChange={(e) => setFpCode(e.target.value)}
                       disabled={fpLoading}
@@ -269,12 +269,12 @@ export function LoginPage() {
 
                   <div className='mt-3'>
                     <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Nueva contraseña
+                      New password
                     </label>
                     <input
                       type='password'
                       className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                      placeholder='Nueva contraseña'
+                      placeholder='New password'
                       value={fpNewPassword}
                       onChange={(e) => setFpNewPassword(e.target.value)}
                       disabled={fpLoading}
@@ -283,12 +283,12 @@ export function LoginPage() {
 
                   <div className='mt-3'>
                     <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Confirmar nueva contraseña
+                      Confirm new password
                     </label>
                     <input
                       type='password'
                       className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                      placeholder='Confirmar nueva contraseña'
+                      placeholder='Confirm new password'
                       value={fpConfirmPassword}
                       onChange={(e) => setFpConfirmPassword(e.target.value)}
                       disabled={fpLoading}
@@ -305,7 +305,7 @@ export function LoginPage() {
                       }}
                       disabled={fpLoading}
                     >
-                      Volver
+                      Back
                     </button>
 
                     <button
@@ -314,7 +314,7 @@ export function LoginPage() {
                       onClick={handleResetPassword}
                       disabled={fpLoading}
                     >
-                      {fpLoading ? 'Procesando...' : 'Restablecer'}
+                      {fpLoading ? 'Processing...' : 'Reset'}
                     </button>
                   </div>
                 </div>
@@ -339,7 +339,7 @@ export function LoginPage() {
               className='w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50'
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Ingresando...' : 'Ingresar'}
+              {isSubmitting ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
         </form>

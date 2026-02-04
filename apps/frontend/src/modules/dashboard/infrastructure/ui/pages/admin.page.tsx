@@ -25,40 +25,40 @@ const getLocalCoverUrl = (_title?: string): string | null => {
   return null
 }
 
-type TabType = 'libros' | 'usuarios' | 'prestamos'
+type TabType = 'books' | 'users' | 'loans'
 
 interface AdminBook {
-  id_libro: number
-  titulo: string
-  autor: string
-  descripcion?: string
-  stock_compra?: number
-  stock_renta?: number
-  valor?: number
-  disponibilidad?: number
-  id_categoria?: string
+  id: number
+  title: string
+  author: string
+  description?: string
+  purchaseStock?: number
+  rentalStock?: number
+  price?: number
+  available?: number
+  categoryId?: string
 }
 
 interface AdminLoan {
-  id_prestamo: number
-  titulo?: string
-  autor?: string
-  nombre_usuario?: string
-  fecha_prestamo?: string
-  fecha_devolucion?: string
-  estado?: string
+  id: number
+  title?: string
+  author?: string
+  userName?: string
+  loanDate?: string
+  returnDate?: string
+  status?: string
 }
 
 const emptyBook: AdminBook = {
-  id_libro: 0,
-  titulo: '',
-  autor: '',
-  descripcion: '',
-  stock_compra: 0,
-  stock_renta: 0,
-  valor: 0,
-  disponibilidad: 1,
-  id_categoria: '',
+  id: 0,
+  title: '',
+  author: '',
+  description: '',
+  purchaseStock: 0,
+  rentalStock: 0,
+  price: 0,
+  available: 1,
+  categoryId: '',
 }
 
 export default function AdminPage() {
@@ -68,7 +68,7 @@ export default function AdminPage() {
   const { user } = useServiceState(authService) as any
   const { success: showSuccess, error: showError } = useToast()
 
-  const [tab, setTab] = useState<TabType>('libros')
+  const [tab, setTab] = useState<TabType>('books')
   const [books, setBooks] = useState<AdminBook[]>([])
   const [users, setUsers] = useState<User[]>([])
   const [loans, setLoans] = useState<AdminLoan[]>([])
@@ -80,10 +80,10 @@ export default function AdminPage() {
 
   // User management
   const [newUserForm, setNewUserForm] = useState({
-    nombre: '',
-    correo: '',
+    name: '',
+    email: '',
     password: '',
-    id_rol: 2,
+    roleId: 2,
   })
   const [creatingUser, setCreatingUser] = useState<boolean>(false)
 
@@ -91,7 +91,7 @@ export default function AdminPage() {
     try {
       const sp = new URLSearchParams(location.search || '')
       const t = sp.get('tab')
-      if (t === 'libros' || t === 'usuarios' || t === 'prestamos') {
+      if (t === 'books' || t === 'users' || t === 'loans') {
         setTab(t)
       }
     } catch {
@@ -102,15 +102,15 @@ export default function AdminPage() {
   const loadAll = useCallback(async () => {
     try {
       // Load books
-      const booksResponse = await api.get<AdminBook[]>('/libros')
+      const booksResponse = await api.get<AdminBook[]>('/admin/books')
       setBooks(booksResponse.data || [])
 
       // Load users
-      const usersResponse = await api.get<User[]>('/admin/usuarios')
+      const usersResponse = await api.get<User[]>('/admin/users')
       setUsers(usersResponse.data || [])
 
       // Load loans
-      const loansResponse = await api.get<AdminLoan[]>('/admin/prestamos')
+      const loansResponse = await api.get<AdminLoan[]>('/admin/loans')
       setLoans(loansResponse.data || [])
     } catch (e: unknown) {
       showError((e as { message?: string }).message || 'Error loading data')
@@ -123,31 +123,31 @@ export default function AdminPage() {
 
   const onCreateUser = async () => {
     const payload = {
-      nombre: String(newUserForm.nombre || '').trim(),
-      correo: String(newUserForm.correo || '').trim(),
+      name: String(newUserForm.name || '').trim(),
+      email: String(newUserForm.email || '').trim(),
       password: String(newUserForm.password || ''),
-      id_rol: Number(newUserForm.id_rol),
+      roleId: Number(newUserForm.roleId),
     }
 
-    if (!payload.nombre || !payload.correo || !payload.password) {
-      showError('Nombre, correo y contraseña son obligatorios.')
+    if (!payload.name || !payload.email || !payload.password) {
+      showError('Name, email, and password are required.')
       return
     }
 
     setCreatingUser(true)
     try {
-      const response = await api.post('/admin/usuarios', payload)
+      const response = await api.post('/admin/users', payload)
 
       if (response.error) {
-        showError(response.error.message || 'No se pudo crear el usuario.')
+        showError(response.error.message || 'Could not create user.')
         return
       }
 
-      showSuccess('Usuario creado.')
-      setNewUserForm({ nombre: '', correo: '', password: '', id_rol: 2 })
+      showSuccess('User created.')
+      setNewUserForm({ name: '', email: '', password: '', roleId: 2 })
       await loadAll()
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'No se pudo crear el usuario.')
+      showError((e as { message?: string }).message || 'Could not create user.')
     } finally {
       setCreatingUser(false)
     }
@@ -155,84 +155,84 @@ export default function AdminPage() {
 
   const onSaveBook = async () => {
     const payload = {
-      titulo: String(bookForm.titulo || '').trim(),
-      autor: String(bookForm.autor || '').trim(),
-      descripcion: String(bookForm.descripcion || '').trim(),
-      stock_compra: Number(bookForm.stock_compra || 0),
-      stock_renta: Number(bookForm.stock_renta || 0),
-      valor: Number(bookForm.valor || 0),
-      disponibilidad: Number(bookForm.disponibilidad || 1),
-      id_categoria: String(bookForm.id_categoria || ''),
+      title: String(bookForm.title || '').trim(),
+      author: String(bookForm.author || '').trim(),
+      description: String(bookForm.description || '').trim(),
+      purchaseStock: Number(bookForm.purchaseStock || 0),
+      rentalStock: Number(bookForm.rentalStock || 0),
+      price: Number(bookForm.price || 0),
+      available: Number(bookForm.available || 1),
+      categoryId: String(bookForm.categoryId || ''),
     }
 
-    if (!payload.titulo || !payload.autor) {
-      showError('Título y autor son obligatorios.')
+    if (!payload.title || !payload.author) {
+      showError('Title and author are required.')
       return
     }
 
     setSaving(true)
     try {
-      const response = bookForm.id_libro
-        ? await api.patch(`/libros/${bookForm.id_libro}`, payload)
-        : await api.post('/libros', payload)
+      const response = bookForm.id
+        ? await api.patch(`/books/${bookForm.id}`, payload)
+        : await api.post('/books', payload)
 
       if (response.error) {
-        showError(response.error.message || 'No se pudo guardar el libro.')
+        showError(response.error.message || 'Could not save book.')
         return
       }
 
-      showSuccess(bookForm.id_libro ? 'Libro actualizado.' : 'Libro creado.')
+      showSuccess(bookForm.id ? 'Book updated.' : 'Book created.')
       setBookForm(emptyBook)
       setShowBookForm(false)
       await loadAll()
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'No se pudo guardar el libro.')
+      showError((e as { message?: string }).message || 'Could not save book.')
     } finally {
       setSaving(false)
     }
   }
 
-  const onDeleteBook = async (id_libro: number) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este libro?')) return
+  const onDeleteBook = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this book?')) return
 
     try {
-      const response = await api.delete(`/libros/${id_libro}`)
+      const response = await api.delete(`/books/${id}`)
 
       if (response.error) {
-        showError(response.error.message || 'No se pudo eliminar el libro.')
+        showError(response.error.message || 'Could not delete book.')
         return
       }
 
-      showSuccess('Libro eliminado.')
+      showSuccess('Book deleted.')
       await loadAll()
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'No se pudo eliminar el libro.')
+      showError((e as { message?: string }).message || 'Could not delete book.')
     }
   }
 
-  const onDeleteUser = async (id_usuario: number) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este usuario?')) return
+  const onDeleteUser = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this user?')) return
 
     try {
-      const response = await api.delete(`/admin/usuarios/${id_usuario}`)
+      const response = await api.delete(`/admin/users/${id}`)
 
       if (response.error) {
-        showError(response.error.message || 'No se pudo eliminar el usuario.')
+        showError(response.error.message || 'Could not delete user.')
         return
       }
 
-      showSuccess('Usuario eliminado.')
+      showSuccess('User deleted.')
       await loadAll()
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'No se pudo eliminar el usuario.')
+      showError((e as { message?: string }).message || 'Could not delete user.')
     }
   }
 
-  if (!user || user.id_rol !== 1) {
+  if (!user || user.roleId !== 1) {
     return (
       <div className='text-center py-10'>
-        <h1 className='text-2xl font-bold text-gray-900'>Acceso Denegado</h1>
-        <p className='text-gray-600 mt-2'>No tienes permisos para acceder a esta página.</p>
+        <h1 className='text-2xl font-bold text-gray-900'>Access Denied</h1>
+        <p className='text-gray-600 mt-2'>You do not have permission to access this page.</p>
       </div>
     )
   }
@@ -240,55 +240,55 @@ export default function AdminPage() {
   return (
     <div className='space-y-6'>
       <div className='mb-6'>
-        <h1 className='text-3xl font-bold text-gray-900'>Panel de Administración</h1>
-        <p className='text-gray-600 mt-1'>Gestiona libros, usuarios y préstamos del sistema.</p>
+        <h1 className='text-3xl font-bold text-gray-900'>Administration Panel</h1>
+        <p className='text-gray-600 mt-1'>Manage books, users, and loans in the system.</p>
       </div>
 
       <div className='rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 p-2'>
         <div className='flex flex-wrap gap-2'>
           <button
             type='button'
-            onClick={() => setTab('libros')}
+            onClick={() => setTab('books')}
             className={
-              tab === 'libros'
+              tab === 'books'
                 ? 'inline-flex items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white'
                 : 'inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50'
             }
           >
-            📚 Libros
+            📚 Books
           </button>
 
           <button
             type='button'
-            onClick={() => setTab('usuarios')}
+            onClick={() => setTab('users')}
             className={
-              tab === 'usuarios'
+              tab === 'users'
                 ? 'inline-flex items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white'
                 : 'inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50'
             }
           >
-            👥 Usuarios
+            👥 Users
           </button>
 
           <button
             type='button'
-            onClick={() => setTab('prestamos')}
+            onClick={() => setTab('loans')}
             className={
-              tab === 'prestamos'
+              tab === 'loans'
                 ? 'inline-flex items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white'
                 : 'inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50'
             }
           >
-            📖 Préstamos
+            📖 Loans
           </button>
         </div>
       </div>
 
       {/* Books Tab */}
-      {tab === 'libros' && (
+      {tab === 'books' && (
         <div className='space-y-4'>
           <div className='flex items-center justify-between'>
-            <h2 className='text-lg font-semibold text-gray-900'>Gestión de Libros</h2>
+            <h2 className='text-lg font-semibold text-gray-900'>Book Management</h2>
             <button
               type='button'
               onClick={() => {
@@ -297,80 +297,80 @@ export default function AdminPage() {
               }}
               className='rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700'
             >
-              Agregar Libro
+              Add Book
             </button>
           </div>
 
           {showBookForm && (
             <div className='rounded-2xl border border-gray-200 bg-gray-50 p-4'>
               <h3 className='text-sm font-bold text-gray-900 mb-4'>
-                {bookForm.id_libro ? 'Editar Libro' : 'Nuevo Libro'}
+                {bookForm.id ? 'Edit Book' : 'New Book'}
               </h3>
 
               <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700'>Título</label>
+                  <label className='block text-sm font-medium text-gray-700'>Title</label>
                   <input
                     type='text'
-                    value={bookForm.titulo}
-                    onChange={(e) => setBookForm((prev) => ({ ...prev, titulo: e.target.value }))}
+                    value={bookForm.title}
+                    onChange={(e) => setBookForm((prev) => ({ ...prev, title: e.target.value }))}
                     className='mt-1 block w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm'
                   />
                 </div>
 
                 <div>
-                  <label className='block text-sm font-medium text-gray-700'>Autor</label>
+                  <label className='block text-sm font-medium text-gray-700'>Author</label>
                   <input
                     type='text'
-                    value={bookForm.autor}
-                    onChange={(e) => setBookForm((prev) => ({ ...prev, autor: e.target.value }))}
+                    value={bookForm.author}
+                    onChange={(e) => setBookForm((prev) => ({ ...prev, author: e.target.value }))}
                     className='mt-1 block w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm'
                   />
                 </div>
 
                 <div>
-                  <label className='block text-sm font-medium text-gray-700'>Precio</label>
+                  <label className='block text-sm font-medium text-gray-700'>Price</label>
                   <input
                     type='number'
-                    value={bookForm.valor || ''}
+                    value={bookForm.price || ''}
                     onChange={(e) =>
-                      setBookForm((prev) => ({ ...prev, valor: Number(e.target.value) }))
+                      setBookForm((prev) => ({ ...prev, price: Number(e.target.value) }))
                     }
                     className='mt-1 block w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm'
                   />
                 </div>
 
                 <div>
-                  <label className='block text-sm font-medium text-gray-700'>Stock Compra</label>
+                  <label className='block text-sm font-medium text-gray-700'>Purchase Stock</label>
                   <input
                     type='number'
-                    value={bookForm.stock_compra || ''}
+                    value={bookForm.purchaseStock || ''}
                     onChange={(e) =>
-                      setBookForm((prev) => ({ ...prev, stock_compra: Number(e.target.value) }))
+                      setBookForm((prev) => ({ ...prev, purchaseStock: Number(e.target.value) }))
                     }
                     className='mt-1 block w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm'
                   />
                 </div>
 
                 <div>
-                  <label className='block text-sm font-medium text-gray-700'>Stock Renta</label>
+                  <label className='block text-sm font-medium text-gray-700'>Rental Stock</label>
                   <input
                     type='number'
-                    value={bookForm.stock_renta || ''}
+                    value={bookForm.rentalStock || ''}
                     onChange={(e) =>
-                      setBookForm((prev) => ({ ...prev, stock_renta: Number(e.target.value) }))
+                      setBookForm((prev) => ({ ...prev, rentalStock: Number(e.target.value) }))
                     }
                     className='mt-1 block w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm'
                   />
                 </div>
 
                 <div>
-                  <label className='block text-sm font-medium text-gray-700'>Categoría</label>
+                  <label className='block text-sm font-medium text-gray-700'>Category</label>
                   <input
                     type='text'
-                    value={bookForm.id_categoria || ''}
+                    value={bookForm.categoryId || ''}
                     onChange={(e) =>
-                      setBookForm((prev) => ({ ...prev, id_categoria: e.target.value }))
+                      setBookForm((prev) => ({ ...prev, categoryId: e.target.value }))
                     }
                     className='mt-1 block w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm'
                   />
@@ -378,11 +378,11 @@ export default function AdminPage() {
               </div>
 
               <div className='mt-4'>
-                <label className='block text-sm font-medium text-gray-700'>Descripción</label>
+                <label className='block text-sm font-medium text-gray-700'>Description</label>
                 <textarea
-                  value={bookForm.descripcion || ''}
+                  value={bookForm.description || ''}
                   onChange={(e) =>
-                    setBookForm((prev) => ({ ...prev, descripcion: e.target.value }))
+                    setBookForm((prev) => ({ ...prev, description: e.target.value }))
                   }
                   rows={3}
                   className='mt-1 block w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm'
@@ -398,7 +398,7 @@ export default function AdminPage() {
                   }}
                   className='rounded-xl bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-300'
                 >
-                  Cancelar
+                  Cancel
                 </button>
                 <button
                   type='button'
@@ -406,7 +406,7 @@ export default function AdminPage() {
                   onClick={onSaveBook}
                   className='rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50'
                 >
-                  {saving ? 'Guardando...' : 'Guardar'}
+                  {saving ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </div>
@@ -417,40 +417,40 @@ export default function AdminPage() {
               <thead className='bg-gray-50'>
                 <tr>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Libro
+                    Book
                   </th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                     Stock
                   </th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Precio
+                    Price
                   </th>
                   <th className='px-6 py-3' />
                 </tr>
               </thead>
               <tbody className='bg-white divide-y divide-gray-200'>
                 {books.map((book) => (
-                  <tr key={book.id_libro}>
+                  <tr key={book.id}>
                     <td className='px-6 py-4'>
                       <div className='flex items-center'>
                         <div className='shrink-0 h-10 w-10'>
                           <img
                             className='h-10 w-10 rounded-full'
-                            src={getLocalCoverUrl(book.titulo) || createCoverDataUri(book.titulo)}
+                            src={getLocalCoverUrl(book.title) || createCoverDataUri(book.title)}
                             alt=''
                           />
                         </div>
                         <div className='ml-4'>
-                          <div className='text-sm font-medium text-gray-900'>{book.titulo}</div>
-                          <div className='text-sm text-gray-500'>{book.autor}</div>
+                          <div className='text-sm font-medium text-gray-900'>{book.title}</div>
+                          <div className='text-sm text-gray-500'>{book.author}</div>
                         </div>
                       </div>
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                      C: {book.stock_compra || 0}, R: {book.stock_renta || 0}
+                      C: {book.purchaseStock || 0}, R: {book.rentalStock || 0}
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                      {book.valor ? `$${book.valor}` : '-'}
+                      {book.price ? `$${book.price}` : '-'}
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
                       <button
@@ -460,13 +460,13 @@ export default function AdminPage() {
                         }}
                         className='text-indigo-600 hover:text-indigo-900 mr-3'
                       >
-                        Editar
+                        Edit
                       </button>
                       <button
-                        onClick={() => onDeleteBook(book.id_libro)}
+                        onClick={() => onDeleteBook(book.id)}
                         className='text-red-600 hover:text-red-900'
                       >
-                        Eliminar
+                        Delete
                       </button>
                     </td>
                   </tr>
@@ -478,45 +478,45 @@ export default function AdminPage() {
       )}
 
       {/* Users Tab */}
-      {tab === 'usuarios' && (
+      {tab === 'users' && (
         <div className='space-y-4'>
           <div className='flex items-center justify-between'>
-            <h2 className='text-lg font-semibold text-gray-900'>Gestión de Usuarios</h2>
+            <h2 className='text-lg font-semibold text-gray-900'>User Management</h2>
             <button
               type='button'
-              onClick={() => setTab('usuarios')}
+              onClick={() => setTab('users')}
               className='rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700'
             >
-              Agregar Usuario
+              Add User
             </button>
           </div>
 
           <div className='rounded-2xl border border-gray-200 bg-gray-50 p-4'>
-            <h3 className='text-sm font-bold text-gray-900 mb-4'>Nuevo Usuario</h3>
+            <h3 className='text-sm font-bold text-gray-900 mb-4'>New User</h3>
 
             <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
               <div>
-                <label className='block text-sm font-medium text-gray-700'>Nombre</label>
+                <label className='block text-sm font-medium text-gray-700'>Name</label>
                 <input
                   type='text'
-                  value={newUserForm.nombre}
-                  onChange={(e) => setNewUserForm((prev) => ({ ...prev, nombre: e.target.value }))}
+                  value={newUserForm.name}
+                  onChange={(e) => setNewUserForm((prev) => ({ ...prev, name: e.target.value }))}
                   className='mt-1 block w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm'
                 />
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-gray-700'>Correo</label>
+                <label className='block text-sm font-medium text-gray-700'>Email</label>
                 <input
                   type='email'
-                  value={newUserForm.correo}
-                  onChange={(e) => setNewUserForm((prev) => ({ ...prev, correo: e.target.value }))}
+                  value={newUserForm.email}
+                  onChange={(e) => setNewUserForm((prev) => ({ ...prev, email: e.target.value }))}
                   className='mt-1 block w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm'
                 />
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-gray-700'>Contraseña</label>
+                <label className='block text-sm font-medium text-gray-700'>Password</label>
                 <input
                   type='password'
                   value={newUserForm.password}
@@ -528,16 +528,16 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-gray-700'>Rol</label>
+                <label className='block text-sm font-medium text-gray-700'>Role</label>
                 <select
-                  value={newUserForm.id_rol}
+                  value={newUserForm.roleId}
                   onChange={(e) =>
-                    setNewUserForm((prev) => ({ ...prev, id_rol: Number(e.target.value) }))
+                    setNewUserForm((prev) => ({ ...prev, roleId: Number(e.target.value) }))
                   }
                   className='mt-1 block w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm'
                 >
-                  <option value={2}>Usuario</option>
-                  <option value={1}>Administrador</option>
+                  <option value={2}>User</option>
+                  <option value={1}>Administrator</option>
                 </select>
               </div>
             </div>
@@ -549,7 +549,7 @@ export default function AdminPage() {
                 onClick={onCreateUser}
                 className='rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50'
               >
-                {creatingUser ? 'Creando...' : 'Crear Usuario'}
+                {creatingUser ? 'Creating...' : 'Create User'}
               </button>
             </div>
           </div>
@@ -559,30 +559,30 @@ export default function AdminPage() {
               <thead className='bg-gray-50'>
                 <tr>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Usuario
+                    User
                   </th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Rol
+                    Role
                   </th>
                   <th className='px-6 py-3' />
                 </tr>
               </thead>
               <tbody className='bg-white divide-y divide-gray-200'>
                 {users.map((user) => (
-                  <tr key={user.id_usuario}>
+                  <tr key={user.id}>
                     <td className='px-6 py-4'>
-                      <div className='text-sm font-medium text-gray-900'>{user.nombre}</div>
-                      <div className='text-sm text-gray-500'>{user.correo || user.email}</div>
+                      <div className='text-sm font-medium text-gray-900'>{user.name}</div>
+                      <div className='text-sm text-gray-500'>{user.email}</div>
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                      {user.id_rol === 1 ? 'Administrador' : 'Usuario'}
+                      {user.roleId === 1 ? 'Administrator' : 'User'}
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
                       <button
-                        onClick={() => onDeleteUser(user.id_usuario)}
+                        onClick={() => onDeleteUser(user.id)}
                         className='text-red-600 hover:text-red-900'
                       >
-                        Eliminar
+                        Delete
                       </button>
                     </td>
                   </tr>
@@ -594,56 +594,56 @@ export default function AdminPage() {
       )}
 
       {/* Loans Tab */}
-      {tab === 'prestamos' && (
+      {tab === 'loans' && (
         <div className='space-y-4'>
-          <h2 className='text-lg font-semibold text-gray-900'>Préstamos Activos</h2>
+          <h2 className='text-lg font-semibold text-gray-900'>Active Loans</h2>
 
           <div className='bg-white shadow rounded-lg overflow-hidden'>
             <table className='min-w-full divide-y divide-gray-200'>
               <thead className='bg-gray-50'>
                 <tr>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Libro
+                    Book
                   </th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Usuario
+                    User
                   </th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Fecha Préstamo
+                    Loan Date
                   </th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Fecha Devolución
+                    Return Date
                   </th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Estado
+                    Status
                   </th>
                 </tr>
               </thead>
               <tbody className='bg-white divide-y divide-gray-200'>
                 {loans.map((loan) => (
-                  <tr key={loan.id_prestamo}>
+                  <tr key={loan.id}>
                     <td className='px-6 py-4'>
-                      <div className='text-sm font-medium text-gray-900'>{loan.titulo}</div>
-                      <div className='text-sm text-gray-500'>{loan.autor}</div>
+                      <div className='text-sm font-medium text-gray-900'>{loan.title}</div>
+                      <div className='text-sm text-gray-500'>{loan.author}</div>
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                      {loan.nombre_usuario}
+                      {loan.userName}
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                      {formatDate(loan.fecha_prestamo || '')}
+                      {formatDate(loan.loanDate || '')}
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                      {formatDate(loan.fecha_devolucion || '')}
+                      {formatDate(loan.returnDate || '')}
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap'>
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          loan.estado?.toLowerCase().includes('activo')
+                          loan.status?.toLowerCase().includes('active')
                             ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
                         }`}
                       >
-                        {loan.estado || 'Desconocido'}
+                        {loan.status || 'Unknown'}
                       </span>
                     </td>
                   </tr>
