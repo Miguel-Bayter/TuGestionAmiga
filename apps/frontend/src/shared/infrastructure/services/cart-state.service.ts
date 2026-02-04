@@ -8,8 +8,8 @@ import {
   AddToCartUseCase,
   RemoveFromCartUseCase,
   CheckoutUseCase,
-} from '@/domain/UseCase/cart'
-import type { Cart } from '@/domain/Entity/cart.entity'
+} from '@/modules/cart'
+import type { Cart } from '@/modules/cart'
 
 interface CartStateData {
   cart: Cart | null

@@ -1,11 +1,12 @@
 import { useContext, createContext, type ReactNode } from 'react'
 import type { AwilixContainer } from 'awilix'
 import container from '@/presentation/config/container'
+import type { Cradle } from '@/presentation/config/container.types'
 
 /**
  * Context para el contenedor de dependencias
  */
-const ContainerContext = createContext<AwilixContainer | null>(null)
+const ContainerContext = createContext<AwilixContainer<Cradle> | null>(null)
 
 /**
  * Provider que envuelve la aplicación con el contenedor
@@ -35,9 +36,9 @@ export function useContainer() {
  * @param useCaseName - Nombre del use case registrado en el contenedor
  * @returns Instancia del use case
  */
-export function useUseCase<T extends string>(useCaseName: T) {
+export function useUseCase<K extends keyof Cradle>(useCaseName: K): Cradle[K] {
   const container = useContainer()
-  return container.cradle[useCaseName as never]
+  return container.cradle[useCaseName]
 }
 
 /**
@@ -45,9 +46,9 @@ export function useUseCase<T extends string>(useCaseName: T) {
  * @param repositoryName - Nombre del repositorio registrado en el contenedor
  * @returns Instancia del repositorio
  */
-export function useRepository<T extends string>(repositoryName: T) {
+export function useRepository<K extends keyof Cradle>(repositoryName: K): Cradle[K] {
   const container = useContainer()
-  return container.cradle[repositoryName as never]
+  return container.cradle[repositoryName]
 }
 
 /**
@@ -55,7 +56,7 @@ export function useRepository<T extends string>(repositoryName: T) {
  * @param serviceName - Nombre del servicio registrado en el contenedor
  * @returns Instancia del servicio
  */
-export function useService<T extends string>(serviceName: T) {
+export function useService<K extends keyof Cradle>(serviceName: K): Cradle[K] {
   const container = useContainer()
-  return container.cradle[serviceName as never]
+  return container.cradle[serviceName]
 }

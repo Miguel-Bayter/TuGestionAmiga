@@ -3,11 +3,10 @@
  */
 
 export interface User {
-  id_usuario: number
-  nombre: string
+  id: number
+  name: string
   email?: string
-  correo?: string
-  id_rol: number
+  roleId: number
   createdAt?: string
   updatedAt?: string
 }
@@ -29,7 +28,7 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest extends LoginRequest {
-  nombre: string
+  name: string
 }
 
 export interface RegisterResponse extends LoginResponse {}
@@ -43,9 +42,9 @@ export interface RefreshTokenResponse {
 }
 
 export interface JWTPayload {
-  id_usuario: number
+  userId: number
   email: string
-  id_rol: number
+  roleId: number
   iat?: number
   exp?: number
 }

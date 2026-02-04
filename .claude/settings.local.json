@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm --filter @tu-gestion-amiga/backend test --listTests)",
+      "Bash(pnpm --filter @tu-gestion-amiga/backend test src/shared/middleware/__tests__/jwt.test.ts)",
+      "Bash(pnpm --filter @tu-gestion-amiga/backend type-check:*)",
+      "Bash(pnpm --filter @tu-gestion-amiga/backend lint:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(pnpm --filter @tu-gestion-amiga/backend build:*)"
+    ]
+  }
+}

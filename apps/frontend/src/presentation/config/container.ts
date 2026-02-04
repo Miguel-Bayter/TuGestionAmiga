@@ -1,4 +1,5 @@
 import { type AwilixContainer, createContainer, InjectionMode, asClass } from 'awilix'
+import type { Cradle } from './container.types'
 
 // ============================================
 // REPOSITORIES (Infrastructure Layer)
@@ -69,7 +70,7 @@ import { ToastStateService } from '@/shared/infrastructure/services/toast-state.
  * - Use Cases: 22
  * - State Services: 6
  */
-export const container: AwilixContainer = createContainer({
+export const container: AwilixContainer<Cradle> = createContainer({
   injectionMode: InjectionMode.CLASSIC,
   strict: true,
 })

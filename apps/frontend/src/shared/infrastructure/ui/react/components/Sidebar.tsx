@@ -18,15 +18,15 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: SidebarProps) {
   const container = useContainer()
-  const authService = container.cradle.authStateService as any
-  const { user } = useServiceState(authService) as any
-  const cartService = container.cradle.cartStateService as any
-  const { items } = useServiceState(cartService) as any
+  const authService = container.cradle.authStateService
+  const { user } = useServiceState(authService)
+  const cartService = container.cradle.cartStateService
+  const { cart } = useServiceState(cartService)
 
-  const isAdmin = user?.id_rol === 1
+  const isAdmin = user?.roleId === 1
 
   // Calculate cart count
-  const cartCount = items.reduce((acc: number, item: any) => acc + (item.cantidad || 0), 0)
+  const cartCount = cart?.items.reduce((acc, item) => acc + (item.quantity || 0), 0) ?? 0
 
   const linkClass = ({ isActive }: { isActive: boolean }) => {
     const base = isActive
@@ -41,7 +41,7 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
     <aside
       id='sidebar'
       className={cn(
-        'relative z-50 bg-white w-64 p-4 absolute inset-y-0 left-0 transform shadow-lg',
+        'relative z-50 bg-white w-64 p-4 inset-y-0 left-0 transform shadow-lg',
         'md:fixed md:top-24 md:left-4 md:inset-y-auto md:transform-none md:rounded-2xl md:ring-1 md:ring-gray-200/60 md:shadow-sm',
         'transition duration-200 ease-in-out',
         {
