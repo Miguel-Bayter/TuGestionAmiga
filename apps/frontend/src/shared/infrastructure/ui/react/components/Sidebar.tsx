@@ -18,10 +18,9 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: SidebarProps) {
   const container = useContainer()
-  const authService = container.cradle.authStateService
-  const { user } = useServiceState(authService)
-  const cartService = container.cradle.cartStateService
-  const { cart } = useServiceState(cartService)
+  const { authStateService, cartStateService } = container.cradle
+  const { user } = useServiceState(authStateService)
+  const { cart } = useServiceState(cartStateService)
 
   const isAdmin = user?.roleId === 1
 

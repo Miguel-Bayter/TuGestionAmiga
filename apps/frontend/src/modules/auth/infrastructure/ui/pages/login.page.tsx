@@ -5,7 +5,7 @@
 
 import { useState, FormEvent, ChangeEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useContainer, useUseCase } from '@/shared/infrastructure/hooks'
+import { useContainer } from '@/shared/infrastructure/hooks'
 import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { ROUTES } from '@/shared/application/config'
 import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
@@ -14,8 +14,8 @@ export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const container = useContainer()
-  const { authService } = container.cradle
-  useServiceState(authService)
+  const { authStateService, forgotPasswordUseCase, verifyPasswordCodeUseCase } = container.cradle
+  useServiceState(authStateService)
   const toast = useToast()
 
   // Login form state
@@ -40,7 +40,7 @@ export function LoginPage() {
     setIsSubmitting(true)
 
     try {
-      const success = await authService.login({ email, password })
+      const success = await authStateService.login({ email, password })
 
       if (success) {
         toast.success('Bienvenido de nuevo')
@@ -79,7 +79,6 @@ export function LoginPage() {
     setFpLoading(true)
 
     try {
-      const forgotPasswordUseCase = useUseCase('forgotPasswordUseCase')
       const response = await forgotPasswordUseCase.execute(fpEmail)
 
       setFpSuccess('Si el correo existe, se generó un código temporal.')
@@ -115,7 +114,6 @@ export function LoginPage() {
     setFpLoading(true)
 
     try {
-      const verifyPasswordCodeUseCase = useUseCase('verifyPasswordCodeUseCase')
       await verifyPasswordCodeUseCase.execute(fpEmail, fpCode, fpNewPassword)
 
       setFpSuccess('Contraseña actualizada. Ya puedes iniciar sesión.')
