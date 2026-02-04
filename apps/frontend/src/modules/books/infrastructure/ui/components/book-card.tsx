@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Book } from '@/shared/domain/types'
-import { api } from '@/data/Repository'
 import { useContainer } from '@/shared/infrastructure/hooks'
 import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
@@ -34,8 +33,8 @@ const getLocalCoverUrl = (_title?: string): string | null => {
 export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCardProps) {
   const navigate = useNavigate()
   const container = useContainer()
-  const authService = container.cradle.authStateService as any
-  const { user } = useServiceState(authService) as any
+  const { authStateService, logoutUseCase } = container.cradle
+  const { user } = useServiceState(authStateService)
   const { success, error: showError } = useToast()
 
   const [buyQty, setBuyQty] = useState<number>(1)
@@ -55,15 +54,15 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
   }, [])
 
   // Stock calculations
-  const stockCompra = Number(book.stock_compra)
-  const stockRenta = Number(book.stock_renta)
+  const stockCompra = Number(book.stock)
+  const stockRenta = Number(book.rentalStock)
   const hasSplitStock = Number.isFinite(stockCompra) || Number.isFinite(stockRenta)
 
   const getInCartQty = (): number => {
     try {
       const list = (window as unknown as { __tga_cart_items?: unknown }).__tga_cart_items
       const items = Array.isArray(list) ? list : []
-      const id = Number(book.id_libro)
+      const id = Number(book.id)
       if (!Number.isFinite(id)) return 0
       const found = items.find(
         (it: unknown) => Number((it as { id_libro?: unknown })?.id_libro) === id
@@ -82,9 +81,9 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
 
   const buyAvailable = Number.isFinite(stockCompra)
     ? (buyRemaining ?? 0) > 0
-    : book.disponibilidad === 1
-  const rentAvailable = Number.isFinite(stockRenta) ? stockRenta > 0 : book.disponibilidad === 1
-  const isAvailable = hasSplitStock ? buyAvailable || rentAvailable : book.disponibilidad === 1
+    : book.availability === 1
+  const rentAvailable = Number.isFinite(stockRenta) ? stockRenta > 0 : book.availability === 1
+  const isAvailable = hasSplitStock ? buyAvailable || rentAvailable : book.availability === 1
 
   const statusText = isAvailable ? 'En stock' : 'No disponible'
 
@@ -98,10 +97,10 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
         : 0
 
   const coverSrc =
-    (coversRev >= 0 ? getLocalCoverUrl(book.titulo) : null) || createCoverDataUri(book.titulo)
+    (coversRev >= 0 ? getLocalCoverUrl(book.title) : null) || createCoverDataUri(book.title)
 
   const ensureUserOrRedirect = () => {
-    if (!user?.id_usuario) {
+    if (!user?.id) {
       navigate('/login')
       return null
     }
@@ -110,7 +109,7 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
 
   const handleCompraError = (msg: string) => {
     if (msg.toLowerCase().includes('usuario no encontrado')) {
-      authService.logout()
+      logoutUseCase.execute()
       showError(msg)
       navigate('/login')
       return
@@ -119,7 +118,7 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
   }
 
   const onBuy = async () => {
-    if (!book.id_libro) return
+    if (!book.id) return
     const currentUser = ensureUserOrRedirect()
     if (!currentUser) return
 
@@ -144,11 +143,11 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
     }
 
     try {
-      const response = await api.post('/carrito', {
-        id_usuario: currentUser.id_usuario,
-        id_libro: book.id_libro,
+      /*const response = await api.post('/cart', {
+        id_usuario: currentUser.id,
+        id_libro: book.id,
         cantidad,
-      })
+        })*/
 
       if (response.error) {
         handleCompraError(response.error.message || 'No se pudo registrar la compra')
@@ -164,7 +163,7 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
   }
 
   const onRent = async () => {
-    if (!book.id_libro) return
+    if (!book.id) return
     const currentUser = ensureUserOrRedirect()
     if (!currentUser) return
 
@@ -180,9 +179,9 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
     }
 
     try {
-      const response = await api.post('/prestamos', {
-        id_usuario: currentUser.id_usuario,
-        id_libro: book.id_libro,
+      const response = await api.post('/loans', {
+        id_user: currentUser.id,
+        id_libro: book.id,
         cantidad,
       })
 
@@ -226,21 +225,21 @@ export default function BookCard({ book, onOpenDetails, mode = 'todos' }: BookCa
       <div className='p-4 flex flex-col sm:flex-row gap-4 items-start'>
         <img
           src={coverSrc}
-          alt={`Portada del libro ${book.titulo || ''}`.trim()}
+          alt={`Portada del libro ${book.title || ''}`.trim()}
           className='w-20 sm:w-24 md:w-28 object-cover rounded-md border border-gray-200 shrink-0 bg-gray-50'
           onError={(ev) => {
             ev.currentTarget.onerror = null
-            ev.currentTarget.src = createCoverDataUri(book.titulo)
+            ev.currentTarget.src = createCoverDataUri(book.title)
           }}
         />
 
         <div className='flex-1'>
           <div className='flex items-start justify-between gap-3'>
             <div>
-              <h3 className='text-lg font-bold text-gray-900'>{book.titulo || 'Sin título'}</h3>
+              <h3 className='text-lg font-bold text-gray-900'>{book.title || 'Sin título'}</h3>
               <p className='text-sm text-gray-600 mt-1'>
-                {(book.autor || 'Autor desconocido') +
-                  (book.nombre_categoria ? ` · ${book.nombre_categoria}` : '')}
+                {(book.author || 'Autor desconocido') +
+                  (book.category_name ? ` · ${book.category_name}` : '')}
               </p>
             </div>
             <span

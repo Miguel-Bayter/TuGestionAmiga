@@ -1,5 +1,5 @@
-import type { PurchaseEntity } from '@/modules/purchase/domain/entity/purchase.entity'
+import type { PurchaseEntity } from '@/modules/purchase/domain/entity/purchase.entity';
 
 export interface IPurchaseRepository {
-  getByUserId(userId: number): Promise<PurchaseEntity[]>
+  getByUserId(userId: number): Promise<PurchaseEntity[]>;
 }

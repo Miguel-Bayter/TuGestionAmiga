@@ -22,7 +22,11 @@ export class ToastStateService {
     return `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   }
 
-  private addToast(message: string, type: 'success' | 'error' | 'warning' | 'info', duration?: number): void {
+  private addToast(
+    message: string,
+    type: 'success' | 'error' | 'warning' | 'info',
+    duration?: number
+  ): void {
     const id = this.generateId()
     const toast: ToastMessage = {
       id,

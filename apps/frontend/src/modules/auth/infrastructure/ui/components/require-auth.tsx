@@ -16,8 +16,8 @@ interface RequireAuthProps {
 export function RequireAuth({ children }: RequireAuthProps) {
   const location = useLocation()
   const container = useContainer()
-  const authService = container.cradle.authStateService as any
-  const state = useServiceState(authService) as any
+  const { authStateService } = container.cradle
+  const state = useServiceState(authStateService)
   const { user, isAuthenticated, isLoading } = state
 
   // Show loading state while checking auth
@@ -33,7 +33,7 @@ export function RequireAuth({ children }: RequireAuthProps) {
   }
 
   // Redirect to login if not authenticated
-  if (!isAuthenticated || !user?.id_usuario) {
+  if (!isAuthenticated || !user?.id) {
     return <Navigate to={ROUTES.LOGIN} replace state={{ from: location.pathname }} />
   }
 

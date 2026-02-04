@@ -2,7 +2,9 @@ import { ComponentType, lazy } from 'react'
 import { LoginPage } from '@/modules/auth/infrastructure/ui/pages/login.page'
 import { RegisterPage } from '@/modules/auth/infrastructure/ui/pages/register.page'
 // Lazy-loaded pages for code splitting
-const DashboardPage = lazy(() => import('@/modules/dashboard/infrastructure/ui/pages/dashboard.page'))
+const DashboardPage = lazy(
+  () => import('@/modules/dashboard/infrastructure/ui/pages/dashboard.page')
+)
 const CartPage = lazy(() => import('@/modules/cart/infrastructure/ui/pages/cart.page'))
 const LoansPage = lazy(() => import('@/modules/loans/infrastructure/ui/pages/loans.page'))
 const AccountPage = lazy(() => import('@/modules/user/infrastructure/ui/pages/account.page'))

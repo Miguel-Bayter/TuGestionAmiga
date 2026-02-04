@@ -140,22 +140,22 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const onCatalogUpdated = () => load()
-     const onLoansUpdated = () => {
-       const uid = user?.id_usuario
-       if (!uid) return
+    const onLoansUpdated = () => {
+      const uid = user?.id_usuario
+      if (!uid) return
 
-       getLoansUseCase
-         .execute()
-         .then((list: any) => {
-           const loans = Array.isArray(list) ? list : []
-           const active = loans.filter((r: any) => {
-             const st = String(r?.estado || '').toLowerCase()
-             return !st.includes('devuel')
-           })
-           setMyLoansCount(active.length)
-         })
-         .catch(() => setMyLoansCount(0))
-     }
+      getLoansUseCase
+        .execute()
+        .then((list: any) => {
+          const loans = Array.isArray(list) ? list : []
+          const active = loans.filter((r: any) => {
+            const st = String(r?.estado || '').toLowerCase()
+            return !st.includes('devuel')
+          })
+          setMyLoansCount(active.length)
+        })
+        .catch(() => setMyLoansCount(0))
+    }
 
     window.addEventListener('tga_catalog_updated', onCatalogUpdated)
     window.addEventListener('tga_loans_updated', onLoansUpdated)
@@ -188,23 +188,23 @@ export default function DashboardPage() {
         return
       }
 
-       try {
-         const users = await getLoansUseCase.execute()
-         if (alive && users) {
-           setUsersCount(Array.isArray(users) ? users.length : 0)
-         }
-       } catch {
-         if (alive) setUsersCount(0)
-       }
+      try {
+        const users = await getLoansUseCase.execute()
+        if (alive && users) {
+          setUsersCount(Array.isArray(users) ? users.length : 0)
+        }
+      } catch {
+        if (alive) setUsersCount(0)
+      }
 
-       try {
-         const loans = await getLoansUseCase.execute()
-         if (alive && loans) {
-           setAdminLoans(Array.isArray(loans) ? loans : [])
-         }
-       } catch {
-         if (alive) setAdminLoans([])
-       }
+      try {
+        const loans = await getLoansUseCase.execute()
+        if (alive && loans) {
+          setAdminLoans(Array.isArray(loans) ? loans : [])
+        }
+      } catch {
+        if (alive) setAdminLoans([])
+      }
     }
 
     loadAdminMetrics()
@@ -223,17 +223,17 @@ export default function DashboardPage() {
         return
       }
 
-       try {
-         const loans = await getLoansUseCase.execute()
-         const list = Array.isArray(loans) ? loans : []
-         const active = list.filter((r: any) => {
-           const st = String(r?.estado || '').toLowerCase()
-           return !st.includes('devuel')
-         })
-         if (alive) setMyLoansCount(active.length)
-       } catch {
-         if (alive) setMyLoansCount(0)
-       }
+      try {
+        const loans = await getLoansUseCase.execute()
+        const list = Array.isArray(loans) ? loans : []
+        const active = list.filter((r: any) => {
+          const st = String(r?.estado || '').toLowerCase()
+          return !st.includes('devuel')
+        })
+        if (alive) setMyLoansCount(active.length)
+      } catch {
+        if (alive) setMyLoansCount(0)
+      }
     }
 
     loadMyLoans()

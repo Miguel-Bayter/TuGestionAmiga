@@ -1,6 +1,6 @@
-import type { PurchaseEntity } from '@/modules/purchase/domain/entity/purchase.entity'
-import type { IPurchaseRepository } from '@/modules/purchase/domain/interface/purchase.repository'
-import type { PrismaClient } from '@prisma/client'
+import type { PurchaseEntity } from '@/modules/purchase/domain/entity/purchase.entity';
+import type { IPurchaseRepository } from '@/modules/purchase/domain/interface/purchase.repository';
+import type { PrismaClient } from '@prisma/client';
 
 export class PurchaseRepository implements IPurchaseRepository {
   constructor(private prisma: PrismaClient) {}
@@ -10,7 +10,7 @@ export class PurchaseRepository implements IPurchaseRepository {
       where: { userId },
       include: { book: true },
       orderBy: { date: 'desc' },
-    })
+    });
 
     return purchases.map((purchase) => ({
       ...purchase,
@@ -22,6 +22,6 @@ export class PurchaseRepository implements IPurchaseRepository {
             author: purchase.book.author,
           }
         : undefined,
-    }))
+    }));
   }
 }

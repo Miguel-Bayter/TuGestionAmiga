@@ -117,9 +117,9 @@ container.register({
   returnLoanUseCase: asClass(ReturnLoanUseCase).singleton(),
   getOverdueLoansUseCase: asClass(GetOverdueLoansUseCase).singleton(),
 
-   // User Module (2)
-   getUserProfileUseCase: asClass(GetUserProfileUseCase).singleton(),
-   updateProfileUseCase: asClass(UpdateProfileUseCase).singleton(),
+  // User Module (2)
+  getUserProfileUseCase: asClass(GetUserProfileUseCase).singleton(),
+  updateProfileUseCase: asClass(UpdateProfileUseCase).singleton(),
 })
 
 // ============================================

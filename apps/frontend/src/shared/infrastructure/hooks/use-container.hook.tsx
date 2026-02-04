@@ -12,11 +12,7 @@ const ContainerContext = createContext<AwilixContainer<Cradle> | null>(null)
  * Provider que envuelve la aplicación con el contenedor
  */
 export function ContainerProvider({ children }: { children: ReactNode }) {
-  return (
-    <ContainerContext.Provider value={container}>
-      {children}
-    </ContainerContext.Provider>
-  )
+  return <ContainerContext.Provider value={container}>{children}</ContainerContext.Provider>
 }
 
 /**

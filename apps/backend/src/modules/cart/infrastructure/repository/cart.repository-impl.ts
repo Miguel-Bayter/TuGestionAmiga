@@ -40,4 +40,45 @@ export class CartRepository implements ICartRepository {
         : undefined,
     }));
   }
+
+  async addCartItem(userId: number, bookId: number, quantity: number): Promise<CartItemEntity> {
+    const cartItem = await this.prisma.cartItem.create({
+      data: {
+        userId,
+        bookId,
+        quantity,
+      },
+    });
+
+    return {
+      id: cartItem.id,
+      userId: cartItem.userId,
+      bookId: cartItem.bookId,
+      quantity: cartItem.quantity,
+      createdAt: cartItem.createdAt,
+      updatedAt: cartItem.updatedAt,
+      book: undefined,
+    };
+  }
+
+  async updateCartItemQuantity(cartItemId: number, quantity: number): Promise<CartItemEntity> {
+    const cartItem = await this.prisma.cartItem.update({
+      where: { id: cartItemId },
+      data: { quantity },
+    });
+
+    return {
+      id: cartItem.id,
+      userId: cartItem.userId,
+      bookId: cartItem.bookId,
+      quantity: cartItem.quantity,
+      createdAt: cartItem.createdAt,
+      updatedAt: cartItem.updatedAt,
+      book: undefined,
+    };
+  }
+
+  async removeCartItem(cartItemId: number): Promise<void> {
+    await this.prisma.cartItem.delete({ where: { id: cartItemId } });
+  }
 }

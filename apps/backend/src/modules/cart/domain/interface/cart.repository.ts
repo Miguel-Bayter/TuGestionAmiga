@@ -11,4 +11,7 @@ export interface ICartRepository {
    * @returns Promise with array of cart item entities
    */
   getByUserId(userId: number): Promise<CartItemEntity[]>;
+  addCartItem(userId: number, bookId: number, quantity: number): Promise<CartItemEntity>;
+  updateCartItemQuantity(cartItemId: number, quantity: number): Promise<CartItemEntity>;
+  removeCartItem(cartItemId: number): Promise<void>;
 }

@@ -113,12 +113,12 @@ export function Layout({ children }: LayoutProps) {
 
       <div className='flex-1 md:flex md:items-start'>
         {/* Sidebar */}
-         <Sidebar
-           isOpen={isSidebarOpen}
-           isCollapsed={sidebarCollapsed}
-           onClose={() => uiService.closeSidebar()}
-           onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
-         />
+        <Sidebar
+          isOpen={isSidebarOpen}
+          isCollapsed={sidebarCollapsed}
+          onClose={() => uiService.closeSidebar()}
+          onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
+        />
 
         {/* Main content */}
         <main

@@ -20,13 +20,9 @@ export function createApiRoutes(container: AwilixContainer) {
   });
 
   // Test endpoint for JWT middleware verification
-  router.get(
-    '/test-auth',
-    requireAuth,
-    (_req: Request, res: Response) => {
-      res.json({ ok: true, user: _req.user });
-    }
-  );
+  router.get('/test-auth', requireAuth, (_req: Request, res: Response) => {
+    res.json({ ok: true, user: _req.user });
+  });
 
   // Public utility endpoint - list available book covers
   router.get('/covers', async (_req: Request, res: Response) => {
