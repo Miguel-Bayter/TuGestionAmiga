@@ -8,7 +8,10 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(pnpm --filter @tu-gestion-amiga/backend build:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(tree:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm type-check:*)"
     ]
   }
 }

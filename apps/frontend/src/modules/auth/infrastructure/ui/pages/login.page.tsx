@@ -5,12 +5,14 @@
 
 import { useState, FormEvent, ChangeEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useContainer } from '@/shared/infrastructure/hooks'
 import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { ROUTES } from '@/shared/application/config'
 import { useToast } from '@/shared/infrastructure/hooks/use-toast.hook'
 
 export function LoginPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const container = useContainer()
@@ -43,14 +45,14 @@ export function LoginPage() {
       const success = await authStateService.login({ email, password })
 
       if (success) {
-        toast.success('Welcome back')
+        toast.success(t('messages.welcomeBack'))
         const redirectTo = (location.state as { from?: string })?.from || ROUTES.HOME
         navigate(redirectTo, { replace: true })
       } else {
-        toast.error('Invalid credentials')
+        toast.error(t('errors.invalidCredentials'))
       }
     } catch (error: unknown) {
-      toast.error((error as { message?: string }).message || 'Error signing in')
+      toast.error((error as { message?: string }).message || t('auth.errorSigningIn'))
     } finally {
       setIsSubmitting(false)
     }
@@ -72,7 +74,7 @@ export function LoginPage() {
     setFpSuccess('')
 
     if (!fpEmail) {
-      setFpError('Enter your email')
+      setFpError(t('auth.enterEmail'))
       return
     }
 
@@ -81,16 +83,16 @@ export function LoginPage() {
     try {
       const response = await forgotPasswordUseCase.execute(fpEmail)
 
-      setFpSuccess('If the email exists, a temporary code was generated.')
+      setFpSuccess(t('auth.codeEmailSent'))
 
       if (response?.demo_code) {
         setFpCode(String(response.demo_code))
-        setFpSuccess(`Code generated (demo): ${response.demo_code}`)
+        setFpSuccess(t('auth.codeGenerated', { code: response.demo_code }))
       }
 
       setFpStep(2)
     } catch (error: unknown) {
-      setFpError((error as { message?: string }).message || 'Could not send code')
+      setFpError((error as { message?: string }).message || t('auth.couldNotSendCode'))
     } finally {
       setFpLoading(false)
     }
@@ -102,12 +104,12 @@ export function LoginPage() {
     setFpSuccess('')
 
     if (!fpEmail || !fpCode || !fpNewPassword || !fpConfirmPassword) {
-      setFpError('Complete all fields')
+      setFpError(t('auth.completeAllFields'))
       return
     }
 
     if (fpNewPassword !== fpConfirmPassword) {
-      setFpError('Passwords do not match')
+      setFpError(t('errors.passwordMismatch'))
       return
     }
 
@@ -116,13 +118,13 @@ export function LoginPage() {
     try {
       await verifyPasswordCodeUseCase.execute(fpEmail, fpCode, fpNewPassword)
 
-      setFpSuccess('Password updated. You can now sign in.')
+      setFpSuccess(t('auth.passwordUpdated'))
       setFpStep(1)
       setFpCode('')
       setFpNewPassword('')
       setFpConfirmPassword('')
     } catch (error: unknown) {
-      setFpError((error as { message?: string }).message || 'Could not reset password')
+      setFpError((error as { message?: string }).message || t('auth.couldNotReset'))
     } finally {
       setFpLoading(false)
     }
@@ -133,12 +135,12 @@ export function LoginPage() {
       <div className='bg-white p-8 rounded-lg shadow-lg w-full max-w-md'>
         <div>
           <h2 className='text-center text-3xl font-extrabold text-gray-900'>
-            Sign in to your account
+            {t('auth.loginTitle')}
           </h2>
           <p className='mt-2 text-center text-sm text-gray-600'>
-            Or{' '}
+            {t('auth.or')}{' '}
             <Link to={ROUTES.REGISTER} className='font-medium text-blue-600 hover:text-blue-500'>
-              create a new account
+              {t('auth.createNewAccount')}
             </Link>
           </p>
         </div>
@@ -147,7 +149,7 @@ export function LoginPage() {
           <div className='rounded-md shadow-sm -space-y-px'>
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-2'>
-                Email
+                {t('auth.email')}
               </label>
               <input
                 type='email'
@@ -160,12 +162,12 @@ export function LoginPage() {
               />
             </div>
             <div className='pt-4'>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>Password</label>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>{t('auth.password')}</label>
               <input
                 type='password'
                 required
                 className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                placeholder='Password'
+                placeholder={t('auth.password')}
                 value={password}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                 disabled={isSubmitting}
@@ -186,7 +188,7 @@ export function LoginPage() {
                   resetForgotState()
                 }}
               >
-                Forgot your password?
+                {t('auth.forgotYourPassword')}
               </button>
             </div>
           </div>
@@ -195,9 +197,9 @@ export function LoginPage() {
             <div className='rounded-xl border border-gray-200 bg-linear-to-b from-gray-50 to-white p-4 shadow-sm'>
               <div className='flex items-start justify-between gap-3'>
                 <div>
-                  <p className='text-sm font-semibold text-gray-800'>Recover access</p>
+                  <p className='text-sm font-semibold text-gray-800'>{t('auth.recoverAccess')}</p>
                   <p className='mt-1 text-sm text-gray-600'>
-                    Generate a temporary code and use it to create a new password.
+                    {t('auth.recoverDescription')}
                   </p>
                 </div>
                 <button
@@ -208,22 +210,22 @@ export function LoginPage() {
                     resetForgotState()
                   }}
                 >
-                  Close
+                  {t('common.close')}
                 </button>
               </div>
 
               {fpStep === 1 ? (
                 <div className='mt-4 rounded-lg border border-gray-200 bg-white p-4'>
                   <p className='text-xs font-semibold uppercase tracking-wide text-gray-500'>
-                    Step 1
+                    {t('auth.step1')}
                   </p>
                   <p className='mt-1 text-sm text-gray-700'>
-                    Enter your email and press &quot;Send code&quot;.
+                    {t('auth.step1Description')}
                   </p>
 
                   <div className='mt-3'>
                     <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Email
+                      {t('auth.email')}
                     </label>
                     <input
                       type='email'
@@ -242,21 +244,21 @@ export function LoginPage() {
                       onClick={handleSendCode}
                       disabled={fpLoading}
                     >
-                      {fpLoading ? 'Sending...' : 'Send code'}
+                      {fpLoading ? t('auth.sendingCode') : t('auth.sendCode')}
                     </button>
                   </div>
                 </div>
               ) : (
                 <div className='mt-4 rounded-lg border border-gray-200 bg-white p-4'>
                   <p className='text-xs font-semibold uppercase tracking-wide text-gray-500'>
-                    Step 2
+                    {t('auth.step2')}
                   </p>
                   <p className='mt-1 text-sm text-gray-700'>
-                    Enter the code and your new password.
+                    {t('auth.step2Description')}
                   </p>
 
                   <div className='mt-3'>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>Code</label>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>{t('auth.code')}</label>
                     <input
                       type='text'
                       className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
@@ -269,12 +271,12 @@ export function LoginPage() {
 
                   <div className='mt-3'>
                     <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      New password
+                      {t('auth.newPassword')}
                     </label>
                     <input
                       type='password'
                       className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                      placeholder='New password'
+                      placeholder={t('auth.newPassword')}
                       value={fpNewPassword}
                       onChange={(e) => setFpNewPassword(e.target.value)}
                       disabled={fpLoading}
@@ -283,12 +285,12 @@ export function LoginPage() {
 
                   <div className='mt-3'>
                     <label className='block text-sm font-medium text-gray-700 mb-2'>
-                      Confirm new password
+                      {t('auth.confirmNewPassword')}
                     </label>
                     <input
                       type='password'
                       className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                      placeholder='Confirm new password'
+                      placeholder={t('auth.confirmNewPassword')}
                       value={fpConfirmPassword}
                       onChange={(e) => setFpConfirmPassword(e.target.value)}
                       disabled={fpLoading}
@@ -305,7 +307,7 @@ export function LoginPage() {
                       }}
                       disabled={fpLoading}
                     >
-                      Back
+                      {t('common.back')}
                     </button>
 
                     <button
@@ -314,7 +316,7 @@ export function LoginPage() {
                       onClick={handleResetPassword}
                       disabled={fpLoading}
                     >
-                      {fpLoading ? 'Processing...' : 'Reset'}
+                      {fpLoading ? t('auth.processing') : t('common.reset')}
                     </button>
                   </div>
                 </div>
@@ -339,7 +341,7 @@ export function LoginPage() {
               className='w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50'
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Signing in...' : 'Sign in'}
+              {isSubmitting ? t('auth.signingIn') : t('auth.signIn')}
             </button>
           </div>
         </form>

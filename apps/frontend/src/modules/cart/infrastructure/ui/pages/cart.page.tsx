@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { api } from '@/data/Repository'
 import { useContainer } from '@/shared/infrastructure/hooks'
 import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
@@ -14,6 +15,7 @@ interface CartItemData {
 }
 
 export default function CartPage() {
+  const { t } = useTranslation()
   const container = useContainer()
   const { authService } = container.cradle
   const { user } = useServiceState(authService)
@@ -26,7 +28,7 @@ export default function CartPage() {
   const load = useCallback(async () => {
     if (!user?.id) {
       setItems([])
-      showError('Sign in to view your cart.')
+      showError(t('cart.signInToView'))
       return
     }
 
@@ -38,11 +40,11 @@ export default function CartPage() {
       setItems(Array.isArray(response.data) ? response.data : [])
     } catch (e: unknown) {
       setItems([])
-      showError((e as { message?: string }).message || 'Could not load cart.')
+      showError((e as { message?: string }).message || t('cart.couldNotLoad'))
     } finally {
       setLoading(false)
     }
-  }, [showError, user?.id])
+  }, [showError, t, user?.id])
 
   useEffect(() => {
     load()
@@ -67,15 +69,15 @@ export default function CartPage() {
       )
 
       if (response.error) {
-        showError(response.error.message || 'Could not remove item.')
+        showError(response.error.message || t('cart.couldNotRemove'))
         return
       }
 
-      showSuccess('Item removed from cart.')
+      showSuccess(t('cart.itemRemoved'))
       window.dispatchEvent(new Event('tga_cart_updated'))
       await load()
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'Could not remove item.')
+      showError((e as { message?: string }).message || t('cart.couldNotRemove'))
     }
   }
 
@@ -91,21 +93,21 @@ export default function CartPage() {
       })
 
       if (response.error) {
-        showError(response.error.message || 'Could not complete purchase.')
+        showError(response.error.message || t('cart.couldNotCheckout'))
         return
       }
 
-      showSuccess('Purchase completed.')
+      showSuccess(t('cart.purchaseComplete'))
       window.dispatchEvent(new Event('tga_cart_updated'))
       window.dispatchEvent(new Event('tga_catalog_updated'))
       window.dispatchEvent(
         new CustomEvent('tga_toast', {
-          detail: { message: `Purchase successful! Total: ${totalLabel}. Thank you for your purchase.` },
+          detail: { message: t('cart.purchaseSuccess', { total: totalLabel }) },
         })
       )
       await load()
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'Could not complete purchase.')
+      showError((e as { message?: string }).message || t('cart.couldNotCheckout'))
     } finally {
       setCheckingOut(false)
     }
@@ -114,28 +116,28 @@ export default function CartPage() {
   return (
     <div>
       <div className='mb-6'>
-        <h1 className='text-3xl font-bold text-gray-900'>Cart</h1>
-        <p className='text-gray-600 mt-1'>Review your books before purchasing.</p>
+        <h1 className='text-3xl font-bold text-gray-900'>{t('cart.cart')}</h1>
+        <p className='text-gray-600 mt-1'>{t('cart.reviewBeforePurchasing')}</p>
       </div>
 
       <div className='bg-white shadow rounded-lg overflow-hidden'>
         <div className='px-4 sm:px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between'>
-          <h2 className='text-lg font-semibold text-gray-900'>My items</h2>
+          <h2 className='text-lg font-semibold text-gray-900'>{t('cart.myItems')}</h2>
           <button
             type='button'
             className='rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 active:translate-y-px disabled:opacity-50 w-full sm:w-auto'
             disabled={checkingOut || loading || (items || []).length === 0}
             onClick={onCheckout}
           >
-            Buy ({formatCurrency(total)})
+            {t('cart.buy')} ({formatCurrency(total)})
           </button>
         </div>
 
         <div className='lg:hidden'>
-          {loading && <p className='px-4 py-4 text-sm text-gray-500'>Loading...</p>}
+          {loading && <p className='px-4 py-4 text-sm text-gray-500'>{t('common.loading')}</p>}
 
           {!loading && (!items || items.length === 0) && (
-            <p className='px-4 py-4 text-sm text-gray-500'>Your cart is empty.</p>
+            <p className='px-4 py-4 text-sm text-gray-500'>{t('cart.empty')}</p>
           )}
 
           {(items || []).map((it) => {
@@ -161,14 +163,14 @@ export default function CartPage() {
 
                   <div className='mt-3 grid grid-cols-2 gap-2 text-sm'>
                     <p className='text-gray-600'>
-                      <span className='font-semibold text-gray-900'>Quantity:</span> {qty}
+                      <span className='font-semibold text-gray-900'>{t('cart.quantity')}:</span> {qty}
                     </p>
                     <p className='text-gray-600'>
-                      <span className='font-semibold text-gray-900'>Price:</span>{' '}
+                      <span className='font-semibold text-gray-900'>{t('cart.price')}:</span>{' '}
                       {Number.isFinite(price) ? formatCurrency(price) : '-'}
                     </p>
                     <p className='col-span-2 text-gray-600'>
-                      <span className='font-semibold text-gray-900'>Subtotal:</span>{' '}
+                      <span className='font-semibold text-gray-900'>{t('cart.subtotal')}:</span>{' '}
                       {subtotal == null ? '-' : formatCurrency(subtotal)}
                     </p>
                   </div>
@@ -179,7 +181,7 @@ export default function CartPage() {
                       className='rounded-lg bg-gray-200 px-3 py-2 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-300 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 active:translate-y-px'
                       onClick={() => onRemove(it.bookId)}
                     >
-                      Remove
+                      {t('cart.remove')}
                     </button>
                   </div>
                 </div>
@@ -193,16 +195,16 @@ export default function CartPage() {
             <thead className='bg-gray-50'>
               <tr>
                 <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Book
+                  {t('books.book')}
                 </th>
                 <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Quantity
+                  {t('cart.quantity')}
                 </th>
                 <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Price
+                  {t('cart.price')}
                 </th>
                 <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                  Subtotal
+                  {t('cart.subtotal')}
                 </th>
                 <th className='px-4 sm:px-6 py-3' />
               </tr>
@@ -211,7 +213,7 @@ export default function CartPage() {
               {loading && (
                 <tr>
                   <td colSpan={5} className='px-4 sm:px-6 py-4 text-sm text-gray-500'>
-                    Loading...
+                    {t('common.loading')}
                   </td>
                 </tr>
               )}
@@ -219,7 +221,7 @@ export default function CartPage() {
               {!loading && (!items || items.length === 0) && (
                 <tr>
                   <td colSpan={5} className='px-4 sm:px-6 py-4 text-sm text-gray-500'>
-                    Your cart is empty.
+                    {t('cart.empty')}
                   </td>
                 </tr>
               )}
@@ -260,7 +262,7 @@ export default function CartPage() {
                         className='rounded-lg bg-gray-200 px-3 py-2 text-xs font-semibold text-gray-800 shadow-sm hover:bg-gray-300 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 active:translate-y-px'
                         onClick={() => onRemove(it.bookId)}
                       >
-                        Remove
+                        {t('cart.remove')}
                       </button>
                     </td>
                   </tr>

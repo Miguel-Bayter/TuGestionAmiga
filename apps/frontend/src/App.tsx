@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { routes } from '@/shared/infrastructure/ui/react/routes'
 import { Toast } from '@/shared/infrastructure/ui/react/components/Toast'
 import { Layout } from '@/shared/infrastructure/ui/react/components/Layout'
+import { LoadingSpinner } from '@/shared/infrastructure/ui/react/components/LoadingSpinner'
 import { ContainerProvider } from '@/shared/infrastructure/hooks/use-container.hook'
 import { RequireAuth } from '@/modules/auth/infrastructure/ui/components/require-auth'
 import { RequireAdmin } from '@/modules/auth/infrastructure/ui/components/require-admin'
@@ -39,16 +40,7 @@ function App() {
               if (requiresAuth || requiresAdmin) {
                 element = (
                   <Layout>
-                    <Suspense
-                      fallback={
-                        <div className='flex items-center justify-center min-h-screen'>
-                          <div className='text-center'>
-                            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto'></div>
-                            <p className='mt-4 text-gray-600'>Cargando...</p>
-                          </div>
-                        </div>
-                      }
-                    >
+                    <Suspense fallback={<LoadingSpinner />}>
                       {element}
                     </Suspense>
                   </Layout>

@@ -13,7 +13,7 @@ const HelpPage = lazy(() => import('@/modules/dashboard/infrastructure/ui/pages/
 
 export interface RouteConfig {
   path: string
-  title: string
+  titleKey: string
   element: ComponentType
   requiresAuth?: boolean
   requiresAdmin?: boolean
@@ -25,13 +25,13 @@ export const routes: RouteConfig[] = [
   // Public routes
   {
     path: '/login',
-    title: 'Iniciar Sesión',
+    titleKey: 'auth.login',
     element: LoginPage,
     showInNav: false,
   },
   {
-    path: '/registro',
-    title: 'Registro',
+    path: '/register',
+    titleKey: 'auth.register',
     element: RegisterPage,
     showInNav: false,
   },
@@ -39,15 +39,15 @@ export const routes: RouteConfig[] = [
   // Protected routes
   {
     path: '/',
-    title: 'Inicio',
+    titleKey: 'nav.home',
     element: DashboardPage,
     requiresAuth: true,
     showInNav: true,
     icon: 'home',
   },
   {
-    path: '/buscar',
-    title: 'Buscar',
+    path: '/search',
+    titleKey: 'nav.search',
     element: DashboardPage, // Dashboard handles both home and search views
     requiresAuth: true,
     showInNav: true,
@@ -55,38 +55,38 @@ export const routes: RouteConfig[] = [
   },
   {
     path: '/rentable',
-    title: 'Rentable',
+    titleKey: 'nav.rentable',
     element: DashboardPage, // Dashboard handles rentable mode
     requiresAuth: true,
     showInNav: false, // Handled via tabs in Dashboard
   },
   {
-    path: '/carrito',
-    title: 'Carrito',
+    path: '/cart',
+    titleKey: 'nav.cart',
     element: CartPage,
     requiresAuth: true,
     showInNav: true,
     icon: 'cart',
   },
   {
-    path: '/prestamos',
-    title: 'Mis Préstamos',
+    path: '/loans',
+    titleKey: 'nav.loans',
     element: LoansPage,
     requiresAuth: true,
     showInNav: true,
     icon: 'book-open',
   },
   {
-    path: '/cuenta',
-    title: 'Mi Cuenta',
+    path: '/account',
+    titleKey: 'nav.account',
     element: AccountPage,
     requiresAuth: true,
     showInNav: true,
     icon: 'user',
   },
   {
-    path: '/ayuda',
-    title: 'Ayuda',
+    path: '/help',
+    titleKey: 'nav.help',
     element: HelpPage,
     requiresAuth: true,
     showInNav: true,
@@ -96,7 +96,7 @@ export const routes: RouteConfig[] = [
   // Admin routes
   {
     path: '/admin',
-    title: 'Administración',
+    titleKey: 'nav.admin',
     element: AdminPage,
     requiresAuth: true,
     requiresAdmin: true,

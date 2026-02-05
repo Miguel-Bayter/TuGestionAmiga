@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { api } from '@/data/Repository'
 import { Book, User } from '@/shared/domain/types'
 import { useContainer, useUseCase } from '@/shared/infrastructure/hooks'
@@ -80,6 +81,7 @@ const isBookPurchasable = (b: Book): boolean => {
 }
 
 export default function DashboardPage() {
+  const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
   const container = useContainer()
@@ -292,9 +294,9 @@ export default function DashboardPage() {
         <section className='rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 p-5 sm:p-6'>
           <div className='flex flex-col gap-1'>
             <h1 className='text-xl sm:text-2xl font-bold text-gray-900'>
-              Welcome, {user?.name || 'User'}
+              {t('dashboard.welcomeUser', { name: user?.name || 'User' })}
             </h1>
-            <p className='text-sm text-gray-500'>Manage your library efficiently</p>
+            <p className='text-sm text-gray-500'>{t('dashboard.manageLibrary')}</p>
           </div>
 
           <div className='mt-5'>
@@ -319,7 +321,7 @@ export default function DashboardPage() {
                 <input
                   id='quick-search'
                   type='text'
-                  placeholder='Quick search for books...'
+                  placeholder={t('dashboard.quickSearch')}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   className='w-full h-11 pl-10 pr-3 text-sm text-gray-900 border border-gray-200 rounded-xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500'
@@ -335,7 +337,7 @@ export default function DashboardPage() {
                 }}
                 className='h-11 text-gray-700 bg-gray-100 hover:bg-gray-200 font-semibold rounded-xl text-sm px-4 w-full sm:w-auto'
               >
-                Click to search
+                {t('dashboard.clickToSearch')}
               </button>
             </div>
           </div>
@@ -344,7 +346,7 @@ export default function DashboardPage() {
             <div className='rounded-2xl bg-white ring-1 ring-gray-200/60 shadow-sm p-4 border-l-4 border-blue-600'>
               <div className='flex items-start justify-between gap-3'>
                 <div className='min-w-0'>
-                  <div className='text-xs font-semibold text-gray-500'>Total Books</div>
+                  <div className='text-xs font-semibold text-gray-500'>{t('admin.totalBooks')}</div>
                   <div className='text-2xl font-bold text-gray-900'>{totalBooks}</div>
                 </div>
                 <div className='h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center'>
@@ -370,7 +372,7 @@ export default function DashboardPage() {
               <div className='flex items-start justify-between gap-3'>
                 <div className='min-w-0'>
                   <div className='text-xs font-semibold text-gray-500'>
-                    {isAdmin ? 'Active Loans' : 'My Loans'}
+                    {isAdmin ? t('admin.activeLoans') : t('dashboard.myLoans')}
                   </div>
                   <div className='text-2xl font-bold text-gray-900'>
                     {isAdmin ? activeAdminLoans.length : myLoansCount}
@@ -405,7 +407,7 @@ export default function DashboardPage() {
               <div className='rounded-2xl bg-white ring-1 ring-gray-200/60 shadow-sm p-4 border-l-4 border-emerald-500'>
                 <div className='flex items-start justify-between gap-3'>
                   <div className='min-w-0'>
-                    <div className='text-xs font-semibold text-gray-500'>Registered Users</div>
+                    <div className='text-xs font-semibold text-gray-500'>{t('dashboard.registeredUsers')}</div>
                     <div className='text-2xl font-bold text-gray-900'>{usersCount}</div>
                   </div>
                   <div className='h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center'>
@@ -442,7 +444,7 @@ export default function DashboardPage() {
               <div className='rounded-2xl bg-white ring-1 ring-gray-200/60 shadow-sm p-4 border-l-4 border-emerald-500'>
                 <div className='flex items-start justify-between gap-3'>
                   <div className='min-w-0'>
-                    <div className='text-xs font-semibold text-gray-500'>Rentable Books</div>
+                    <div className='text-xs font-semibold text-gray-500'>{t('books.rentableBooks')}</div>
                     <div className='text-2xl font-bold text-gray-900'>{rentableBooks}</div>
                   </div>
                   <div className='h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center'>
@@ -474,7 +476,7 @@ export default function DashboardPage() {
             <div className='rounded-2xl bg-white ring-1 ring-gray-200/60 shadow-sm p-4 border-l-4 border-purple-500'>
               <div className='flex items-start justify-between gap-3'>
                 <div className='min-w-0'>
-                  <div className='text-xs font-semibold text-gray-500'>Available Books</div>
+                  <div className='text-xs font-semibold text-gray-500'>{t('books.availableBooks')}</div>
                   <div className='text-2xl font-bold text-gray-900'>{availableBooks}</div>
                 </div>
                 <div className='h-10 w-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center'>
@@ -511,8 +513,8 @@ export default function DashboardPage() {
                 className='w-full rounded-2xl bg-blue-700 hover:bg-blue-800 text-white shadow-sm ring-1 ring-blue-700/30 p-4 text-left flex items-center justify-between gap-3'
               >
                 <div className='min-w-0'>
-                  <div className='text-sm font-bold'>Manage Books</div>
-                  <div className='text-xs text-blue-100'>Manage the catalog</div>
+                  <div className='text-sm font-bold'>{t('admin.manageBooks')}</div>
+                  <div className='text-xs text-blue-100'>{t('admin.manageCatalog')}</div>
                 </div>
                 <svg
                   className='h-6 w-6 text-blue-100'
@@ -536,8 +538,8 @@ export default function DashboardPage() {
                 className='w-full rounded-2xl bg-white hover:bg-gray-50 shadow-sm ring-1 ring-gray-200/60 p-4 text-left flex items-center justify-between gap-3'
               >
                 <div className='min-w-0'>
-                  <div className='text-sm font-bold text-gray-900'>Manage Users</div>
-                  <div className='text-xs text-gray-500'>Manage system users</div>
+                  <div className='text-sm font-bold text-gray-900'>{t('admin.manageUsers')}</div>
+                  <div className='text-xs text-gray-500'>{t('admin.manageSystemUsers')}</div>
                 </div>
                 <svg
                   className='h-6 w-6 text-blue-600'
@@ -566,9 +568,9 @@ export default function DashboardPage() {
               <div className='rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 p-4 sm:p-5'>
                 <div className='flex items-center justify-between gap-3'>
                   <div className='min-w-0'>
-                    <div className='text-sm font-bold text-gray-900'>Ad space</div>
+                    <div className='text-sm font-bold text-gray-900'>{t('dashboard.adSpace')}</div>
                     <div className='text-xs text-gray-500'>
-                      Reserved for Google AdSense integration
+                      {t('dashboard.adSpaceDescription')}
                     </div>
                   </div>
                   <div className='h-10 w-10 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center'>
@@ -594,7 +596,7 @@ export default function DashboardPage() {
           )}
 
           <div className='mt-6'>
-            <h2 className='text-base font-bold text-gray-900'>Latest Books Added</h2>
+            <h2 className='text-base font-bold text-gray-900'>{t('dashboard.latestBooks')}</h2>
             <div className='mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3'>
               {latestBooks.map((b) => {
                 const title = String(b?.title || 'Book')
@@ -624,23 +626,23 @@ export default function DashboardPage() {
 
       {showInicio && isAdmin && (
         <section className='rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 p-5 sm:p-6'>
-          <h2 className='text-base font-bold text-gray-900'>Active Loans</h2>
+          <h2 className='text-base font-bold text-gray-900'>{t('admin.activeLoans')}</h2>
           <div className='mt-4 overflow-x-auto'>
             <table className='min-w-full text-sm'>
               <thead>
                 <tr className='text-left text-gray-500'>
-                  <th className='py-2 pr-4 font-semibold'>User</th>
-                  <th className='py-2 pr-4 font-semibold'>Book</th>
-                  <th className='py-2 pr-4 font-semibold'>Due Date</th>
-                  <th className='py-2 pr-4 font-semibold'>Status</th>
-                  <th className='py-2 pr-4 font-semibold'>Actions</th>
+                  <th className='py-2 pr-4 font-semibold'>{t('user.title')}</th>
+                  <th className='py-2 pr-4 font-semibold'>{t('books.book')}</th>
+                  <th className='py-2 pr-4 font-semibold'>{t('loans.dueDate')}</th>
+                  <th className='py-2 pr-4 font-semibold'>{t('loans.status')}</th>
+                  <th className='py-2 pr-4 font-semibold'>{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className='divide-y divide-gray-200/70'>
                 {activeAdminLoansPreview.length === 0 && (
                   <tr>
                     <td className='py-4 text-gray-500' colSpan={5}>
-                      No active loans.
+                      {t('dashboard.noActiveLoans')}
                     </td>
                   </tr>
                 )}
@@ -680,7 +682,7 @@ export default function DashboardPage() {
                           onClick={() => navigate('/admin?tab=loans')}
                           className='text-sm font-semibold text-blue-600 hover:text-blue-700'
                         >
-                          View details
+                          {t('books.viewDetails')}
                         </button>
                       </td>
                     </tr>
@@ -697,7 +699,7 @@ export default function DashboardPage() {
           <div className='flex flex-col sm:flex-row gap-2'>
             <input
               type='text'
-              placeholder='Search books (e.g. Java)'
+              placeholder={t('dashboard.searchBooks')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className='w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500'
@@ -707,7 +709,7 @@ export default function DashboardPage() {
               onClick={() => load()}
               className='text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-4 py-3 sm:py-2 w-full sm:w-auto'
             >
-              Search
+              {t('common.search')}
             </button>
           </div>
 
@@ -735,7 +737,7 @@ export default function DashboardPage() {
                   d='M4 6h16M4 12h16M4 18h16'
                 />
               </svg>
-              <span>All</span>
+              <span>{t('common.all')}</span>
             </button>
 
             <button
@@ -761,7 +763,7 @@ export default function DashboardPage() {
                   d='M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 7H19M7 13l-2-8m2 8h12'
                 />
               </svg>
-              <span>Buy</span>
+              <span>{t('books.buy')}</span>
             </button>
 
             <button
@@ -793,7 +795,7 @@ export default function DashboardPage() {
                   d='M7 10V7a5 5 0 0110 0v3'
                 />
               </svg>
-              <span>Rentable</span>
+              <span>{t('books.rentable')}</span>
             </button>
 
             <button
@@ -803,12 +805,12 @@ export default function DashboardPage() {
               onClick={() => setViewGrid((v) => !v)}
               aria-label='Toggle view'
             >
-              <span id='view-toggle-label'>Toggle view</span>
+              <span id='view-toggle-label'>{t('dashboard.toggleView')}</span>
             </button>
           </div>
 
           <div>
-            <h2 className='text-2xl font-semibold text-gray-800 mb-4'>Results</h2>
+            <h2 className='text-2xl font-semibold text-gray-800 mb-4'>{t('dashboard.results')}</h2>
 
             <div
               id='results-container'
@@ -820,7 +822,7 @@ export default function DashboardPage() {
             >
               {filtered.length === 0 && (
                 <div className='text-center text-gray-500 py-10'>
-                  No books loaded yet. Load sample data in MySQL and reload.
+                  {t('dashboard.noBooks')}
                 </div>
               )}
 

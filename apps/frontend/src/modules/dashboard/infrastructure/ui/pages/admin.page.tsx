@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { api } from '@/data/Repository'
 import { useContainer } from '@/shared/infrastructure/hooks'
 import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
@@ -62,6 +63,7 @@ const emptyBook: AdminBook = {
 }
 
 export default function AdminPage() {
+  const { t } = useTranslation()
   const location = useLocation()
   const container = useContainer()
   const authService = container.cradle.authStateService as any
@@ -113,9 +115,9 @@ export default function AdminPage() {
       const loansResponse = await api.get<AdminLoan[]>('/admin/loans')
       setLoans(loansResponse.data || [])
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'Error loading data')
+      showError((e as { message?: string }).message || t('admin.errorLoadingData'))
     }
-  }, [showError])
+  }, [showError, t])
 
   useEffect(() => {
     loadAll()
@@ -130,7 +132,7 @@ export default function AdminPage() {
     }
 
     if (!payload.name || !payload.email || !payload.password) {
-      showError('Name, email, and password are required.')
+      showError(t('admin.nameEmailPasswordRequired'))
       return
     }
 
@@ -139,15 +141,15 @@ export default function AdminPage() {
       const response = await api.post('/admin/users', payload)
 
       if (response.error) {
-        showError(response.error.message || 'Could not create user.')
+        showError(response.error.message || t('admin.couldNotCreateUser'))
         return
       }
 
-      showSuccess('User created.')
+      showSuccess(t('admin.userCreated'))
       setNewUserForm({ name: '', email: '', password: '', roleId: 2 })
       await loadAll()
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'Could not create user.')
+      showError((e as { message?: string }).message || t('admin.couldNotCreateUser'))
     } finally {
       setCreatingUser(false)
     }
@@ -166,7 +168,7 @@ export default function AdminPage() {
     }
 
     if (!payload.title || !payload.author) {
-      showError('Title and author are required.')
+      showError(t('admin.titleAuthorRequired'))
       return
     }
 
@@ -177,62 +179,62 @@ export default function AdminPage() {
         : await api.post('/books', payload)
 
       if (response.error) {
-        showError(response.error.message || 'Could not save book.')
+        showError(response.error.message || t('admin.couldNotSaveBook'))
         return
       }
 
-      showSuccess(bookForm.id ? 'Book updated.' : 'Book created.')
+      showSuccess(bookForm.id ? t('admin.bookUpdated') : t('admin.bookCreated'))
       setBookForm(emptyBook)
       setShowBookForm(false)
       await loadAll()
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'Could not save book.')
+      showError((e as { message?: string }).message || t('admin.couldNotSaveBook'))
     } finally {
       setSaving(false)
     }
   }
 
   const onDeleteBook = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this book?')) return
+    if (!confirm(t('admin.confirmDeleteBook'))) return
 
     try {
       const response = await api.delete(`/books/${id}`)
 
       if (response.error) {
-        showError(response.error.message || 'Could not delete book.')
+        showError(response.error.message || t('admin.couldNotDeleteBook'))
         return
       }
 
-      showSuccess('Book deleted.')
+      showSuccess(t('admin.bookDeleted'))
       await loadAll()
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'Could not delete book.')
+      showError((e as { message?: string }).message || t('admin.couldNotDeleteBook'))
     }
   }
 
   const onDeleteUser = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this user?')) return
+    if (!confirm(t('admin.confirmDeleteUser'))) return
 
     try {
       const response = await api.delete(`/admin/users/${id}`)
 
       if (response.error) {
-        showError(response.error.message || 'Could not delete user.')
+        showError(response.error.message || t('admin.couldNotDeleteUser'))
         return
       }
 
-      showSuccess('User deleted.')
+      showSuccess(t('admin.userDeleted'))
       await loadAll()
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'Could not delete user.')
+      showError((e as { message?: string }).message || t('admin.couldNotDeleteUser'))
     }
   }
 
   if (!user || user.roleId !== 1) {
     return (
       <div className='text-center py-10'>
-        <h1 className='text-2xl font-bold text-gray-900'>Access Denied</h1>
-        <p className='text-gray-600 mt-2'>You do not have permission to access this page.</p>
+        <h1 className='text-2xl font-bold text-gray-900'>{t('admin.accessDenied')}</h1>
+        <p className='text-gray-600 mt-2'>{t('admin.noPermission')}</p>
       </div>
     )
   }
@@ -240,8 +242,8 @@ export default function AdminPage() {
   return (
     <div className='space-y-6'>
       <div className='mb-6'>
-        <h1 className='text-3xl font-bold text-gray-900'>Administration Panel</h1>
-        <p className='text-gray-600 mt-1'>Manage books, users, and loans in the system.</p>
+        <h1 className='text-3xl font-bold text-gray-900'>{t('admin.administrationPanel')}</h1>
+        <p className='text-gray-600 mt-1'>{t('admin.manageDescription')}</p>
       </div>
 
       <div className='rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 p-2'>
@@ -255,7 +257,7 @@ export default function AdminPage() {
                 : 'inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50'
             }
           >
-            📚 Books
+            📚 {t('admin.booksTab')}
           </button>
 
           <button
@@ -267,7 +269,7 @@ export default function AdminPage() {
                 : 'inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50'
             }
           >
-            👥 Users
+            👥 {t('admin.usersTab')}
           </button>
 
           <button
@@ -279,7 +281,7 @@ export default function AdminPage() {
                 : 'inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50'
             }
           >
-            📖 Loans
+            📖 {t('admin.loansTab')}
           </button>
         </div>
       </div>
@@ -288,7 +290,7 @@ export default function AdminPage() {
       {tab === 'books' && (
         <div className='space-y-4'>
           <div className='flex items-center justify-between'>
-            <h2 className='text-lg font-semibold text-gray-900'>Book Management</h2>
+            <h2 className='text-lg font-semibold text-gray-900'>{t('admin.bookManagement')}</h2>
             <button
               type='button'
               onClick={() => {
@@ -297,19 +299,19 @@ export default function AdminPage() {
               }}
               className='rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700'
             >
-              Add Book
+              {t('admin.addBook')}
             </button>
           </div>
 
           {showBookForm && (
             <div className='rounded-2xl border border-gray-200 bg-gray-50 p-4'>
               <h3 className='text-sm font-bold text-gray-900 mb-4'>
-                {bookForm.id ? 'Edit Book' : 'New Book'}
+                {bookForm.id ? t('admin.editBook') : t('admin.newBook')}
               </h3>
 
               <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700'>Title</label>
+                  <label className='block text-sm font-medium text-gray-700'>{t('books.title')}</label>
                   <input
                     type='text'
                     value={bookForm.title}
@@ -319,7 +321,7 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className='block text-sm font-medium text-gray-700'>Author</label>
+                  <label className='block text-sm font-medium text-gray-700'>{t('books.author')}</label>
                   <input
                     type='text'
                     value={bookForm.author}
@@ -329,7 +331,7 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className='block text-sm font-medium text-gray-700'>Price</label>
+                  <label className='block text-sm font-medium text-gray-700'>{t('books.price')}</label>
                   <input
                     type='number'
                     value={bookForm.price || ''}
@@ -341,7 +343,7 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className='block text-sm font-medium text-gray-700'>Purchase Stock</label>
+                  <label className='block text-sm font-medium text-gray-700'>{t('admin.purchaseStock')}</label>
                   <input
                     type='number'
                     value={bookForm.purchaseStock || ''}
@@ -353,7 +355,7 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className='block text-sm font-medium text-gray-700'>Rental Stock</label>
+                  <label className='block text-sm font-medium text-gray-700'>{t('admin.rentalStock')}</label>
                   <input
                     type='number'
                     value={bookForm.rentalStock || ''}
@@ -365,7 +367,7 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className='block text-sm font-medium text-gray-700'>Category</label>
+                  <label className='block text-sm font-medium text-gray-700'>{t('books.category')}</label>
                   <input
                     type='text'
                     value={bookForm.categoryId || ''}
@@ -378,7 +380,7 @@ export default function AdminPage() {
               </div>
 
               <div className='mt-4'>
-                <label className='block text-sm font-medium text-gray-700'>Description</label>
+                <label className='block text-sm font-medium text-gray-700'>{t('books.description')}</label>
                 <textarea
                   value={bookForm.description || ''}
                   onChange={(e) =>
@@ -398,7 +400,7 @@ export default function AdminPage() {
                   }}
                   className='rounded-xl bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-300'
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type='button'
@@ -406,7 +408,7 @@ export default function AdminPage() {
                   onClick={onSaveBook}
                   className='rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50'
                 >
-                  {saving ? 'Saving...' : 'Save'}
+                  {saving ? t('admin.saving') : t('common.save')}
                 </button>
               </div>
             </div>
@@ -417,13 +419,13 @@ export default function AdminPage() {
               <thead className='bg-gray-50'>
                 <tr>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Book
+                    {t('books.book')}
                   </th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Stock
+                    {t('admin.stock')}
                   </th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Price
+                    {t('books.price')}
                   </th>
                   <th className='px-6 py-3' />
                 </tr>
@@ -460,13 +462,13 @@ export default function AdminPage() {
                         }}
                         className='text-indigo-600 hover:text-indigo-900 mr-3'
                       >
-                        Edit
+                        {t('common.edit')}
                       </button>
                       <button
                         onClick={() => onDeleteBook(book.id)}
                         className='text-red-600 hover:text-red-900'
                       >
-                        Delete
+                        {t('common.delete')}
                       </button>
                     </td>
                   </tr>
@@ -481,22 +483,22 @@ export default function AdminPage() {
       {tab === 'users' && (
         <div className='space-y-4'>
           <div className='flex items-center justify-between'>
-            <h2 className='text-lg font-semibold text-gray-900'>User Management</h2>
+            <h2 className='text-lg font-semibold text-gray-900'>{t('admin.userManagement')}</h2>
             <button
               type='button'
               onClick={() => setTab('users')}
               className='rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700'
             >
-              Add User
+              {t('admin.addUser')}
             </button>
           </div>
 
           <div className='rounded-2xl border border-gray-200 bg-gray-50 p-4'>
-            <h3 className='text-sm font-bold text-gray-900 mb-4'>New User</h3>
+            <h3 className='text-sm font-bold text-gray-900 mb-4'>{t('admin.newUser')}</h3>
 
             <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
               <div>
-                <label className='block text-sm font-medium text-gray-700'>Name</label>
+                <label className='block text-sm font-medium text-gray-700'>{t('auth.name')}</label>
                 <input
                   type='text'
                   value={newUserForm.name}
@@ -506,7 +508,7 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-gray-700'>Email</label>
+                <label className='block text-sm font-medium text-gray-700'>{t('auth.email')}</label>
                 <input
                   type='email'
                   value={newUserForm.email}
@@ -516,7 +518,7 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-gray-700'>Password</label>
+                <label className='block text-sm font-medium text-gray-700'>{t('auth.password')}</label>
                 <input
                   type='password'
                   value={newUserForm.password}
@@ -528,7 +530,7 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-gray-700'>Role</label>
+                <label className='block text-sm font-medium text-gray-700'>{t('admin.role')}</label>
                 <select
                   value={newUserForm.roleId}
                   onChange={(e) =>
@@ -536,8 +538,8 @@ export default function AdminPage() {
                   }
                   className='mt-1 block w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm'
                 >
-                  <option value={2}>User</option>
-                  <option value={1}>Administrator</option>
+                  <option value={2}>{t('user.roleUser')}</option>
+                  <option value={1}>{t('user.roleAdmin')}</option>
                 </select>
               </div>
             </div>
@@ -549,7 +551,7 @@ export default function AdminPage() {
                 onClick={onCreateUser}
                 className='rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50'
               >
-                {creatingUser ? 'Creating...' : 'Create User'}
+                {creatingUser ? t('admin.creating') : t('admin.createUser')}
               </button>
             </div>
           </div>
@@ -559,10 +561,10 @@ export default function AdminPage() {
               <thead className='bg-gray-50'>
                 <tr>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    User
+                    {t('user.title')}
                   </th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Role
+                    {t('admin.role')}
                   </th>
                   <th className='px-6 py-3' />
                 </tr>
@@ -575,14 +577,14 @@ export default function AdminPage() {
                       <div className='text-sm text-gray-500'>{user.email}</div>
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                      {user.roleId === 1 ? 'Administrator' : 'User'}
+                      {user.roleId === 1 ? t('user.roleAdmin') : t('user.roleUser')}
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
                       <button
                         onClick={() => onDeleteUser(user.id)}
                         className='text-red-600 hover:text-red-900'
                       >
-                        Delete
+                        {t('common.delete')}
                       </button>
                     </td>
                   </tr>
@@ -596,26 +598,26 @@ export default function AdminPage() {
       {/* Loans Tab */}
       {tab === 'loans' && (
         <div className='space-y-4'>
-          <h2 className='text-lg font-semibold text-gray-900'>Active Loans</h2>
+          <h2 className='text-lg font-semibold text-gray-900'>{t('admin.activeLoans')}</h2>
 
           <div className='bg-white shadow rounded-lg overflow-hidden'>
             <table className='min-w-full divide-y divide-gray-200'>
               <thead className='bg-gray-50'>
                 <tr>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Book
+                    {t('books.book')}
                   </th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    User
+                    {t('user.title')}
                   </th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Loan Date
+                    {t('loans.loanDate')}
                   </th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Return Date
+                    {t('loans.returnDate')}
                   </th>
                   <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Status
+                    {t('loans.status')}
                   </th>
                 </tr>
               </thead>
@@ -643,7 +645,7 @@ export default function AdminPage() {
                             : 'bg-red-100 text-red-800'
                         }`}
                       >
-                        {loan.status || 'Unknown'}
+                        {loan.status || t('admin.unknown')}
                       </span>
                     </td>
                   </tr>

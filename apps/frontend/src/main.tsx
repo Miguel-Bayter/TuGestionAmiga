@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client'
 import App from './App'
 import './index.css'
 
+// Import internationalization configuration
+import '@/shared/infrastructure/config/i18n'
+
 // Import DI container provider
 import { ContainerProvider } from '@/shared/infrastructure/hooks/use-container.hook'
 

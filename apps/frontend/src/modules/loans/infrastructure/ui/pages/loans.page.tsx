@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { api } from '@/data/Repository'
 import { useContainer } from '@/shared/infrastructure/hooks'
 import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
@@ -35,6 +36,7 @@ interface LoanRow {
 }
 
 export default function LoansPage() {
+  const { t } = useTranslation()
   const container = useContainer()
   const authService = container.cradle.authStateService as any
   const { user } = useServiceState(authService) as any
@@ -48,7 +50,7 @@ export default function LoansPage() {
 
     if (!user?.id) {
       setRows([])
-      setError('Sign in to view your loans.')
+      setError(t('loans.signInToView'))
       return
     }
 
@@ -59,7 +61,7 @@ export default function LoansPage() {
       setRows(Array.isArray(response.data) ? response.data : [])
     } catch {
       setRows([])
-      setError('Could not load loans.')
+      setError(t('loans.couldNotLoad'))
     }
   }
 
@@ -84,27 +86,27 @@ export default function LoansPage() {
       })
 
       if (response.error) {
-        showError(response.error.message || 'Could not extend loan')
+        showError(response.error.message || t('loans.couldNotExtend'))
         return
       }
 
-      showSuccess('Loan extended (+5 days)')
+      showSuccess(t('loans.loanExtended'))
       await load()
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'Could not extend loan')
+      showError((e as { message?: string }).message || t('loans.couldNotExtend'))
     }
   }
 
   return (
     <div>
-      <h1 className='text-3xl font-bold text-gray-900 mb-6'>My Loans</h1>
+      <h1 className='text-3xl font-bold text-gray-900 mb-6'>{t('loans.myLoans')}</h1>
 
       <div className='bg-white shadow rounded-lg overflow-hidden'>
         <div className='lg:hidden'>
           {error && <p className='px-4 py-4 text-sm text-gray-500'>{error}</p>}
 
           {!error && rows.length === 0 && (
-            <p className='px-4 py-4 text-sm text-gray-500'>You have no loans yet.</p>
+            <p className='px-4 py-4 text-sm text-gray-500'>{t('loans.noLoans')}</p>
           )}
 
           {(rows || []).map((row) => {
@@ -135,33 +137,33 @@ export default function LoansPage() {
                   <div className='min-w-0 flex-1'>
                     <div className='flex items-start justify-between gap-2'>
                       <p
-                        title={String(row?.title || 'No title')}
+                        title={String(row?.title || t('loans.noTitle'))}
                         className='min-w-0 text-sm font-semibold text-gray-900 truncate'
                       >
-                        {row?.title || 'No title'}
+                        {row?.title || t('loans.noTitle')}
                       </p>
                       <span
                         className={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${badgeClass}`}
                       >
-                        {(row?.status || 'Unknown') +
+                        {(row?.status || t('loans.unknown')) +
                           (status.includes('active') ? ` (${ext}/2)` : '')}
                       </span>
                     </div>
 
                     <p
-                      title={String(row?.author || 'Unknown author')}
+                      title={String(row?.author || t('loans.unknownAuthor'))}
                       className='mt-1 text-xs text-gray-500 truncate'
                     >
-                      {row?.author || 'Unknown author'}
+                      {row?.author || t('loans.unknownAuthor')}
                     </p>
 
                     <div className='mt-3 grid grid-cols-1 gap-2 text-sm text-gray-700'>
                       <p>
-                        <span className='font-semibold text-gray-900'>Loan date:</span>{' '}
+                        <span className='font-semibold text-gray-900'>{t('loans.loanDateLabel')}</span>{' '}
                         {formatDate(row?.loanDate || '')}
                       </p>
                       <p>
-                        <span className='font-semibold text-gray-900'>Return date:</span>{' '}
+                        <span className='font-semibold text-gray-900'>{t('loans.returnDateLabel')}</span>{' '}
                         {formatDate(row?.returnDate || '')}
                       </p>
                     </div>
@@ -173,7 +175,7 @@ export default function LoansPage() {
                           className='rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-700'
                           onClick={() => onExtend(row.loanId)}
                         >
-                          Extend
+                          {t('loans.extendButton')}
                         </button>
                       ) : (
                         <span className='text-xs text-gray-500'>-</span>
@@ -194,37 +196,37 @@ export default function LoansPage() {
                   scope='col'
                   className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                 >
-                  Book
+                  {t('books.book')}
                 </th>
                 <th
                   scope='col'
                   className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                 >
-                  Loan Date
+                  {t('loans.loanDate')}
                 </th>
                 <th
                   scope='col'
                   className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                 >
-                  Return Date
+                  {t('loans.returnDate')}
                 </th>
                 <th
                   scope='col'
                   className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                 >
-                  Actual Return
+                  {t('loans.actualReturn')}
                 </th>
                 <th
                   scope='col'
                   className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                 >
-                  Status
+                  {t('loans.status')}
                 </th>
                 <th
                   scope='col'
                   className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                 >
-                  Actions
+                  {t('common.actions')}
                 </th>
               </tr>
             </thead>
@@ -240,7 +242,7 @@ export default function LoansPage() {
               {!error && rows.length === 0 && (
                 <tr>
                   <td colSpan={6} className='px-4 sm:px-6 py-4 text-sm text-gray-500'>
-                    You have no loans yet.
+                    {t('loans.noLoans')}
                   </td>
                 </tr>
               )}
@@ -275,16 +277,16 @@ export default function LoansPage() {
                         </div>
                         <div className='ml-4 min-w-0'>
                           <div
-                            title={String(row?.title || 'No title')}
+                            title={String(row?.title || t('loans.noTitle'))}
                             className='text-sm font-medium text-gray-900 truncate'
                           >
-                            {row?.title || 'No title'}
+                            {row?.title || t('loans.noTitle')}
                           </div>
                           <div
-                            title={String(row?.author || 'Unknown author')}
+                            title={String(row?.author || t('loans.unknownAuthor'))}
                             className='text-sm text-gray-500 truncate'
                           >
-                            {row?.author || 'Unknown author'}
+                            {row?.author || t('loans.unknownAuthor')}
                           </div>
                         </div>
                       </div>
@@ -302,7 +304,7 @@ export default function LoansPage() {
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${badgeClass}`}
                       >
-                        {(row?.status || 'Unknown') +
+                        {(row?.status || t('loans.unknown')) +
                           (status.includes('active') ? ` (${ext}/2)` : '')}
                       </span>
                     </td>
@@ -313,7 +315,7 @@ export default function LoansPage() {
                           className='rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-700'
                           onClick={() => onExtend(row.loanId)}
                         >
-                          Extend
+                          {t('loans.extendButton')}
                         </button>
                       ) : (
                         <span className='text-xs text-gray-500'>-</span>

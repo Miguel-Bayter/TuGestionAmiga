@@ -4,10 +4,12 @@
  */
 
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useContainer } from '@/shared/infrastructure/hooks/use-container.hook'
 import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { getInitials } from '@/shared/application/helpers'
 import { ROUTES } from '@/shared/application/config'
+import { LanguageSwitcher } from './LanguageSwitcher'
 
 interface NavbarProps {
   onToggleSidebar?: () => void
@@ -16,6 +18,7 @@ interface NavbarProps {
 
 export function Navbar(_props: NavbarProps) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const container = useContainer()
   const authService = container.cradle.authStateService as any
   const { user } = useServiceState(authService) as any
@@ -26,8 +29,8 @@ export function Navbar(_props: NavbarProps) {
   }
 
   const isAdmin = user?.roleId === 1
-  const roleLabel = isAdmin ? 'Administrator' : 'User'
-  const initials = getInitials(user?.name || 'User')
+  const roleLabel = isAdmin ? t('user.roleAdmin') : t('user.roleUser')
+  const initials = getInitials(user?.name || t('user.roleUser'))
 
   return (
     <header className='bg-white border-b border-gray-200/70'>
@@ -63,6 +66,9 @@ export function Navbar(_props: NavbarProps) {
 
             {/* Right side actions */}
             <div className='flex items-center justify-end gap-2'>
+              {/* Language Switcher */}
+              <LanguageSwitcher />
+
               {/* Notifications button */}
               <button
                 type='button'
@@ -142,7 +148,7 @@ export function Navbar(_props: NavbarProps) {
                     d='M16 19a2 2 0 002-2V7a2 2 0 00-2-2H9a2 2 0 00-2 2v2'
                   />
                 </svg>
-                <span className='hidden sm:inline'>Sign Out</span>
+                <span className='hidden sm:inline'>{t('auth.logout')}</span>
               </button>
             </div>
           </div>

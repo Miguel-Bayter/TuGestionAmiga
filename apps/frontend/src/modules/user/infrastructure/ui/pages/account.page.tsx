@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { api } from '@/data/Repository'
 import { useContainer } from '@/shared/infrastructure/hooks'
 import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
@@ -17,6 +18,7 @@ interface PurchaseRow {
 type TabType = 'info' | 'security' | 'notifications'
 
 export default function AccountPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const container = useContainer()
   const authService = container.cradle.authStateService as any
@@ -111,7 +113,7 @@ export default function AccountPage() {
     }
 
     if (!payload.name || !payload.email) {
-      showError('Name and email are required.')
+      showError(t('account.nameEmailRequired'))
       return
     }
 
@@ -120,16 +122,16 @@ export default function AccountPage() {
       const response = await api.patch(`/users/${encodeURIComponent(uid)}`, payload)
 
       if (response.error) {
-        showError(response.error.message || 'Could not update profile.')
+        showError(response.error.message || t('account.couldNotUpdateProfile'))
         return
       }
 
       // Profile refreshed successfully
 
-      showSuccess('Profile updated.')
+      showSuccess(t('account.profileUpdated'))
       setEditingProfile(false)
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'Could not update profile.')
+      showError((e as { message?: string }).message || t('account.couldNotUpdateProfile'))
     } finally {
       setSavingProfile(false)
     }
@@ -140,12 +142,12 @@ export default function AccountPage() {
     if (!Number.isFinite(uid)) return
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      showError('Complete all fields')
+      showError(t('account.completeAllFields'))
       return
     }
 
     if (newPassword !== confirmPassword) {
-      showError('Confirmation does not match')
+      showError(t('account.confirmationMismatch'))
       return
     }
 
@@ -157,17 +159,17 @@ export default function AccountPage() {
       })
 
       if (response.error) {
-        showError(response.error.message || 'Could not change password')
+        showError(response.error.message || t('account.couldNotChangePassword'))
         return
       }
 
-      showSuccess('Password updated')
+      showSuccess(t('account.passwordUpdated'))
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
       setPanelOpen(false)
     } catch (e: unknown) {
-      showError((e as { message?: string }).message || 'Could not change password')
+      showError((e as { message?: string }).message || t('account.couldNotChangePassword'))
     }
   }
 
@@ -177,14 +179,14 @@ export default function AccountPage() {
   }
 
   const isAdmin = user?.roleId === 1
-  const roleLabel = isAdmin ? 'Administrator' : 'User'
+  const roleLabel = isAdmin ? t('user.roleAdmin') : t('user.roleUser')
   const initials = getInitials(user?.name || '')
 
   return (
     <div className='max-w-7xl mx-auto px-3 sm:px-0'>
       <div className='mb-4'>
-        <h1 className='text-2xl sm:text-3xl font-bold text-gray-900'>My Profile</h1>
-        <p className='text-sm text-gray-500'>Manage your personal information and preferences</p>
+        <h1 className='text-2xl sm:text-3xl font-bold text-gray-900'>{t('account.myProfile')}</h1>
+        <p className='text-sm text-gray-500'>{t('account.managePersonalInfo')}</p>
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-[360px_minmax(0,1fr)] gap-6 items-start'>
@@ -222,11 +224,11 @@ export default function AccountPage() {
 
               <div className='mt-5 w-full border-t border-gray-200/70 pt-4 space-y-3 text-sm'>
                 <div className='flex items-center justify-between text-gray-600'>
-                  <span>Active loans</span>
+                  <span>{t('account.activeLoans')}</span>
                   <span className='font-semibold text-rose-600'>{activeLoans}</span>
                 </div>
                 <div className='flex items-center justify-between text-gray-600'>
-                  <span>Books purchased</span>
+                  <span>{t('account.booksPurchased')}</span>
                   <span className='font-semibold text-emerald-600'>{purchases.length}</span>
                 </div>
               </div>
@@ -256,7 +258,7 @@ export default function AccountPage() {
                     d='M16 19a2 2 0 002-2V7a2 2 0 00-2-2H9a2 2 0 00-2 2v2'
                   />
                 </svg>
-                Sign Out
+                {t('account.signOut')}
               </button>
             </div>
           </div>
@@ -294,7 +296,7 @@ export default function AccountPage() {
                     d='M15 7a3 3 0 11-6 0 3 3 0 016 0z'
                   />
                 </svg>
-                Personal Information
+                {t('account.personalInfo')}
               </button>
 
               <button
@@ -326,7 +328,7 @@ export default function AccountPage() {
                     d='M7 11V8a5 5 0 0110 0v3'
                   />
                 </svg>
-                Security
+                {t('account.security')}
               </button>
 
               <button
@@ -358,7 +360,7 @@ export default function AccountPage() {
                     d='M9 17a3 3 0 006 0'
                   />
                 </svg>
-                Notifications
+                {t('account.notifications')}
               </button>
             </div>
           </div>
@@ -366,7 +368,7 @@ export default function AccountPage() {
           {tab === 'info' && (
             <div className='rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 overflow-hidden'>
               <div className='flex items-center justify-between gap-3 px-5 py-4 border-b border-gray-200/70'>
-                <h2 className='text-sm font-bold text-gray-900'>Personal Information</h2>
+                <h2 className='text-sm font-bold text-gray-900'>{t('account.personalInfo')}</h2>
                 <button
                   type='button'
                   className='inline-flex items-center gap-2 text-sm font-semibold text-blue-600'
@@ -388,7 +390,7 @@ export default function AccountPage() {
                       d='M16.5 3.5l4 4L8 20H4v-4L16.5 3.5z'
                     />
                   </svg>
-                  Edit
+                  {t('common.edit')}
                 </button>
               </div>
 
@@ -397,7 +399,7 @@ export default function AccountPage() {
                   <div className='rounded-2xl bg-gray-50 ring-1 ring-gray-200/60 p-4 space-y-4'>
                     <div>
                       <label className='block text-sm font-medium text-gray-700'>
-                        Full Name
+                        {t('auth.fullName')}
                       </label>
                       <input
                         type='text'
@@ -409,7 +411,7 @@ export default function AccountPage() {
 
                     <div>
                       <label className='block text-sm font-medium text-gray-700'>
-                        Email
+                        {t('auth.email')}
                       </label>
                       <input
                         type='email'
@@ -425,7 +427,7 @@ export default function AccountPage() {
                         className='rounded-xl bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-300 w-full sm:w-auto'
                         onClick={cancelProfileEditor}
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </button>
                       <button
                         type='button'
@@ -433,21 +435,21 @@ export default function AccountPage() {
                         className='rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 w-full sm:w-auto'
                         onClick={onSaveProfile}
                       >
-                        Save
+                        {t('common.save')}
                       </button>
                     </div>
                   </div>
                 ) : (
                   <>
                     <div>
-                      <div className='text-xs font-semibold text-gray-500'>Full Name</div>
+                      <div className='text-xs font-semibold text-gray-500'>{t('auth.fullName')}</div>
                       <div className='mt-2 rounded-xl bg-gray-50 ring-1 ring-gray-200/60 px-3 py-2 text-sm text-gray-900'>
                         {user?.name || '-'}
                       </div>
                     </div>
 
                     <div>
-                      <div className='text-xs font-semibold text-gray-500'>Email</div>
+                      <div className='text-xs font-semibold text-gray-500'>{t('auth.email')}</div>
                       <div className='mt-2 rounded-xl bg-gray-50 ring-1 ring-gray-200/60 px-3 py-2 text-sm text-gray-900'>
                         {user?.email || '-'}
                       </div>
@@ -457,7 +459,7 @@ export default function AccountPage() {
 
                 <div className='pt-2'>
                   <div className='flex items-center justify-between gap-3'>
-                    <h3 className='text-sm font-bold text-gray-900'>Books purchased</h3>
+                    <h3 className='text-sm font-bold text-gray-900'>{t('account.booksPurchased')}</h3>
                     <span className='text-xs font-semibold text-gray-500'>{purchases.length}</span>
                   </div>
 
@@ -467,13 +469,13 @@ export default function AccountPage() {
                         <thead className='bg-gray-50 sticky top-0 z-10'>
                           <tr>
                             <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                              Book
+                              {t('books.book')}
                             </th>
                             <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40'>
-                              Date
+                              {t('account.date')}
                             </th>
                             <th className='px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32'>
-                              Price
+                              {t('account.price')}
                             </th>
                           </tr>
                         </thead>
@@ -481,7 +483,7 @@ export default function AccountPage() {
                           {purchases.length === 0 ? (
                             <tr>
                               <td colSpan={3} className='px-4 sm:px-6 py-4 text-sm text-gray-500'>
-                                You have no purchases yet.
+                                {t('account.noPurchasesYet')}
                               </td>
                             </tr>
                           ) : (
@@ -522,7 +524,7 @@ export default function AccountPage() {
           {tab === 'security' && (
             <div className='rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 overflow-hidden'>
               <div className='flex items-center justify-between gap-3 px-5 py-4 border-b border-gray-200/70'>
-                <h2 className='text-sm font-bold text-gray-900'>Security</h2>
+                <h2 className='text-sm font-bold text-gray-900'>{t('account.security')}</h2>
                 <button
                   type='button'
                   className={
@@ -532,7 +534,7 @@ export default function AccountPage() {
                   }
                   onClick={() => setPanelOpen((v) => !v)}
                 >
-                  {panelOpen ? 'Close' : 'Change Password'}
+                  {panelOpen ? t('common.close') : t('account.changePassword')}
                 </button>
               </div>
 
@@ -540,13 +542,13 @@ export default function AccountPage() {
                 {panelOpen ? (
                   <div className='rounded-2xl border border-gray-200 bg-gray-50 p-4'>
                     <p className='text-sm text-gray-600'>
-                      For security, first enter your current password and then the new one.
+                      {t('account.securityDescription')}
                     </p>
 
                     <div className='mt-4 grid grid-cols-1 gap-4'>
                       <div>
                         <label className='block text-sm font-medium text-gray-700'>
-                          Current password
+                          {t('account.currentPassword')}
                         </label>
                         <input
                           type='password'
@@ -558,7 +560,7 @@ export default function AccountPage() {
 
                       <div>
                         <label className='block text-sm font-medium text-gray-700'>
-                          New password
+                          {t('account.newPassword')}
                         </label>
                         <input
                           type='password'
@@ -570,7 +572,7 @@ export default function AccountPage() {
 
                       <div>
                         <label className='block text-sm font-medium text-gray-700'>
-                          Confirm new password
+                          {t('account.confirmNewPassword')}
                         </label>
                         <input
                           type='password'
@@ -592,20 +594,20 @@ export default function AccountPage() {
                           setConfirmPassword('')
                         }}
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </button>
                       <button
                         type='button'
                         className='rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700'
                         onClick={onSave}
                       >
-                        Save
+                        {t('common.save')}
                       </button>
                     </div>
                   </div>
                 ) : (
                   <p className='text-sm text-gray-500'>
-                    Select &quot;Change Password&quot; to update it.
+                    {t('account.selectChangePassword')}
                   </p>
                 )}
               </div>
@@ -615,7 +617,7 @@ export default function AccountPage() {
           {tab === 'notifications' && (
             <div className='rounded-2xl bg-white shadow-sm ring-1 ring-gray-200/60 overflow-hidden'>
               <div className='px-5 py-4 border-b border-gray-200/70'>
-                <h2 className='text-sm font-bold text-gray-900'>Notifications</h2>
+                <h2 className='text-sm font-bold text-gray-900'>{t('account.notifications')}</h2>
               </div>
               <div className='p-5'>
                 <div className='flex items-start rounded-2xl bg-gray-50 ring-1 ring-gray-200/60 p-4'>
@@ -630,10 +632,10 @@ export default function AccountPage() {
                   </div>
                   <div className='ml-3 text-sm'>
                     <label htmlFor='notifications' className='font-medium text-gray-700'>
-                      Receive email notifications
+                      {t('account.receiveEmailNotifications')}
                     </label>
                     <p className='text-gray-500'>
-                      Get an email when a book becomes available.
+                      {t('account.emailAvailability')}
                     </p>
                   </div>
                 </div>

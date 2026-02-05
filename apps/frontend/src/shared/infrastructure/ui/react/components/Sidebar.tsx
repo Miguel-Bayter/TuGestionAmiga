@@ -4,6 +4,7 @@
  */
 
 import { NavLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useContainer } from '@/shared/infrastructure/hooks/use-container.hook'
 import { useServiceState } from '@/shared/infrastructure/hooks/use-service-state.hook'
 import { ROUTES } from '@/shared/application/config'
@@ -17,6 +18,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: SidebarProps) {
+  const { t } = useTranslation()
   const container = useContainer()
   const { authStateService, cartStateService } = container.cradle
   const { user } = useServiceState(authStateService)
@@ -110,7 +112,7 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
         <ul className='flex flex-col'>
           {/* Home */}
           <li className='mt-1'>
-            <NavLink to={ROUTES.HOME} className={linkClass} end title='Home'>
+            <NavLink to={ROUTES.HOME} className={linkClass} end title={t('nav.home')}>
               <svg
                 className='w-6 h-6'
                 xmlns='http://www.w3.org/2000/svg'
@@ -125,13 +127,13 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
                   d='M3 10.5l9-7 9 7V21a1 1 0 01-1 1h-5v-7H9v7H4a1 1 0 01-1-1V10.5z'
                 />
               </svg>
-              <span className={cn({ 'md:hidden': isCollapsed })}>Home</span>
+              <span className={cn({ 'md:hidden': isCollapsed })}>{t('nav.home')}</span>
             </NavLink>
           </li>
 
           {/* Search */}
           <li className='mt-1'>
-            <NavLink to={ROUTES.BOOKS} className={linkClass} title='Search'>
+            <NavLink to={ROUTES.BOOKS} className={linkClass} title={t('nav.search')}>
               <svg
                 className='w-6 h-6'
                 xmlns='http://www.w3.org/2000/svg'
@@ -146,13 +148,13 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
                   d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
                 />
               </svg>
-              <span className={cn({ 'md:hidden': isCollapsed })}>Search</span>
+              <span className={cn({ 'md:hidden': isCollapsed })}>{t('nav.search')}</span>
             </NavLink>
           </li>
 
           {/* Loans */}
           <li className='mt-1'>
-            <NavLink to={ROUTES.LOANS} className={linkClass} title='Loans'>
+            <NavLink to={ROUTES.LOANS} className={linkClass} title={t('nav.loans')}>
               <svg
                 className='w-6 h-6'
                 xmlns='http://www.w3.org/2000/svg'
@@ -167,13 +169,13 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
                   d='M9 5h6a2 2 0 012 2v1m-10-3a2 2 0 00-2 2v1m12 0H7m10 0v10a2 2 0 01-2 2H9a2 2 0 01-2-2V8m3 4h4m-4 4h4'
                 />
               </svg>
-              <span className={cn({ 'md:hidden': isCollapsed })}>Loans</span>
+              <span className={cn({ 'md:hidden': isCollapsed })}>{t('nav.loans')}</span>
             </NavLink>
           </li>
 
           {/* Cart */}
           <li className='mt-1'>
-            <NavLink to={ROUTES.CART} className={linkClass} title='Cart'>
+            <NavLink to={ROUTES.CART} className={linkClass} title={t('nav.cart')}>
               <span className='relative inline-flex'>
                 <svg
                   className='w-6 h-6'
@@ -205,13 +207,13 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
                   </span>
                 )}
               </span>
-              <span className={cn({ 'md:hidden': isCollapsed })}>Cart</span>
+              <span className={cn({ 'md:hidden': isCollapsed })}>{t('nav.cart')}</span>
             </NavLink>
           </li>
 
           {/* Account */}
           <li className='mt-1'>
-            <NavLink to={ROUTES.ACCOUNT} className={linkClass} title='My Account'>
+            <NavLink to={ROUTES.ACCOUNT} className={linkClass} title={t('nav.account')}>
               <svg
                 className='w-6 h-6'
                 xmlns='http://www.w3.org/2000/svg'
@@ -232,14 +234,14 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
                   d='M4.5 20.25a7.5 7.5 0 0115 0'
                 />
               </svg>
-              <span className={cn({ 'md:hidden': isCollapsed })}>My Account</span>
+              <span className={cn({ 'md:hidden': isCollapsed })}>{t('nav.account')}</span>
             </NavLink>
           </li>
 
           {/* Admin (only for admins) */}
           {isAdmin && (
             <li className='mt-1'>
-              <NavLink to={ROUTES.ADMIN} className={linkClass} title='Admin'>
+              <NavLink to={ROUTES.ADMIN} className={linkClass} title={t('nav.admin')}>
                 <svg
                   className='w-6 h-6'
                   xmlns='http://www.w3.org/2000/svg'
@@ -260,14 +262,14 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
                     d='M9.5 12.5l1.5 1.5 3.5-3.5'
                   />
                 </svg>
-                <span className={cn({ 'md:hidden': isCollapsed })}>Admin</span>
+                <span className={cn({ 'md:hidden': isCollapsed })}>{t('nav.admin')}</span>
               </NavLink>
             </li>
           )}
 
           {/* Help */}
           <li className='mt-4 border-t border-gray-200/60 pt-4'>
-            <NavLink to={ROUTES.HELP} className={linkClass} title='Help'>
+            <NavLink to={ROUTES.HELP} className={linkClass} title={t('nav.help')}>
               <svg
                 className='w-6 h-6'
                 xmlns='http://www.w3.org/2000/svg'
@@ -294,7 +296,7 @@ export function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }: Side
                   d='M12 17.25h.01'
                 />
               </svg>
-              <span className={cn({ 'md:hidden': isCollapsed })}>Help</span>
+              <span className={cn({ 'md:hidden': isCollapsed })}>{t('nav.help')}</span>
             </NavLink>
           </li>
         </ul>
